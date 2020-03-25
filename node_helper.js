@@ -1,5 +1,6 @@
 var NodeHelper = require('node_helper');
 const { Freebox } = require("freebox");
+FB = (...args) => { /* do nothing */ }
 
 async function Freebox_OS(token,id,domain,port) {
   var rate
@@ -53,7 +54,6 @@ module.exports = NodeHelper.create({
     console.log("[Freebox] Starting...")
     this.freebox = null
     this.init = false
-    this.FB = (text,param) => { /* do nothing */ }
   },
 
   Freebox: function (token,id,domain,port) {
@@ -63,7 +63,7 @@ module.exports = NodeHelper.create({
         else this.sendInfo("RESULT", res)
       },
       (err) => { 
-        console.log("[Freebox] Freebox -- " + err)
+        console.log("[Freebox] " + err)
         if (!this.init) this.scan() 
       }
     )
@@ -82,14 +82,13 @@ module.exports = NodeHelper.create({
     switch(notification) {
       case "INIT":
         this.config = payload
-        this.sendInfo("INITIALIZED")
         if (this.config.debug) {
-          this.FB = (text,param) => { console.log("[Freebox " + text, param) }
+          FB = (...args) => { console.log("[Freebox]", ...args) }
         }
         this.scan()
         break
       case "SCAN":
-      this.init = true
+        this.init = true
         this.scan()
         break
       case "CACHE":
@@ -100,7 +99,7 @@ module.exports = NodeHelper.create({
   },
 
   sendInfo: function (noti, payload) {
-    this.FB("Send notification: " + noti, payload ? payload : "")
+    FB("Send notification: " + noti, payload)
     this.sendSocketNotification(noti, payload)
   },
 
@@ -114,6 +113,6 @@ module.exports = NodeHelper.create({
         }
       }
     }
-    this.sendInfo("CACHE", this.cache)
+    this.sendInfo("INITIALIZED", this.cache)
   }
 });

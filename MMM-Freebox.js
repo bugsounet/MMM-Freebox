@@ -1,3 +1,5 @@
+FB = (...arg) => { /* do nothing */ }
+
 Module.register("MMM-Freebox", {
 
   defaults: {
@@ -22,6 +24,7 @@ Module.register("MMM-Freebox", {
     this.Init = false
     this.update = null
     this.Freebox = {
+      "Hidden": true,
       "Sync": null,
       "Debit": null,
       "State": null,
@@ -29,8 +32,7 @@ Module.register("MMM-Freebox", {
       "Client": [],
       "Cache": {}
     }
-    this.FB = (text,param) => { /* do nothing */ }
-    if (this.config.debug) this.FB = (text,param) => { console.log("[Freebox] " + text,param) }
+    if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
     console.log("[Freebox] Started...")
   },
 
@@ -46,10 +48,10 @@ Module.register("MMM-Freebox", {
     switch (notification) {
       case "INITIALIZED":
         this.Init = true
+        this.cache(payload)
         break
       case "CACHE":
         this.cache(payload)
-        this.ScanClient()
         break
       case "RESULT":
         this.result(payload)
@@ -58,8 +60,26 @@ Module.register("MMM-Freebox", {
 
   cache: function(payload) {
     this.Freebox.Cache = payload
-    this.FB("Cache:", this.Freebox)
-    this.updateDom(3000)
+    FB("Cache:", this.Freebox)
+    this.hideFreebox()
+  },
+
+  hideFreebox: function() {
+    this.Freebox.Hidden = true
+    this.hide(1000, this.callbackHide(), {lockString: "FREEBOX_LOCKED"})
+    FB("Hide module")
+  },
+
+  callbackHide: function () {
+    this.updateDom()
+    this.sendSocketNotification("SCAN")
+    this.ScanClient()
+  },
+
+  showFreebox: function() {
+    this.Freebox.Hidden = false
+    FB("Show module")
+    this.show(1000, {lockString: "FREEBOX_LOCKED"})
   },
   
   result: function(payload) { // to do
@@ -68,8 +88,9 @@ Module.register("MMM-Freebox", {
     this.Freebox.State = payload.State
     this.Freebox.IP = payload.IP
     this.Freebox.Client = payload.Client
-    this.FB("Result:", this.Freebox)
+    FB("Result:", this.Freebox)
     this.displayDom()
+    if (this.Freebox.Hidden) this.showFreebox()
   },
   
   displayDom: function() {
@@ -95,7 +116,7 @@ Module.register("MMM-Freebox", {
         if (!selectClient[0]) {
           clearInterval(this.update)
           this.update = null
-          this.FB("Client inconnu ... Rechargement du cache.")
+          FB("Appareil inconnu [" + client.l2ident.id + "]... Rechargement du cache.")
           return this.sendSocketNotification("CACHE")
         }
 
