@@ -106,13 +106,14 @@ module.exports = NodeHelper.create({
   makeCache: function (res) {
     this.cache = {}
     if (Object.keys(res.Client).length > 0) {
-      for (let [item, value] of Object.entries(res.Client)) {
-        this.cache[value.l2ident.id] = {
-          name: value.primary_name ? value.primary_name : "(Appareil sans nom)",
-          type: value.host_type
+      for (let [item, client] of Object.entries(res.Client)) {
+        this.cache[client.l2ident.id] = {
+          name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
+          type: client.host_type,
+          show: (!this.config.showPlayer && client.vendor_name == "Freebox SAS") ? false : this.config.showClient
         }
       }
     }
     this.sendInfo("INITIALIZED", this.cache)
-  }
+  },
 });

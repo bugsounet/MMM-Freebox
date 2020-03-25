@@ -120,12 +120,14 @@ Module.register("MMM-Freebox", {
           return this.sendSocketNotification("CACHE")
         }
 
+        var cache = this.Freebox.Cache[client.l2ident.id]
+
         /** Le nom d'affichage a été changé **/
         var nameClient = selectClient[0].querySelector("#FREE_NAME")
         client.primary_name = client.primary_name ? client.primary_name : "(Appareil sans nom)"
-        if (this.Freebox.Cache[client.l2ident.id].name != client.primary_name) {
+        if (cache.name != client.primary_name) {
           this.Freebox.Cache[client.l2ident.id].name = client.primary_name
-          nameClient.textContent = this.Freebox.Cache[client.l2ident.id].name
+          nameClient.textContent = cache.name
         }
         
         var statusClient = selectClient[0].querySelector("INPUT")
@@ -136,9 +138,9 @@ Module.register("MMM-Freebox", {
         iconClient.className= client.host_type + (client.active ? "1" : "0")
         if (this.config.showIcon) iconClient.classList.remove("hidden")
         else iconClient.classList.add("hidden")
-        
-        if (this.config.showClient) selectClient[0].classList.remove("hidden")
-        if ((!this.config.showPlayer && client.vendor_name == "Freebox SAS") || (this.config.activeOnly && !client.active)) selectClient[0].classList.add("hidden")
+
+        if (cache.show) selectClient[0].classList.remove("hidden")
+        if (this.config.activeOnly && !client.active) selectClient[0].classList.add("hidden")
       }
     }
 
@@ -179,7 +181,7 @@ Module.register("MMM-Freebox", {
       wrapper.appendChild(free)
     } else {
       wrapper.innerHTML = ""
-      /** on prepare le DOM **/
+      /** on prepare le DOM en cachant tout **/
       var sync = document.createElement("div")
       sync.id = "FREE_SYNC"
       sync.classList.add("hidden")
