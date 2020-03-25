@@ -63,7 +63,7 @@ module.exports = NodeHelper.create({
         else this.sendInfo("RESULT", res)
       },
       (err) => { 
-        this.FB("[Freebox] Freebox -- " + err)
+        console.log("[Freebox] Freebox -- " + err)
         if (!this.init) this.scan() 
       }
     )
@@ -100,7 +100,7 @@ module.exports = NodeHelper.create({
   },
 
   sendInfo: function (noti, payload) {
-    this.FB("[Freebox] Send notification: " + noti, payload ? payload : "")
+    this.FB("Send notification: " + noti, payload ? payload : "")
     this.sendSocketNotification(noti, payload)
   },
 
