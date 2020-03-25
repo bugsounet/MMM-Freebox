@@ -1,0 +1,288 @@
+#FREE_LOADING {
+    text-align: center;
+    font-size: 20px;
+}
+
+#FREE_LOGO {
+    background-image: url(resources/Freebox.png);
+    height: 62px;
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#FREE_SYNC {
+    display: flex;
+    font-size: 14px;
+    line-height: 110%;
+    padding: 1px;
+}
+
+#FREE_SYNC.hidden {
+    display:none;
+}
+
+#FREE_CLIENT {
+    display: flex;
+    font-size: 14px;
+    line-height: 110%;
+    padding: 1px;
+}
+
+#FREE_CLIENT.hidden {
+    display:none;
+}
+
+#FREE_DEBIT {
+    display: flex;
+    font-size: 14px;
+    line-height: 110%;
+    padding: 1px;
+}
+
+#FREE_DEBIT.hidden {
+    display:none;
+}
+
+#FREE_NAME {
+ /*   width: 250px; */
+    text-align: center;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
+
+#FREE_ICON {
+    background-image: url(resources/free.png);
+    height: 16px;
+    width: 16px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 0;
+}
+
+#FREE_ICON.hidden {
+    display:none;
+}
+
+#FREE_ICON.freebox_delta0 {
+    background-image: url(resources/delta0.png);
+    height: 16px;
+    width: 16px;
+    background-size: 100%;
+}
+
+#FREE_ICON.freebox_mini0 {
+    background-image: url(resources/mini0.png);
+}
+
+#FREE_ICON.workstation0 {
+    background-image: url(resources/desktop0.png);
+}
+
+#FREE_ICON.laptop0 {
+    background-image: url(resources/laptop0.png);
+}
+
+#FREE_ICON.smartphone0 {
+    background-image: url(resources/mobile0.png);
+}
+
+#FREE_ICON.tablet0 {
+    background-image: url(resources/tab0.png);
+}
+
+#FREE_ICON.printer0 {
+    background-image: url(resources/printer0.png);
+}
+
+#FREE_ICON.vg_console0 {
+    background-image: url(resources/game0.png);
+}
+
+#FREE_ICON.television0 {
+    background-image: url(resources/tv0.png);
+}
+
+#FREE_ICON.nas0 {
+    background-image: url(resources/nas0.png);
+}
+
+#FREE_ICON.ip_camera0 {
+    background-image: url(resources/camera0.png);
+}
+
+#FREE_ICON.ip_phone0 {
+    background-image: url(resources/tel0.png);
+
+}
+
+#FREE_ICON.freebox_player0 {
+    background-image: url(resources/player0.png);
+}
+
+#FREE_ICON.freebox_hd0 {
+    background-image: url(resources/V50.png);
+}
+
+#FREE_ICON.networking_device0 {
+    background-image: url(resources/router0.png);
+    height: 16px;
+    width: 16px;
+    background-size: 100%;
+}
+#FREE_ICON.multimedia_device0 {
+    background-image: url(resources/media0.png);
+}
+
+#FREE_ICON.other0 {
+    background-image: url(resources/hub0.png);
+}
+
+
+#FREE_ICON.freebox_delta1 {
+    background-image: url(resources/delta1.png);
+}
+
+#FREE_ICON.freebox_mini1 {
+    background-image: url(resources/mini1.png);
+}
+
+#FREE_ICON.workstation1 {
+    background-image: url(resources/desktop1.png);
+}
+
+#FREE_ICON.laptop1 {
+    background-image: url(resources/laptop1.png);
+}
+
+#FREE_ICON.smartphone1 {
+    background-image: url(resources/mobile1.png);
+}
+
+#FREE_ICON.tablet1 {
+    background-image: url(resources/tab1.png);
+}
+
+#FREE_ICON.printer1 {
+    background-image: url(resources/printer1.png);
+}
+
+#FREE_ICON.vg_console1 {
+    background-image: url(resources/game1.png);
+}
+
+#FREE_ICON.television1 {
+    background-image: url(resources/tv1.png);
+}
+
+#FREE_ICON.nas1 {
+    background-image: url(resources/nas1.png);
+}
+
+#FREE_ICON.ip_camera1 {
+    background-image: url(resources/camera1.png);
+}
+
+#FREE_ICON.ip_phone1 {
+    background-image: url(resources/tel1.png);
+}
+
+#FREE_ICON.freebox_player1 {
+    background-image: url(resources/player1.png);
+}
+
+#FREE_ICON.freebox_hd1 {
+    background-image: url(resources/V51.png);
+}
+
+#FREE_ICON.networking_device1 {
+    background-image: url(resources/router1.png);
+}
+
+#FREE_ICON.multimedia_device1 {
+    background-image: url(resources/media1.png);
+}
+
+#FREE_ICON.other1 {
+    background-image: url(resources/hub1.png);
+}
+
+/* ------------ */
+
+input.switch-round + label {
+  padding: 1px;
+  width: 40px;
+  height: 15px;
+  background-color: #808080;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  -ms-border-radius: 30px;
+  -o-border-radius: 30px;
+  border-radius: 30px;
+}
+input.switch-round + label:before, input.switch-round + label:after {
+  display: block;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  bottom: 1px;
+  content: "";
+}
+input.switch-round + label:before {
+  right: 1px;
+  background-color: #706c6c;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  -ms-border-radius: 30px;
+  -o-border-radius: 30px;
+  border-radius: 30px;
+  -webkit-transition: background 0.4s;
+  -moz-transition: background 0.4s;
+  -o-transition: background 0.4s;
+  transition: background 0.4s;
+}
+input.switch-round + label:after {
+  width: 20px;
+  background-color: #DCDCDC;
+  -webkit-border-radius: 100%;
+  -moz-border-radius: 100%;
+  -ms-border-radius: 100%;
+  -o-border-radius: 100%;
+  border-radius: 100%;
+  -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  -webkit-transition: margin 0.4s;
+  -moz-transition: margin 0.4s;
+  -o-transition: margin 0.4s;
+  transition: margin 0.4s;
+}
+input.switch-round:checked + label:before {
+  background-color: #009966;
+}
+input.switch-round:checked + label:after {
+  margin-left: 20px;
+}
+
+.switch-toggle {
+  position: absolute;
+  margin-left: -9999px;
+  visibility: hidden;
+}
+.switch-toggle + label {
+  display: block;
+  position: relative;
+  cursor: none;
+  outline: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.hidden {
+    display:none;
+}
