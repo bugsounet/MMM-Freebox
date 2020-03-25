@@ -1,7 +1,7 @@
 Module.register("MMM-Freebox", {
 
   defaults: {
-    updateDelay: 3 * 1000,
+    updateDelay:  1 * 1000,
     debug: false,
     app_token: "",
     app_id: "",
