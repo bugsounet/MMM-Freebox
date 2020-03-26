@@ -31,7 +31,7 @@ Module.register("MMM-Freebox", {
       "Debit": null,
       "State": null,
       "IP": null,
-      "Client": [],
+      "Clients": [],
       "Cache": {}
     }
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
@@ -93,7 +93,7 @@ Module.register("MMM-Freebox", {
     this.Freebox.Debit = payload.Debit
     this.Freebox.State = payload.State
     this.Freebox.IP = payload.IP
-    this.Freebox.Client = payload.Client
+    this.Freebox.Clients = payload.Clients
     FB("Result:", this.Freebox)
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
@@ -115,9 +115,9 @@ Module.register("MMM-Freebox", {
     var syncStatus = sync.querySelector("INPUT")
     syncStatus.checked = (this.Freebox.status == "up") ? "true" : "false"
 
-    if (Object.keys(this.Freebox.Client).length > 0) {
-      for (let [item, client] of Object.entries(this.Freebox.Client)) {
-        var mac = client.l2ident.id
+    if (Object.keys(this.Freebox.Clients).length > 0) {
+      for (let [item, client] of Object.entries(this.Freebox.Clients)) {
+        var mac = client.mac
         var cache = this.Freebox.Cache[mac]
         var excludeMac = this.config.excludeMac
 
@@ -132,18 +132,18 @@ Module.register("MMM-Freebox", {
 
         /** Le nom d'affichage a été changé **/
         var nameClient = selectClient[0].querySelector("#FREE_NAME")
-        client.primary_name = client.primary_name ? client.primary_name : "(Appareil sans nom)"
-        if (cache.name != client.primary_name) {
-          this.Freebox.Cache[mac].name = client.primary_name
+        client.name = client.name ? client.name : "(Appareil sans nom)"
+        if (cache.name != client.name) {
+          this.Freebox.Cache[mac].name = client.name
           nameClient.textContent = cache.name
         }
-        
+
         var statusClient = selectClient[0].querySelector("INPUT")
         var iconClient = selectClient[0].querySelector("#FREE_ICON")
         var statusBouton = selectClient[0].querySelector(".switch")
         if (this.config.showButton) statusBouton.classList.remove("hidden")
         statusClient.checked = client.active
-        iconClient.className= client.host_type + (client.active ? "1" : "0")
+        iconClient.className= client.type + (client.active ? "1" : "0")
         if (this.config.showIcon) iconClient.classList.remove("hidden")
         else iconClient.classList.add("hidden")
 

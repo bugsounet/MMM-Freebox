@@ -1,5 +1,7 @@
 var NodeHelper = require('node_helper');
 const { Freebox } = require("freebox");
+var _ = require("underscore");
+
 FB = (...args) => { /* do nothing */ }
 
 async function Freebox_OS(token,id,domain,port) {
@@ -21,7 +23,7 @@ async function Freebox_OS(token,id,domain,port) {
     url: "connection/xdsl",
   });
 
-  const client = await freebox.request({
+  const clients = await freebox.request({
     method: "GET",
     url: "lan/browser/pub/",
   });
@@ -30,6 +32,11 @@ async function Freebox_OS(token,id,domain,port) {
     method: "GET",
     url: "connection/",
   });
+
+  const calls = await freebox.request({
+    method: "GET",
+    url:"call/log/",
+  }),
   
   sync = (xdsl.data.result.down.rate/1000).toFixed(2) + "/" + (xdsl.data.result.up.rate/1000).toFixed(2)
   debit = (cnx.data.result.rate_down/1000).toFixed(2) + "/" + (cnx.data.result.rate_up/1000).toFixed(2)
@@ -41,7 +48,8 @@ async function Freebox_OS(token,id,domain,port) {
     Debit: debit,
     State : cnx.data.result.state,
     IP: cnx.data.result.ipv4,
-    Client: client.data.result,
+    Client: clients.data.result,
+    Calls: calls.data.result
   }
 
   await freebox.logout()
@@ -60,7 +68,8 @@ module.exports = NodeHelper.create({
     Freebox_OS(token,id,domain,port).then(
       (res) => {
         if (!this.init) this.makeCache(res)
-        else this.sendInfo("RESULT", res)
+        //else this.sendInfo("RESULT", res)
+        else this.makeResult(res)
       },
       (err) => { 
         console.log("[Freebox] " + err)
@@ -100,10 +109,11 @@ module.exports = NodeHelper.create({
 
   sendInfo: function (noti, payload) {
     FB("Send notification: " + noti, payload)
-    this.sendSocketNotification(noti, payload)
+    if(!this.config.dev) this.sendSocketNotification(noti, payload)
   },
 
   makeCache: function (res) {
+    console.log (res)
     this.cache = {}
     if (Object.keys(res.Client).length > 0) {
       for (let [item, client] of Object.entries(res.Client)) {
@@ -116,6 +126,17 @@ module.exports = NodeHelper.create({
     }
     this.cache = this.sortBy(this.cache, this.config.sortBy)
     this.sendInfo("INITIALIZED", this.cache)
+/*
+    var filtered = _.where(res.Calls, {type: "missed"})
+    var missed = 0
+    if (filtered.length) missed = filtered.length
+
+    var msg = {
+      who:  filtered,
+      missed: missed
+    }
+    FB("msg:",msg)
+*/
   },
 
   sortBy: function (data, sort) {
@@ -164,5 +185,24 @@ module.exports = NodeHelper.create({
       result = data
     }
     return result
+  },
+
+  makeResult: function(res) {
+    res.Clients = []
+    var device = {}
+    if (Object.keys(res.Client).length > 0) {
+      for (let [item, client] of Object.entries(res.Client)) {
+        device = {
+          mac: client.l2ident.id,
+          name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
+          type: client.host_type,
+          vendor: client.vendor_name,
+          active: client.active
+        }
+        res.Clients.push(device)
+      }
+    }
+    delete res.Client
+    this.sendInfo("RESULT", res)
   }
 });
