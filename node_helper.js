@@ -114,6 +114,55 @@ module.exports = NodeHelper.create({
         }
       }
     }
+    this.cache = this.sortBy(this.cache, this.config.sortBy)
     this.sendInfo("INITIALIZED", this.cache)
   },
+
+  sortBy: function (data, sort) {
+    var result = {}
+    /** sort by type or by name **/
+    if (sort == "type" || sort == "name") {
+      FB("Sort cache by" , sort)
+      var arr = []
+      for (var mac in data) {
+        if (data.hasOwnProperty(mac)) {
+            var obj = {}
+            obj[mac] = data[mac]
+            obj.Sort = data[mac][sort].toLowerCase()
+            arr.push(obj)
+        }
+      }
+
+      arr.sort((a, b)=> {
+        var at = a.Sort
+        var bt = b.Sort
+        return at > bt ? 1 : ( at < bt ? -1 : 0 )
+      })
+
+      for (var i=0, l=arr.length; i<l; i++) {
+        var obj = arr[i];
+        delete obj.Sort
+        for (var mac in obj) {
+          if (obj.hasOwnProperty(mac)) {
+              var id = mac
+          }
+        }
+
+        result[mac] = obj[id]
+      }
+    } else if (sort == "mac") {
+      /** sort by MAC **/
+      FB("Sort cache by", sort)
+      var mac = Object.keys(data)
+      mac.sort()
+      mac.forEach((macSort)=> {
+        result[macSort] = data[macSort]
+      })
+    } else {
+      /** other return the same **/
+      FB("Cache not sorted")
+      result = data
+    }
+    return result
+  }
 });

@@ -16,7 +16,9 @@ Module.register("MMM-Freebox", {
     showRate: true,
     showClient: true,
     showPlayer: false,
-    textWidth: "250px" 
+    textWidth: "250px",
+    excludeMac: [],
+    sortBy: null
   },
 
   start: function () {
@@ -33,6 +35,10 @@ Module.register("MMM-Freebox", {
       "Cache": {}
     }
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
+    if (this.config.excludeMac.length > 0) {
+      /** normalise les adresses MAC en majuscule **/
+      this.config.excludeMac = this.config.excludeMac.map(function(x){ return x.toUpperCase() })
+    }
     console.log("[Freebox] Started...")
   },
 
@@ -111,22 +117,24 @@ Module.register("MMM-Freebox", {
 
     if (Object.keys(this.Freebox.Client).length > 0) {
       for (let [item, client] of Object.entries(this.Freebox.Client)) {
-        var selectClient = document.getElementsByClassName(client.l2ident.id)
+        var mac = client.l2ident.id
+        var cache = this.Freebox.Cache[mac]
+        var excludeMac = this.config.excludeMac
+
+        var selectClient = document.getElementsByClassName(mac)
         /** Nouveau Client connecté -> rebuild du cache **/
         if (!selectClient[0]) {
           clearInterval(this.update)
           this.update = null
-          FB("Appareil inconnu [" + client.l2ident.id + "]... Rechargement du cache.")
+          FB("Appareil inconnu [" + mac + "] - Rechargement du cache.")
           return this.sendSocketNotification("CACHE")
         }
-
-        var cache = this.Freebox.Cache[client.l2ident.id]
 
         /** Le nom d'affichage a été changé **/
         var nameClient = selectClient[0].querySelector("#FREE_NAME")
         client.primary_name = client.primary_name ? client.primary_name : "(Appareil sans nom)"
         if (cache.name != client.primary_name) {
-          this.Freebox.Cache[client.l2ident.id].name = client.primary_name
+          this.Freebox.Cache[mac].name = client.primary_name
           nameClient.textContent = cache.name
         }
         
@@ -140,7 +148,7 @@ Module.register("MMM-Freebox", {
         else iconClient.classList.add("hidden")
 
         if (cache.show) selectClient[0].classList.remove("hidden")
-        if (this.config.activeOnly && !client.active) selectClient[0].classList.add("hidden")
+        if ((excludeMac.indexOf(mac) > -1) || (this.config.activeOnly && !client.active)) selectClient[0].classList.add("hidden")
       }
     }
 
