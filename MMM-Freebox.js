@@ -183,6 +183,7 @@ Module.register("MMM-Freebox", {
 
     if (!this.Init) {
       wrapper.id = "FREE_LOADING"
+      wrapper.style.width= this.config.textWidth
       wrapper.innerHTML = this.translate("LOADING")
       var free = document.createElement("div")
       free.id = "FREE_LOGO"
