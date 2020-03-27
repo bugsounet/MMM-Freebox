@@ -15,15 +15,16 @@ Module.register("MMM-Freebox", {
     showSync: true, 
     showRate: true,
     showClient: true,
-    showPlayer: false,
+    showPlayer: true,
     showMissed: true,
+    maxMissed: 3,
     textWidth: "250px",
     excludeMac: [],
     sortBy: null
   },
 
   start: function () {
-    this.config = this.configAssignment({}, this.defaults, this.config)
+    this.config = Object.assign({}, this.defaults, this.config)
     this.Init = false
     this.update = null
     this.Freebox = {
@@ -37,6 +38,7 @@ Module.register("MMM-Freebox", {
       "Calls" : [],
       "MissedCall": 0
     }
+    this.maxMissedCall = 0
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
     if (this.config.excludeMac.length > 0) {
       /** normalise les adresses MAC en majuscule **/
@@ -131,9 +133,9 @@ Module.register("MMM-Freebox", {
         var cache = this.Freebox.Cache[mac]
         var excludeMac = this.config.excludeMac
 
-        var selectClient = document.getElementsByClassName(mac)
+        var clientSelect = document.getElementsByClassName(mac)[0]
         /** Nouveau Client connecté -> rebuild du cache **/
-        if (!selectClient[0]) {
+        if (!clientSelect) {
           clearInterval(this.update)
           this.update = null
           FB("Appareil inconnu [" + mac + "] - Rechargement du cache.")
@@ -141,24 +143,24 @@ Module.register("MMM-Freebox", {
         }
 
         /** Le nom d'affichage a été changé **/
-        var nameClient = selectClient[0].querySelector("#FREE_NAME")
+        var clientName = clientSelect.querySelector("#FREE_NAME")
         client.name = client.name ? client.name : "(Appareil sans nom)"
         if (cache.name != client.name) {
           this.Freebox.Cache[mac].name = client.name
-          nameClient.textContent = cache.name
+          clientName.textContent = cache.name
         }
 
-        var statusClient = selectClient[0].querySelector("INPUT")
-        var iconClient = selectClient[0].querySelector("#FREE_ICON")
-        var statusBouton = selectClient[0].querySelector(".switch")
-        if (this.config.showButton) statusBouton.classList.remove("hidden")
-        statusClient.checked = client.active
-        iconClient.className= client.type + (client.active ? "1" : "0")
-        if (this.config.showIcon) iconClient.classList.remove("hidden")
-        else iconClient.classList.add("hidden")
+        var clientStatus = clientSelect.querySelector("INPUT")
+        var clientIcon = clientSelect.querySelector("#FREE_ICON")
+        var clientBouton = clientSelect.querySelector(".switch")
+        if (this.config.showButton) clientBouton.classList.remove("hidden")
+        clientStatus.checked = client.active
+        clientIcon.className= client.type + (client.active ? "1" : "0")
+        if (this.config.showIcon) clientIcon.classList.remove("hidden")
+        else clientIcon.classList.add("hidden")
 
-        if (cache.show) selectClient[0].classList.remove("hidden")
-        if ((excludeMac.indexOf(mac) > -1) || (this.config.activeOnly && !client.active)) selectClient[0].classList.add("hidden")
+        if (cache.show) clientSelect.classList.remove("hidden")
+        if ((excludeMac.indexOf(mac) > -1) || (this.config.activeOnly && !client.active)) clientSelect.classList.add("hidden")
       }
     }
 
@@ -172,7 +174,6 @@ Module.register("MMM-Freebox", {
 
     /** Appels manqués **/
 
-    /*
     if (this.Freebox.Calls.missed != this.Freebox.MissedCall) {
       clearInterval(this.update)
       this.update = null
@@ -183,21 +184,23 @@ Module.register("MMM-Freebox", {
     if (this.Freebox.Calls.missed > 0) {
       var call = document.getElementById("FREE_CALL")
       if (this.config.showMissed) call.classList.remove("hidden")
-      var callIco = call.querySelector("#FREE_CALL_ICON")
+      var callIco = call.querySelector("#FREE_ICON")
       if (this.config.showIcon) callIco.classList.remove("hidden")
       var callMissed = call.querySelector("#FREE_CALL_MISSED")
       callMissed.textContent = this.Freebox.Calls.missed + ((this.Freebox.Calls.missed > 1) ? " appels manqués" : " appel manqué")
 
       for (let [nb, value] of Object.entries(this.Freebox.Calls.who)) {
+        if (nb >= this.maxMissedCall) break
         var whoMissed = document.getElementsByClassName("Missed_" + nb)
-        if (this.config.showMissed) whoMissed.classList.remove("hidden")
+        if (this.config.showMissed) whoMissed[0].classList.remove("hidden")
+        var whoIcon = whoMissed[0].querySelector("#FREE_ICON")
         var whoName = whoMissed[0].querySelector("#FREE_CALLER_NAME")
         var whoDate = whoMissed[0].querySelector("#FREE_CALLER_DATE")
+        if (this.config.showIcon) whoIcon.classList.remove("hidden")
         whoName.textContent = value.name
         whoDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") + " :"
       }
     }
-    */
   },
 
   ScanClient: function () {
@@ -237,10 +240,10 @@ Module.register("MMM-Freebox", {
       sync.id = "FREE_SYNC"
       sync.classList.add("hidden")
       
-      var syncIco = document.createElement("div")
-      syncIco.classList.add("hidden")
-      syncIco.id= "FREE_ICON"
-      sync.appendChild(syncIco)
+      var syncIcon = document.createElement("div")
+      syncIcon.classList.add("hidden")
+      syncIcon.id= "FREE_ICON"
+      sync.appendChild(syncIcon)
       
       var syncDisplay= document.createElement("div")
       syncDisplay.id = "FREE_NAME"
@@ -273,43 +276,43 @@ Module.register("MMM-Freebox", {
           var type = value.type
           var setName = value.name
 
-          var Client = document.createElement("div")
-          Client.id= "FREE_CLIENT"
-          Client.className= id
-          Client.classList.add("hidden")
+          var client = document.createElement("div")
+          client.id= "FREE_CLIENT"
+          client.className= id
+          client.classList.add("hidden")
 
-          var icoClient = document.createElement("div")
-          icoClient.id= "FREE_ICON"
-          icoClient.className= type + "0"
-          icoClient.classList.add("hidden")
-          Client.appendChild(icoClient)
+          var clientIcon = document.createElement("div")
+          clientIcon.id= "FREE_ICON"
+          clientIcon.className= type + "0"
+          clientIcon.classList.add("hidden")
+          client.appendChild(clientIcon)
   
-          var nameClient = document.createElement("div")
-          nameClient.id = "FREE_NAME"
-          nameClient.style.width= this.config.textWidth
-          nameClient.textContent = setName
-          Client.appendChild(nameClient)
+          var clientName = document.createElement("div")
+          clientName.id = "FREE_NAME"
+          clientName.style.width= this.config.textWidth
+          clientName.textContent = setName
+          client.appendChild(clientName)
 
-          var StatusClient = document.createElement("div")
-          StatusClient.className = "switch"
-          StatusClient.classList.add("hidden")
+          var clientStatus = document.createElement("div")
+          clientStatus.className = "switch"
+          clientStatus.classList.add("hidden")
 
-          var button = document.createElement("INPUT")
-          button.id = "switched"
-          button.type = "checkbox"
-          button.className = "switch-toggle switch-round";
-          button.checked = false
-          button.disabled = true
+          var clientButton = document.createElement("INPUT")
+          clientButton.id = "switched"
+          clientButton.type = "checkbox"
+          clientButton.className = "switch-toggle switch-round";
+          clientButton.checked = false
+          clientButton.disabled = true
 
-          var label = document.createElement('label')
-          label.htmlFor = "swithed"
+          var clientLabel = document.createElement('label')
+          clientLabel.htmlFor = "swithed"
   
-          StatusClient.appendChild(button)
-          StatusClient.appendChild(label)
+          clientStatus.appendChild(clientButton)
+          clientStatus.appendChild(clientLabel)
 
-          Client.appendChild(StatusClient)
+          client.appendChild(clientStatus)
   
-          wrapper.appendChild(Client)
+          wrapper.appendChild(client)
         }
       }
 
@@ -317,10 +320,10 @@ Module.register("MMM-Freebox", {
       var debit = document.createElement("div")
       debit.id = "FREE_DEBIT"
       debit.classList.add("hidden")
-      var debitIco = document.createElement("div")
-      debitIco.classList.add("hidden")
-      debitIco.id= "FREE_ICON"
-      debit.appendChild(debitIco)
+      var debitIcon = document.createElement("div")
+      debitIcon.classList.add("hidden")
+      debitIcon.id= "FREE_ICON"
+      debit.appendChild(debitIcon)
       var debitDisplay= document.createElement("div")
       debitDisplay.id = "FREE_NAME"
       debitDisplay.style.width= this.config.textWidth
@@ -333,10 +336,10 @@ Module.register("MMM-Freebox", {
       var call = document.createElement("div")
       call.id = "FREE_CALL"
       call.classList.add("hidden")
-      var callIco = document.createElement("div")
-      callIco.classList.add("hidden")
-      callIco.id = "FREE_CALL_ICON"
-      call.appendChild(callIco)
+      var callIcon = document.createElement("div")
+      callIcon.classList.add("hidden")
+      callIcon.id = "FREE_ICON"
+      call.appendChild(callIcon)
       var callMissed = document.createElement("div")
       callMissed.id = "FREE_CALL_MISSED"
       call.appendChild(callMissed)
@@ -344,12 +347,19 @@ Module.register("MMM-Freebox", {
       wrapper.appendChild(call)
 
       if (this.Freebox.MissedCall > 0) {
-        for (var x =0;x < this.Freebox.MissedCall; x++) {
+        if (this.Freebox.MissedCall > this.config.maxMissed) {
+          this.maxMissedCall = this.config.maxMissed
+        }
+        else this.maxMissedCall = this.Freebox.MissedCall
+
+        for (var x =0;x < this.maxMissedCall; x++) {
           var who = document.createElement("div")
           who.id = "FREE_WHO"
-          who.classList.add("Missed_"+ x)
+          who.className= "Missed_"+ x
+          who.classList.add("hidden")
           var whoIcon = document.createElement("div")
-          whoIcon.id = "FREE_CALLER_ICON"
+          whoIcon.id = "FREE_ICON"
+          whoIcon.classList.add("hidden")
           who.appendChild(whoIcon)
           var whoDate = document.createElement("div")
           whoDate.id = "FREE_CALLER_DATE"
@@ -372,24 +382,5 @@ Module.register("MMM-Freebox", {
 
   getStyles: function() {
     return ["MMM-Freebox.css"]
-  },
-
-  configAssignment : function (result) {
-    var stack = Array.prototype.slice.call(arguments, 1)
-    var item
-    var key
-    while (stack.length) {
-      item = stack.shift()
-      for (key in item) {
-        if (item.hasOwnProperty(key)) {
-          if (typeof result[key] === "object" && result[key] && Object.prototype.toString.call(result[key]) !== "[object Array]") {
-            if (typeof item[key] === "object" && item[key] !== null) {
-              result[key] = this.configAssignment({}, result[key], item[key])
-            } else result[key] = item[key]
-          } else result[key] = item[key]
-        }
-      }
-    }
-    return result
   }
 });
