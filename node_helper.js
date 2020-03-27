@@ -39,7 +39,7 @@ async function Freebox_OS(token,id,domain,port) {
   }),
   
   sync = (xdsl.data.result.down.rate/1000).toFixed(2) + "/" + (xdsl.data.result.up.rate/1000).toFixed(2)
-  debit = (cnx.data.result.rate_down/1000).toFixed(2) + "/" + (cnx.data.result.rate_up/1000).toFixed(2)
+  debit = (cnx.data.result.rate_down/1000).toFixed(0) + "/" + (cnx.data.result.rate_up/1000).toFixed(0)
   state = cnx.data.result.state
   ip = cnx.data.result.ipv4
 
@@ -49,7 +49,7 @@ async function Freebox_OS(token,id,domain,port) {
     State : cnx.data.result.state,
     IP: cnx.data.result.ipv4,
     Client: clients.data.result,
-    Calls: calls.data.result
+    Call: calls.data.result
   }
 
   await freebox.logout()
@@ -125,18 +125,11 @@ module.exports = NodeHelper.create({
       }
     }
     this.cache = this.sortBy(this.cache, this.config.sortBy)
+    var filtered = _.where(res.Call, {type: "missed"})
+    var missed = filtered.length
+    this.sendInfo("MISSED_CALL", missed)
     this.sendInfo("INITIALIZED", this.cache)
-/*
-    var filtered = _.where(res.Calls, {type: "missed"})
-    var missed = 0
-    if (filtered.length) missed = filtered.length
 
-    var msg = {
-      who:  filtered,
-      missed: missed
-    }
-    FB("msg:",msg)
-*/
   },
 
   sortBy: function (data, sort) {
@@ -189,7 +182,11 @@ module.exports = NodeHelper.create({
 
   makeResult: function(res) {
     res.Clients = []
+    res.Calls= {}
+    res.Calls.who = []
+    res.Calls.missed = 0
     var device = {}
+    /** Array of client with used value in object **/
     if (Object.keys(res.Client).length > 0) {
       for (let [item, client] of Object.entries(res.Client)) {
         device = {
@@ -202,6 +199,23 @@ module.exports = NodeHelper.create({
         res.Clients.push(device)
       }
     }
+
+    var filtered = _.where(res.Call, {type: "missed"})
+    var missed = filtered.length
+    var call = {}
+    if (missed > 0) {
+      for (let [item, value] of Object.entries(filtered)) {
+        call = {
+          name: value.name,
+          date: value.datetime,
+          new: value.new
+        }
+        res.Calls.who.push(call)
+      }
+    }
+    res.Calls.missed = missed
+
+    delete res.Call
     delete res.Client
     this.sendInfo("RESULT", res)
   }

@@ -210,6 +210,52 @@
     background-image: url(resources/hub1.png);
 }
 
+#FREE_CALL {
+    display: flex;
+    font-size: 14px;
+    line-height: 110%;
+    padding: 1px;
+}
+
+#FREE_CALL_ICON {
+    background-image: url(resources/free.png);
+    height: 16px;
+    width: 16px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 0;
+}
+
+#FREE_CALL_MISSED {
+    margin-left: 15px;
+    font-size: 16px;
+}
+
+#FREE_CALLER_ICON {
+    background-image: url(resources/free.png);
+    height: 16px;
+    width: 16px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 0;
+}
+
+#FREE_CALLER_DATE {
+    margin-left: 15px;
+}
+
+#FREE_CALLER_NAME {
+   /* flex: auto; */
+    margin-left: 10px;
+}
+
+#FREE_WHO {
+  display: flex;
+  font-size: 14px;
+  line-height: 110%;
+  padding: 1px;
+}
+
 /* ------------ */
 
 input.switch-round + label {

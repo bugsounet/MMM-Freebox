@@ -16,6 +16,7 @@ Module.register("MMM-Freebox", {
     showRate: true,
     showClient: true,
     showPlayer: false,
+    showMissed: true,
     textWidth: "250px",
     excludeMac: [],
     sortBy: null
@@ -32,7 +33,9 @@ Module.register("MMM-Freebox", {
       "State": null,
       "IP": null,
       "Clients": [],
-      "Cache": {}
+      "Cache": {},
+      "Calls" : [],
+      "MissedCall": 0
     }
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
     if (this.config.excludeMac.length > 0) {
@@ -55,6 +58,9 @@ Module.register("MMM-Freebox", {
       case "INITIALIZED":
         this.Init = true
         this.cache(payload)
+        break
+      case "MISSED_CALL":
+        this.Freebox.MissedCall = payload
         break
       case "CACHE":
         this.cache(payload)
@@ -94,13 +100,16 @@ Module.register("MMM-Freebox", {
     this.Freebox.State = payload.State
     this.Freebox.IP = payload.IP
     this.Freebox.Clients = payload.Clients
+    this.Freebox.Calls = payload.Calls
     FB("Result:", this.Freebox)
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
   },
   
   displayDom: function() {
-    /** On applique les mises a jour en live **/
+    /** On applique les mises a jour en live ! **/
+
+    /** Synchro **/
     var sync = document.getElementById("FREE_SYNC")
     var syncIcon = sync.querySelector("#FREE_ICON")
     var syncValue = sync.querySelector("#FREE_NAME")
@@ -115,6 +124,7 @@ Module.register("MMM-Freebox", {
     var syncStatus = sync.querySelector("INPUT")
     syncStatus.checked = (this.Freebox.status == "up") ? "true" : "false"
 
+    /** Appareils connecté **/
     if (Object.keys(this.Freebox.Clients).length > 0) {
       for (let [item, client] of Object.entries(this.Freebox.Clients)) {
         var mac = client.mac
@@ -152,12 +162,42 @@ Module.register("MMM-Freebox", {
       }
     }
 
+    /** Affichage Débit utilisé en temps réél **/
     var debit = document.getElementById("FREE_DEBIT")
     var debitIcon = debit.querySelector("#FREE_ICON")
     var debitValue = debit.querySelector("#FREE_NAME")
     if (this.config.showIcon) debitIcon.classList.remove("hidden")
     if (this.config.showRate) debit.classList.remove("hidden")
     debitValue.textContent = "Débit Total utilisé " + this.Freebox.Debit + " Ko/s"
+
+    /** Appels manqués **/
+
+    /*
+    if (this.Freebox.Calls.missed != this.Freebox.MissedCall) {
+      clearInterval(this.update)
+      this.update = null
+      FB("Nouvel appel manqué - Rechargement du cache.")
+      return this.sendSocketNotification("CACHE")
+    }
+
+    if (this.Freebox.Calls.missed > 0) {
+      var call = document.getElementById("FREE_CALL")
+      if (this.config.showMissed) call.classList.remove("hidden")
+      var callIco = call.querySelector("#FREE_CALL_ICON")
+      if (this.config.showIcon) callIco.classList.remove("hidden")
+      var callMissed = call.querySelector("#FREE_CALL_MISSED")
+      callMissed.textContent = this.Freebox.Calls.missed + ((this.Freebox.Calls.missed > 1) ? " appels manqués" : " appel manqué")
+
+      for (let [nb, value] of Object.entries(this.Freebox.Calls.who)) {
+        var whoMissed = document.getElementsByClassName("Missed_" + nb)
+        if (this.config.showMissed) whoMissed.classList.remove("hidden")
+        var whoName = whoMissed[0].querySelector("#FREE_CALLER_NAME")
+        var whoDate = whoMissed[0].querySelector("#FREE_CALLER_DATE")
+        whoName.textContent = value.name
+        whoDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") + " :"
+      }
+    }
+    */
   },
 
   ScanClient: function () {
@@ -191,6 +231,8 @@ Module.register("MMM-Freebox", {
     } else {
       wrapper.innerHTML = ""
       /** on prepare le DOM en cachant tout **/
+
+      /** Afficage Synchro **/
       var sync = document.createElement("div")
       sync.id = "FREE_SYNC"
       sync.classList.add("hidden")
@@ -224,6 +266,7 @@ Module.register("MMM-Freebox", {
       sync.appendChild(syncStatus)
       wrapper.appendChild(sync)
 
+      /** appareils connecté **/
       if (Object.keys(client).length > 0) {
         for (let [item, value] of Object.entries(client)) {
           var id = item
@@ -269,6 +312,8 @@ Module.register("MMM-Freebox", {
           wrapper.appendChild(Client)
         }
       }
+
+      /** debit utilisé **/
       var debit = document.createElement("div")
       debit.id = "FREE_DEBIT"
       debit.classList.add("hidden")
@@ -283,6 +328,38 @@ Module.register("MMM-Freebox", {
       debit.appendChild(debitDisplay)
   
       wrapper.appendChild(debit)
+
+      /** Appels Manqués **/
+      var call = document.createElement("div")
+      call.id = "FREE_CALL"
+      call.classList.add("hidden")
+      var callIco = document.createElement("div")
+      callIco.classList.add("hidden")
+      callIco.id = "FREE_CALL_ICON"
+      call.appendChild(callIco)
+      var callMissed = document.createElement("div")
+      callMissed.id = "FREE_CALL_MISSED"
+      call.appendChild(callMissed)
+
+      wrapper.appendChild(call)
+
+      if (this.Freebox.MissedCall > 0) {
+        for (var x =0;x < this.Freebox.MissedCall; x++) {
+          var who = document.createElement("div")
+          who.id = "FREE_WHO"
+          who.classList.add("Missed_"+ x)
+          var whoIcon = document.createElement("div")
+          whoIcon.id = "FREE_CALLER_ICON"
+          who.appendChild(whoIcon)
+          var whoDate = document.createElement("div")
+          whoDate.id = "FREE_CALLER_DATE"
+          who.appendChild(whoDate)
+          var whoName = document.createElement("div")
+          whoName.id = "FREE_CALLER_NAME"
+          who.appendChild(whoName)
+          wrapper.appendChild(who)
+        }
+      }
     }
     return wrapper
 	},
