@@ -40,7 +40,6 @@ async function Freebox_OS(token,id,domain,port) {
   ip = cnx.data.result.ipv4
   type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
   degroup = (cnx.data.result.type == "rfc2684") ? true : false
-
   output = {
     Type: type,
     Degroup: degroup,

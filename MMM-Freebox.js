@@ -4,7 +4,6 @@ Module.register("MMM-Freebox", {
 
   defaults: {
     updateDelay:  1 * 1000,
-    debug: false,
     app_token: "",
     app_id: "",
     api_domain: "",
@@ -18,10 +17,14 @@ Module.register("MMM-Freebox", {
     showFreePlayer: true,
     showMissedCall: true,
     maxMissed: 3,
-    showPing: false,
-    textWidth: "250px",
+    showIP: true,
+    showPing: true,
+    textWidth: 250,
     excludeMac: [],
-    sortBy: null
+    sortBy: null,
+    debug: false,
+    verbose: false,
+    dev: false
   },
 
   start: function () {
@@ -49,6 +52,7 @@ Module.register("MMM-Freebox", {
       /** normalise les adresses MAC en majuscule **/
       this.config.excludeMac = this.config.excludeMac.map(function(x){ return x.toUpperCase() })
     }
+    if (this.config.textWidth < 220) this.config.textWidth = 220
     console.log("[Freebox] Started...")
   },
 
@@ -123,17 +127,25 @@ Module.register("MMM-Freebox", {
     /** Bande Passante **/
     var bandWidth = document.getElementById("FREE_BAND")
     var bandWidthIcon = bandWidth.querySelector("#FREE_ICON")
-    var bandWidthValue = bandWidth.querySelector("#FREE_NAME")
+
+    var bandWidthValue = bandWidth.querySelector("#FREE_VALUE")
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
-
-    bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':')  + this.Freebox.Bandwidth + " Mb/s"
+    bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':') + this.Freebox.Bandwidth + " Mb/s"
 
     var bandWidthBouton = bandWidth.querySelector(".switch")
     if (this.config.showButton) bandWidthBouton.classList.remove("hidden")
 
     var bandWidthStatus = bandWidth.querySelector("INPUT")
     bandWidthStatus.checked = (this.Freebox.status == "up") ? "true" : "false"
+
+    /** Adresse IP **/
+    var IP = document.getElementById("FREE_IP")
+    var IPIcon = IP.querySelector("#FREE_ICON")
+    var IPDisplay = IP.querySelector("#FREE_VALUE")
+    if (this.config.showIcon) IPIcon.classList.remove("hidden")
+    if (this.config.showIP) IP.classList.remove("hidden")
+    IPDisplay.textContent = this.Freebox.IP
 
     /** Appareils connecté **/
     if (Object.keys(this.Freebox.Clients).length > 0) {
@@ -166,20 +178,29 @@ Module.register("MMM-Freebox", {
         clientStatus.checked = client.active
         clientIcon.className= client.type + (client.active ? "1" : "0")
         if (this.config.showIcon) clientIcon.classList.remove("hidden")
-        else clientIcon.classList.add("hidden")
 
-        if (cache.show) clientSelect.classList.remove("hidden")
-        if ((excludeMac.indexOf(mac) > -1) || (this.config.activeOnly && !client.active)) clientSelect.classList.add("hidden")
+        if (cache.show && excludeMac.indexOf(mac) == "-1") {
+          if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
+          else if (!this.config.activeOnly) clientSelect.classList.remove("hidden")
+        }
       }
     }
 
     /** Affichage Débit utilisé en temps réél **/
     var debit = document.getElementById("FREE_DEBIT")
     var debitIcon = debit.querySelector("#FREE_ICON")
-    var debitValue = debit.querySelector("#FREE_DEBIT_VALUE")
+    var debitValue = debit.querySelector("#FREE_VALUE")
     if (this.config.showIcon) debitIcon.classList.remove("hidden")
     if (this.config.showRate) debit.classList.remove("hidden")
     debitValue.textContent = this.Freebox.Debit + " Ko/s"
+
+    /** Affichage Ping en temps réél **/
+    var ping = document.getElementById("FREE_PING")
+    var pingIcon = ping.querySelector("#FREE_ICON")
+    var pingValue = ping.querySelector("#FREE_VALUE")
+    if (this.config.showIcon) pingIcon.classList.remove("hidden")
+    if (this.config.showPing) ping.classList.remove("hidden")
+    pingValue.textContent = this.Freebox.Ping
 
     /** Appels manqués **/
 
@@ -195,7 +216,7 @@ Module.register("MMM-Freebox", {
       if (this.config.showMissedCall) call.classList.remove("hidden")
       var callIco = call.querySelector("#FREE_ICON")
       if (this.config.showIcon) callIco.classList.remove("hidden")
-      var callMissed = call.querySelector("#FREE_CALL_MISSED")
+      var callMissed = call.querySelector("#FREE_MISSED")
       callMissed.textContent = this.Freebox.Calls.missed + ((this.Freebox.Calls.missed > 1) ? " appels manqués" : " appel manqué")
 
       for (let [nb, value] of Object.entries(this.Freebox.Calls.who)) {
@@ -203,8 +224,8 @@ Module.register("MMM-Freebox", {
         var whoMissed = document.getElementsByClassName("Missed_" + nb)
         if (this.config.showMissedCall) whoMissed[0].classList.remove("hidden")
         var whoIcon = whoMissed[0].querySelector("#FREE_ICON")
-        var whoName = whoMissed[0].querySelector("#FREE_CALLER_NAME")
-        var whoDate = whoMissed[0].querySelector("#FREE_CALLER_DATE")
+        var whoName = whoMissed[0].querySelector("#FREE_CALLER")
+        var whoDate = whoMissed[0].querySelector("#FREE_TEXT")
         if (this.config.showIcon) whoIcon.classList.remove("hidden")
         whoName.textContent = value.name
         whoDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") + " :"
@@ -235,7 +256,7 @@ Module.register("MMM-Freebox", {
 
     if (!this.Init) {
       wrapper.id = "FREE_LOADING"
-      wrapper.style.width= this.config.textWidth
+      wrapper.style.width= this.config.textWidth+"px"
       wrapper.innerHTML = this.translate("LOADING")
       var free = document.createElement("div")
       free.id = "FREE_LOGO"
@@ -247,17 +268,18 @@ Module.register("MMM-Freebox", {
       /** Afficage de la bande passante **/
       var bandWidth = document.createElement("div")
       bandWidth.id = "FREE_BAND"
+      bandWidth.style.width = (this.config.textWidth + 60) + "px"
       bandWidth.classList.add("hidden")
-      
+
       var bandWidthIcon = document.createElement("div")
       bandWidthIcon.className = "bandwidth"
       bandWidthIcon.classList.add("hidden")
       bandWidthIcon.id= "FREE_ICON"
       bandWidth.appendChild(bandWidthIcon)
-      
+
       var bandWidthDisplay= document.createElement("div")
-      bandWidthDisplay.id = "FREE_NAME"
-      bandWidthDisplay.style.width= this.config.textWidth
+      bandWidthDisplay.id = "FREE_VALUE"
+      bandWidthDisplay.style.width= (this.config.textWidth - 15) + "px"
       bandWidth.appendChild(bandWidthDisplay)
 
       var bandWidthStatus= document.createElement("div")
@@ -277,6 +299,25 @@ Module.register("MMM-Freebox", {
 
       bandWidth.appendChild(bandWidthStatus)
       wrapper.appendChild(bandWidth)
+
+      /** Adresse IP **/
+      var IP = document.createElement("div")
+      IP.id = "FREE_IP"
+      IP.classList.add("hidden")
+      var IPIcon = document.createElement("div")
+      IPIcon.id= "FREE_ICON"
+      IPIcon.className = "ip"
+      IPIcon.classList.add("hidden")
+      IP.appendChild(IPIcon)
+      var IPText = document.createElement("div")
+      IPText.id = "FREE_TEXT"
+      IPText.textContent = "Adresse IP :"
+      IP.appendChild(IPText)
+      var IPDisplay= document.createElement("div")
+      IPDisplay.id = "FREE_VALUE"
+
+      IP.appendChild(IPDisplay)
+      wrapper.appendChild(IP)
 
       /** appareils connecté **/
       if (Object.keys(client).length > 0) {
@@ -298,7 +339,7 @@ Module.register("MMM-Freebox", {
   
           var clientName = document.createElement("div")
           clientName.id = "FREE_NAME"
-          clientName.style.width= this.config.textWidth
+          clientName.style.width= this.config.textWidth + "px"
           clientName.textContent = setName
           client.appendChild(clientName)
 
@@ -339,12 +380,29 @@ Module.register("MMM-Freebox", {
       debitText.textContent = "Débit Total utilisé:"
       debit.appendChild(debitText)
       var debitDisplay= document.createElement("div")
-      debitDisplay.id = "FREE_DEBIT_VALUE"
-      //debitDisplay.style.width= this.config.textWidth
+      debitDisplay.id = "FREE_VALUE"
 
       debit.appendChild(debitDisplay)
-  
       wrapper.appendChild(debit)
+
+      /** ping **/
+      var ping = document.createElement("div")
+      ping.id = "FREE_PING"
+      ping.classList.add("hidden")
+      var pingIcon = document.createElement("div")
+      pingIcon.id= "FREE_ICON"
+      pingIcon.className = "ping"
+      pingIcon.classList.add("hidden")
+      ping.appendChild(pingIcon)
+      var pingText = document.createElement("div")
+      pingText.id = "FREE_TEXT"
+      pingText.textContent = "Ping Google:"
+      ping.appendChild(pingText)
+      var pingDisplay= document.createElement("div")
+      pingDisplay.id = "FREE_VALUE"
+
+      ping.appendChild(pingDisplay)
+      wrapper.appendChild(ping)
 
       /** Appels Manqués **/
       var call = document.createElement("div")
@@ -356,7 +414,7 @@ Module.register("MMM-Freebox", {
       callIcon.classList.add("hidden")
       call.appendChild(callIcon)
       var callMissed = document.createElement("div")
-      callMissed.id = "FREE_CALL_MISSED"
+      callMissed.id = "FREE_MISSED"
       call.appendChild(callMissed)
 
       wrapper.appendChild(call)
@@ -378,10 +436,10 @@ Module.register("MMM-Freebox", {
           whoIcon.classList.add("hidden")
           who.appendChild(whoIcon)
           var whoDate = document.createElement("div")
-          whoDate.id = "FREE_CALLER_DATE"
+          whoDate.id = "FREE_TEXT"
           who.appendChild(whoDate)
           var whoName = document.createElement("div")
-          whoName.id = "FREE_CALLER_NAME"
+          whoName.id = "FREE_CALLER"
           who.appendChild(whoName)
           wrapper.appendChild(who)
         }

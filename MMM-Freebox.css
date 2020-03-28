@@ -13,17 +13,12 @@
     margin-right: auto;
 }
 
-#FREE_BAND {
-    display: flex;
-    font-size: 14px;
-    line-height: 110%;
-    padding: 1px;
-}
-
-#FREE_BAND.hidden {
-    display:none;
-}
-
+#FREE_WHO,
+#FREE_CALL,
+#FREE_PING,
+#FREE_IP,
+#FREE_DEBIT,
+#FREE_BAND,
 #FREE_CLIENT {
     display: flex;
     font-size: 14px;
@@ -31,32 +26,49 @@
     padding: 1px;
 }
 
-#FREE_CLIENT.hidden {
-    display:none;
-}
-
-#FREE_DEBIT {
-    display: flex;
-    font-size: 14px;
-    line-height: 110%;
-    padding: 1px;
-}
-
-#FREE_DEBIT.hidden {
-    display:none;
-}
-
-#FREE_DEBIT_VALUE {
+#FREE_VALUE {
     margin-left: 15px;
     text-align: left;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
+
+#FREE_TEXT {
+    margin-left: 15px;
 }
 
 #FREE_NAME {
- /*   width: 250px; */
     text-align: center;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
+}
+
+#FREE_MISSED {
+    margin-left: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #eee;
+}
+
+#FREE_CALLER {
+    margin-left: 10px;
+    font-weight: bold;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
+
+#FREE_IP.hidden,
+#FREE_DEBIT.hidden,
+#FREE_PING.hidden,
+#FREE_CLIENT.hidden,
+#FREE_BAND.hidden,
+#FREE_ICON.hidden,
+#FREE_CALL.hidden,
+#FREE_WHO.hidden {
+    display:none;
 }
 
 #FREE_ICON {
@@ -66,10 +78,6 @@
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: 0;
-}
-
-#FREE_ICON.hidden {
-    display:none;
 }
 
 #FREE_ICON.freebox_delta0 {
@@ -221,46 +229,8 @@
     background-image: url(resources/band.png);
 }
 
-
-#FREE_CALL {
-    display: flex;
-    font-size: 14px;
-    line-height: 110%;
-    padding: 1px;
-}
-#FREE_CALL.hidden {
-    display:none;
-}
-
-#FREE_CALL_MISSED {
-    margin-left: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #eee;
-}
-
-#FREE_CALLER_DATE {
-    margin-left: 15px;
-}
-
-#FREE_CALLER_NAME {
-    margin-left: 10px;
-    font-weight: bold;
-}
-
-#FREE_WHO {
-    display: flex;
-    font-size: 14px;
-    line-height: 110%;
-    padding: 1px;
-}
-
-#FREE_WHO.hidden {
-    display:none;
-}
-
-#FREE_TEXT {
-    margin-left: 15px;
+#FREE_ICON.ping {
+    background-image: url(resources/ping.png);
 }
 
 /* ------------ */
