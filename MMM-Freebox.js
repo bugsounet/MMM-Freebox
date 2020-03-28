@@ -178,6 +178,7 @@ Module.register("MMM-Freebox", {
         clientStatus.checked = client.active
         clientIcon.className= client.type + (client.active ? "1" : "0")
         if (this.config.showIcon) clientIcon.classList.remove("hidden")
+        else clientIcon.classList.add("hidden")
 
         if (cache.show && excludeMac.indexOf(mac) == "-1") {
           if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
