@@ -11,13 +11,14 @@ Module.register("MMM-Freebox", {
     https_port: 0,
     activeOnly: false,
     showIcon: true,
-    showButton: true, 
-    showSync: true, 
+    showButton: true,
+    showBandWidth: true,
     showRate: true,
     showClient: true,
-    showPlayer: true,
-    showMissed: true,
+    showFreePlayer: true,
+    showMissedCall: true,
     maxMissed: 3,
+    showPing: false,
     textWidth: "250px",
     excludeMac: [],
     sortBy: null
@@ -29,15 +30,19 @@ Module.register("MMM-Freebox", {
     this.update = null
     this.Freebox = {
       "Hidden": true,
-      "Sync": null,
+      "Bandwidth": null,
       "Debit": null,
       "State": null,
       "IP": null,
+      "Degroup": false,
+      "Type": null,
       "Clients": [],
       "Cache": {},
       "Calls" : [],
-      "MissedCall": 0
+      "MissedCall": 0,
+      "Ping": null
     }
+
     this.maxMissedCall = 0
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
     if (this.config.excludeMac.length > 0) {
@@ -69,6 +74,7 @@ Module.register("MMM-Freebox", {
         break
       case "RESULT":
         this.result(payload)
+        break
     }
   },
 
@@ -96,13 +102,16 @@ Module.register("MMM-Freebox", {
     this.show(1000, {lockString: "FREEBOX_LOCKED"})
   },
   
-  result: function(payload) { // to do
-    this.Freebox.Sync = payload.Sync
+  result: function(payload) {
+    this.Freebox.Type = payload.Type
+    this.Freebox.Degroup = payload.Degroup
+    this.Freebox.Bandwidth = payload.Bandwidth
     this.Freebox.Debit = payload.Debit
     this.Freebox.State = payload.State
     this.Freebox.IP = payload.IP
     this.Freebox.Clients = payload.Clients
     this.Freebox.Calls = payload.Calls
+    this.Freebox.Ping = payload.Ping
     FB("Result:", this.Freebox)
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
@@ -111,20 +120,20 @@ Module.register("MMM-Freebox", {
   displayDom: function() {
     /** On applique les mises a jour en live ! **/
 
-    /** Synchro **/
-    var sync = document.getElementById("FREE_SYNC")
-    var syncIcon = sync.querySelector("#FREE_ICON")
-    var syncValue = sync.querySelector("#FREE_NAME")
-    if (this.config.showIcon) syncIcon.classList.remove("hidden")
-    if (this.config.showSync) sync.classList.remove("hidden")
+    /** Bande Passante **/
+    var bandWidth = document.getElementById("FREE_BAND")
+    var bandWidthIcon = bandWidth.querySelector("#FREE_ICON")
+    var bandWidthValue = bandWidth.querySelector("#FREE_NAME")
+    if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
+    if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
 
-    syncValue.textContent = "ADSL2+ Sync " + this.Freebox.Sync + " Mb/s"
+    bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':')  + this.Freebox.Bandwidth + " Mb/s"
 
-    var syncBouton = sync.querySelector(".switch")
-    if (this.config.showButton) syncBouton.classList.remove("hidden")
+    var bandWidthBouton = bandWidth.querySelector(".switch")
+    if (this.config.showButton) bandWidthBouton.classList.remove("hidden")
 
-    var syncStatus = sync.querySelector("INPUT")
-    syncStatus.checked = (this.Freebox.status == "up") ? "true" : "false"
+    var bandWidthStatus = bandWidth.querySelector("INPUT")
+    bandWidthStatus.checked = (this.Freebox.status == "up") ? "true" : "false"
 
     /** Appareils connecté **/
     if (Object.keys(this.Freebox.Clients).length > 0) {
@@ -167,10 +176,10 @@ Module.register("MMM-Freebox", {
     /** Affichage Débit utilisé en temps réél **/
     var debit = document.getElementById("FREE_DEBIT")
     var debitIcon = debit.querySelector("#FREE_ICON")
-    var debitValue = debit.querySelector("#FREE_NAME")
+    var debitValue = debit.querySelector("#FREE_DEBIT_VALUE")
     if (this.config.showIcon) debitIcon.classList.remove("hidden")
     if (this.config.showRate) debit.classList.remove("hidden")
-    debitValue.textContent = "Débit Total utilisé " + this.Freebox.Debit + " Ko/s"
+    debitValue.textContent = this.Freebox.Debit + " Ko/s"
 
     /** Appels manqués **/
 
@@ -183,7 +192,7 @@ Module.register("MMM-Freebox", {
 
     if (this.Freebox.Calls.missed > 0) {
       var call = document.getElementById("FREE_CALL")
-      if (this.config.showMissed) call.classList.remove("hidden")
+      if (this.config.showMissedCall) call.classList.remove("hidden")
       var callIco = call.querySelector("#FREE_ICON")
       if (this.config.showIcon) callIco.classList.remove("hidden")
       var callMissed = call.querySelector("#FREE_CALL_MISSED")
@@ -192,7 +201,7 @@ Module.register("MMM-Freebox", {
       for (let [nb, value] of Object.entries(this.Freebox.Calls.who)) {
         if (nb >= this.maxMissedCall) break
         var whoMissed = document.getElementsByClassName("Missed_" + nb)
-        if (this.config.showMissed) whoMissed[0].classList.remove("hidden")
+        if (this.config.showMissedCall) whoMissed[0].classList.remove("hidden")
         var whoIcon = whoMissed[0].querySelector("#FREE_ICON")
         var whoName = whoMissed[0].querySelector("#FREE_CALLER_NAME")
         var whoDate = whoMissed[0].querySelector("#FREE_CALLER_DATE")
@@ -235,39 +244,39 @@ Module.register("MMM-Freebox", {
       wrapper.innerHTML = ""
       /** on prepare le DOM en cachant tout **/
 
-      /** Afficage Synchro **/
-      var sync = document.createElement("div")
-      sync.id = "FREE_SYNC"
-      sync.classList.add("hidden")
+      /** Afficage de la bande passante **/
+      var bandWidth = document.createElement("div")
+      bandWidth.id = "FREE_BAND"
+      bandWidth.classList.add("hidden")
       
-      var syncIcon = document.createElement("div")
-      syncIcon.classList.add("hidden")
-      syncIcon.id= "FREE_ICON"
-      sync.appendChild(syncIcon)
+      var bandWidthIcon = document.createElement("div")
+      bandWidthIcon.className = "bandwidth"
+      bandWidthIcon.classList.add("hidden")
+      bandWidthIcon.id= "FREE_ICON"
+      bandWidth.appendChild(bandWidthIcon)
       
-      var syncDisplay= document.createElement("div")
-      syncDisplay.id = "FREE_NAME"
-      syncDisplay.style.width= this.config.textWidth
-      syncDisplay.textContent = "ADSL2+ Sync"
-      sync.appendChild(syncDisplay)
+      var bandWidthDisplay= document.createElement("div")
+      bandWidthDisplay.id = "FREE_NAME"
+      bandWidthDisplay.style.width= this.config.textWidth
+      bandWidth.appendChild(bandWidthDisplay)
 
-      var syncStatus= document.createElement("div")
-      syncStatus.className= "switch"
-      syncStatus.classList.add("hidden")
+      var bandWidthStatus= document.createElement("div")
+      bandWidthStatus.className= "switch"
+      bandWidthStatus.classList.add("hidden")
 
-      var syncButton = document.createElement("INPUT")
-      syncButton.id = "switched"
-      syncButton.type = "checkbox"
-      syncButton.className = "switch-toggle switch-round";
-      syncButton.checked = false
-      syncButton.disabled = true
-      var syncLabelButton = document.createElement('label')
-      syncLabelButton.htmlFor = "swithed"
-      syncStatus.appendChild(syncButton)
-      syncStatus.appendChild(syncLabelButton)
+      var bandWidthButton = document.createElement("INPUT")
+      bandWidthButton.id = "switched"
+      bandWidthButton.type = "checkbox"
+      bandWidthButton.className = "switch-toggle switch-round";
+      bandWidthButton.checked = false
+      bandWidthButton.disabled = true
+      var bandWidthLabelButton = document.createElement('label')
+      bandWidthLabelButton.htmlFor = "swithed"
+      bandWidthStatus.appendChild(bandWidthButton)
+      bandWidthStatus.appendChild(bandWidthLabelButton)
 
-      sync.appendChild(syncStatus)
-      wrapper.appendChild(sync)
+      bandWidth.appendChild(bandWidthStatus)
+      wrapper.appendChild(bandWidth)
 
       /** appareils connecté **/
       if (Object.keys(client).length > 0) {
@@ -321,13 +330,18 @@ Module.register("MMM-Freebox", {
       debit.id = "FREE_DEBIT"
       debit.classList.add("hidden")
       var debitIcon = document.createElement("div")
-      debitIcon.classList.add("hidden")
       debitIcon.id= "FREE_ICON"
+      debitIcon.className = "bandwidth"
+      debitIcon.classList.add("hidden")
       debit.appendChild(debitIcon)
+      var debitText = document.createElement("div")
+      debitText.id = "FREE_TEXT"
+      debitText.textContent = "Débit Total utilisé:"
+      debit.appendChild(debitText)
       var debitDisplay= document.createElement("div")
-      debitDisplay.id = "FREE_NAME"
-      debitDisplay.style.width= this.config.textWidth
-      debitDisplay.textContent = "Débit Total utilisé 0/0 Ko/s"
+      debitDisplay.id = "FREE_DEBIT_VALUE"
+      //debitDisplay.style.width= this.config.textWidth
+
       debit.appendChild(debitDisplay)
   
       wrapper.appendChild(debit)
@@ -337,8 +351,9 @@ Module.register("MMM-Freebox", {
       call.id = "FREE_CALL"
       call.classList.add("hidden")
       var callIcon = document.createElement("div")
-      callIcon.classList.add("hidden")
       callIcon.id = "FREE_ICON"
+      callIcon.className = "missing"
+      callIcon.classList.add("hidden")
       call.appendChild(callIcon)
       var callMissed = document.createElement("div")
       callMissed.id = "FREE_CALL_MISSED"
@@ -359,6 +374,7 @@ Module.register("MMM-Freebox", {
           who.classList.add("hidden")
           var whoIcon = document.createElement("div")
           whoIcon.id = "FREE_ICON"
+          whoIcon.className = "missed"
           whoIcon.classList.add("hidden")
           who.appendChild(whoIcon)
           var whoDate = document.createElement("div")

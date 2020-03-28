@@ -1,6 +1,7 @@
 var NodeHelper = require('node_helper');
 const { Freebox } = require("freebox");
 var _ = require("underscore");
+var ping = require('ping');
 
 FB = (...args) => { /* do nothing */ }
 
@@ -18,11 +19,6 @@ async function Freebox_OS(token,id,domain,port) {
 
   await freebox.login()
 
-  const xdsl = await freebox.request({
-    method: "GET",
-    url: "connection/xdsl",
-  });
-
   const clients = await freebox.request({
     method: "GET",
     url: "lan/browser/pub/",
@@ -38,13 +34,17 @@ async function Freebox_OS(token,id,domain,port) {
     url:"call/log/",
   }),
   
-  sync = (xdsl.data.result.down.rate/1000).toFixed(2) + "/" + (xdsl.data.result.up.rate/1000).toFixed(2)
+  bandwidth = (cnx.data.result.bandwidth_down/1000000).toFixed(2) + "/" + (cnx.data.result.bandwidth_up/1000000).toFixed(2)
   debit = (cnx.data.result.rate_down/1000).toFixed(0) + "/" + (cnx.data.result.rate_up/1000).toFixed(0)
   state = cnx.data.result.state
   ip = cnx.data.result.ipv4
+  type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
+  degroup = (cnx.data.result.type == "rfc2684") ? true : false
 
   output = {
-    Sync: sync,
+    Type: type,
+    Degroup: degroup,
+    Bandwidth: bandwidth,
     Debit: debit,
     State : cnx.data.result.state,
     IP: cnx.data.result.ipv4,
@@ -62,13 +62,13 @@ module.exports = NodeHelper.create({
     console.log("[Freebox] Starting...")
     this.freebox = null
     this.init = false
+    this.pingValue = null
   },
 
   Freebox: function (token,id,domain,port) {
     Freebox_OS(token,id,domain,port).then(
       (res) => {
         if (!this.init) this.makeCache(res)
-        //else this.sendInfo("RESULT", res)
         else this.makeResult(res)
       },
       (err) => { 
@@ -85,6 +85,7 @@ module.exports = NodeHelper.create({
      this.config.api_domain,
      this.config.https_port
    )
+   if (this.config.showPing) this.Ping()
   },
 
   socketNotificationReceived: function(notification, payload) {
@@ -108,7 +109,7 @@ module.exports = NodeHelper.create({
   },
 
   sendInfo: function (noti, payload) {
-    FB("Send notification: " + noti, payload)
+    FB("Send notification: " + noti, this.config.verbose ? payload : "")
     if(!this.config.dev) this.sendSocketNotification(noti, payload)
   },
 
@@ -120,7 +121,7 @@ module.exports = NodeHelper.create({
         this.cache[client.l2ident.id] = {
           name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
           type: client.host_type,
-          show: (!this.config.showPlayer && client.vendor_name == "Freebox SAS") ? false : this.config.showClient
+          show: (!this.config.showFreePlayer && client.vendor_name == "Freebox SAS") ? false : this.config.showClient
         }
       }
     }
@@ -217,6 +218,18 @@ module.exports = NodeHelper.create({
 
     delete res.Call
     delete res.Client
+    res.Ping = this.pingValue
     this.sendInfo("RESULT", res)
-  }
+  },
+
+  Ping: function() {
+    ping.promise.probe("google.fr")
+    .then((res)=> {
+      if (res.alive) {
+        this.pingValue = res.time + " ms"
+      } else {
+        this.pingValue = "Erreur !"
+      }
+    })
+  },
 });
