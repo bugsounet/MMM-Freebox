@@ -35,7 +35,6 @@ Module.register("MMM-Freebox", {
       "Hidden": true,
       "Bandwidth": null,
       "Debit": null,
-      "State": null,
       "IP": null,
       "Degroup": false,
       "Type": null,
@@ -112,7 +111,6 @@ Module.register("MMM-Freebox", {
     this.Freebox.Degroup = payload.Degroup
     this.Freebox.Bandwidth = payload.Bandwidth
     this.Freebox.Debit = payload.Debit
-    this.Freebox.State = payload.State
     this.Freebox.IP = payload.IP
     this.Freebox.Clients = payload.Clients
     this.Freebox.Calls = payload.Calls
@@ -133,12 +131,6 @@ Module.register("MMM-Freebox", {
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
     bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':') + this.Freebox.Bandwidth + " Mb/s"
-
-    var bandWidthBouton = bandWidth.querySelector(".switch")
-    if (this.config.showButton) bandWidthBouton.classList.remove("hidden")
-
-    var bandWidthStatus = bandWidth.querySelector("INPUT")
-    bandWidthStatus.checked = (this.Freebox.status == "up") ? "true" : "false"
 
     /** Adresse IP **/
     var IP = document.getElementById("FREE_IP")
@@ -281,25 +273,9 @@ Module.register("MMM-Freebox", {
 
       var bandWidthDisplay= document.createElement("div")
       bandWidthDisplay.id = "FREE_VALUE"
-      bandWidthDisplay.style.width= (this.config.textWidth - 15) + "px"
+      bandWidthDisplay.style.width= this.config.textWidth + "px"
       bandWidth.appendChild(bandWidthDisplay)
 
-      var bandWidthStatus= document.createElement("div")
-      bandWidthStatus.className= "switch"
-      bandWidthStatus.classList.add("hidden")
-
-      var bandWidthButton = document.createElement("INPUT")
-      bandWidthButton.id = "switched"
-      bandWidthButton.type = "checkbox"
-      bandWidthButton.className = "switch-toggle switch-round";
-      bandWidthButton.checked = false
-      bandWidthButton.disabled = true
-      var bandWidthLabelButton = document.createElement('label')
-      bandWidthLabelButton.htmlFor = "swithed"
-      bandWidthStatus.appendChild(bandWidthButton)
-      bandWidthStatus.appendChild(bandWidthLabelButton)
-
-      bandWidth.appendChild(bandWidthStatus)
       wrapper.appendChild(bandWidth)
 
       /** Adresse IP **/

@@ -36,7 +36,6 @@ async function Freebox_OS(token,id,domain,port) {
   
   bandwidth = (cnx.data.result.bandwidth_down/1000000).toFixed(2) + "/" + (cnx.data.result.bandwidth_up/1000000).toFixed(2)
   debit = (cnx.data.result.rate_down/1000).toFixed(0) + "/" + (cnx.data.result.rate_up/1000).toFixed(0)
-  state = cnx.data.result.state
   ip = cnx.data.result.ipv4
   type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
   degroup = (cnx.data.result.type == "rfc2684") ? true : false
@@ -45,8 +44,7 @@ async function Freebox_OS(token,id,domain,port) {
     Degroup: degroup,
     Bandwidth: bandwidth,
     Debit: debit,
-    State : cnx.data.result.state,
-    IP: cnx.data.result.ipv4,
+    IP: ip,
     Client: clients.data.result,
     Call: calls.data.result
   }
