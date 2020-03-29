@@ -8,6 +8,9 @@
     "module",
     "freebox"
   ],
+  "scripts": {
+    "postinstall": "installer/postinstall.sh"
+  },
   "author": "bugs",
   "license": "MIT",
   "bugs": {

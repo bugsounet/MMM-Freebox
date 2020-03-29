@@ -5,7 +5,7 @@ Module.register("MMM-Freebox", {
   defaults: {
     updateDelay:  1 * 1000,
     app_token: "",
-    app_id: "",
+    app_id: 'fbx.MMM-Freebox',
     api_domain: "",
     https_port: 0,
     activeOnly: false,
@@ -53,6 +53,7 @@ Module.register("MMM-Freebox", {
       this.config.excludeMac = this.config.excludeMac.map(function(x){ return x.toUpperCase() })
     }
     if (this.config.textWidth < 220) this.config.textWidth = 220
+    if (typeof this.config.textWidth != 'number') this.config.textWidth = this.defaults.textWidth
     console.log("[Freebox] Started...")
   },
 
