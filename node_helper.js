@@ -111,7 +111,6 @@ module.exports = NodeHelper.create({
   },
 
   makeCache: function (res) {
-    console.log (res)
     this.cache = {}
     if (Object.keys(res.Client).length > 0) {
       for (let [item, client] of Object.entries(res.Client)) {
