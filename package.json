@@ -1,0 +1,28 @@
+{
+  "name": "MMM-Freebox",
+  "version": "1.0.0",
+  "description": "Display Freebox informations",
+  "main": "MMM-Freebox.js",
+  "keywords": [
+    "magic mirror",
+    "module",
+    "freebox"
+  ],
+  "scripts": {
+    "postinstall": "installer/postinstall.sh"
+  },
+  "author": "bugs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bugsounet/MMM-Freebox/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bugsounet/MMM-Freebox"
+  },
+  "homepage": "https://github.com/bugsounet/MMM-Freebox",
+  "dependencies": {
+    "ping": "^0.2.2",
+    "freebox": "^1.1.0"
+  }
+}
