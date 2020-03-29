@@ -17,13 +17,12 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
 
 ## Installation
-Clone the module into your MagicMirror module folder and execute `npm intall` in the module's directory.
+Clonez le module dans votre dossier de module de MagicMirror et exécutez `npm install` dans le répertoire du module.
 ```sh
 git clone https://github.com/bugsounet/MMM-Freebox.git
 cd MMM-Freebox
 npm install
 ```
-
 Associer votre MMM-Freebox a votre Freebox Server.
 
 Sauvegarder precieusement les informations de connexion de votre freebox. 
@@ -41,7 +40,6 @@ NE PAS LES DIVULGER
 
 ## Configuration
 Pour afficher le module, inserez ceci dans votre ficher `config.js`
-
 
 ### Configuration Minimale
 
