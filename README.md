@@ -14,7 +14,7 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Appels manqués
 
 ## Screenshoot
-![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/master/screenshoot.png)
+![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
 
 ## Installation
 Clone the module into your MagicMirror module folder and execute `npm intall` in the module's directory.
@@ -94,7 +94,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | Option  | Description | Type | Defaut |
 | ------- | --- | --- | --- |
 | updateDelay | Delai de mise à jour en ms | Number | 1 * 1000 (1 sec) |
-| activeOnly | Affiche uniquement les appareils connecté | Boolean | false |
+| activeOnly | Affiche uniquement les appareils connectés | Boolean | false |
 | showIcon| Affiche les icones | Boolean | true |
 | showButton | Affiche les boutons de status de connexion | Boolean | true) |
 | showBandWidth | Affiche la bande passante | Boolean | true |
@@ -106,13 +106,25 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | showIP | Affiche l'adresse ip de connexion | Boolean | true |
 | showPing | Affiche le ping entre le mirroir et google.fr | Boolean | true |
 | textWidth | Largeur du texte à afficher (mini: 220) | Number | 250 |
-| excludeMac | Ne pas afficher les appareils connecté avec certaines adresses MAC | Array | [] |
+| excludeMac | Ne pas afficher les appareils connectés avec certaines adresses MAC | Array | [] |
 | sortBy | Classement des appareils connectés par : type, name, mac ou null pour classement par defaut| String | null |
 | debug | Active le mode de debuguage | Boolean | false |
 | verbose | Active le mode verbose en console | Boolean| false |
+
+### Personalisation de l'affichage des appareils connecté
+
+ * Utilisez l'interface FreeboxOS de votre Freebox Server (Periphériques Réseau)
+ * Utilisez l'application freebox sur votre téléphone (Appareils Connectés)
 
 ## Change Log
 
 ### 2020-03-30
 - Initial Release
+
+## Notes:
+ - N'ayant pas la fibre, merci de me faire des remontés sur le comportement de ce module !
+ - Les essais ont été effectué avec des Freebox Mini 4k et Freebox Revolution.
+ - Pour les autres Freebox Server, je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
+ - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
+ - En cas de souci, ne pas hésiter a ouvrir une ISSUE
 
