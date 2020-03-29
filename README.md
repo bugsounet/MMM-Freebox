@@ -125,4 +125,3 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
  - Pour les autres Freebox Server, je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
  - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
  - En cas de souci, ne pas hésiter a ouvrir une ISSUE
-
