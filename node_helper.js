@@ -32,21 +32,57 @@ async function Freebox_OS(token,id,domain,port) {
   const calls = await freebox.request({
     method: "GET",
     url:"call/log/",
-  }),
-  
+  });
+
+  const wifiCnx = await freebox.request({
+    method: "GET",
+    url:"wifi/ap/0/stations/",
+  });
+
+  const ethCnx = await freebox.request({
+    method: "GET",
+    url:"switch/status/",
+  });
+
+  const eth1 = await freebox.request({
+    method: "GET",
+    url:"switch/port/1/stats",
+  });
+
+  const eth2 = await freebox.request({
+    method: "GET",
+    url:"switch/port/2/stats",
+  });
+
+  const eth3 = await freebox.request({
+    method: "GET",
+    url:"switch/port/3/stats",
+  });
+
+  const eth4 = await freebox.request({
+    method: "GET",
+    url:"switch/port/4/stats",
+  });
+
   bandwidth = (cnx.data.result.bandwidth_down/1000000).toFixed(2) + "/" + (cnx.data.result.bandwidth_up/1000000).toFixed(2)
   debit = (cnx.data.result.rate_down/1000).toFixed(0) + "/" + (cnx.data.result.rate_up/1000).toFixed(0)
-  ip = cnx.data.result.ipv4
   type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
   degroup = (cnx.data.result.type == "rfc2684") ? true : false
+
   output = {
     Type: type,
     Degroup: degroup,
     Bandwidth: bandwidth,
     Debit: debit,
-    IP: ip,
+    IP: cnx.data.result.ipv4,
     Client: clients.data.result,
-    Call: calls.data.result
+    Call: calls.data.result,
+    Wifi: wifiCnx.data.result,
+    EthCnx: ethCnx.data.result,
+    1: eth1.data.result,
+    2: eth2.data.result,
+    3: eth3.data.result,
+    4: eth4.data.result
   }
 
   await freebox.logout()
@@ -121,6 +157,7 @@ module.exports = NodeHelper.create({
         }
       }
     }
+
     this.cache = this.sortBy(this.cache, this.config.sortBy)
     var filtered = _.where(res.Call, {type: "missed"})
     var missed = filtered.length
@@ -191,7 +228,29 @@ module.exports = NodeHelper.create({
           name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
           type: client.host_type,
           vendor: client.vendor_name,
+          debit: null,
           active: client.active
+        }
+        /** rate of wifi devices **/
+        if (Object.keys(res.Wifi).length > 0) {
+          for (let [item, info] of Object.entries(res.Wifi)) {
+            if (client.l2ident.id == info.mac) {
+              device.debit = (info.tx_rate/1000).toFixed(0) + "/" + (info.rx_rate/1000).toFixed(0)
+            }
+          }
+        }
+        /** rate of eth devices **/
+        if (Object.keys(res.EthCnx).length > 0) {
+          for (let [item, info] of Object.entries(res.EthCnx)) {
+            if (info.mac_list) {
+              var macList = info.mac_list.map((mac_list)=>{return mac_list.mac})
+              macList.forEach(mac => {
+                if (client.l2ident.id == mac) {
+                  device.debit = (res[info.id].tx_bytes_rate/1000).toFixed(0) + "/" + (res[info.id].rx_bytes_rate/1000).toFixed(0)
+                }
+              })
+            }
+          }
         }
         res.Clients.push(device)
       }
@@ -212,8 +271,16 @@ module.exports = NodeHelper.create({
     }
     res.Calls.missed = missed
 
+    /** delete all Freebox result **/
     delete res.Call
     delete res.Client
+    delete res[1]
+    delete res[2]
+    delete res[3]
+    delete res[4]
+    delete res.Wifi
+    delete res.EthCnx
+
     res.Ping = this.pingValue
     this.sendInfo("RESULT", res)
   },

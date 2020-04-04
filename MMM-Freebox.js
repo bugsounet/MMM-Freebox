@@ -164,6 +164,9 @@ Module.register("MMM-Freebox", {
           clientName.textContent = cache.name
         }
 
+        var clientDebit = clientSelect.querySelector("#FREE_RATE")
+        clientDebit.textContent = client.debit ? client.debit + " ko/s" : ""
+
         var clientStatus = clientSelect.querySelector("INPUT")
         var clientIcon = clientSelect.querySelector("#FREE_ICON")
         var clientBouton = clientSelect.querySelector(".switch")
@@ -320,6 +323,11 @@ Module.register("MMM-Freebox", {
           clientName.style.width= this.config.textWidth + "px"
           clientName.textContent = setName
           client.appendChild(clientName)
+
+          var clientDebit = document.createElement("div")
+          clientDebit.id ="FREE_RATE"
+          clientDebit.textContent = "0/0 ko/s"
+          client.appendChild(clientDebit)
 
           var clientStatus = document.createElement("div")
           clientStatus.className = "switch"

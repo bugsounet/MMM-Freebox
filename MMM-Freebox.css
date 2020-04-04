@@ -34,6 +34,16 @@
     white-space: nowrap;
 }
 
+#FREE_RATE {
+    margin-left: 15px;
+    text-align: left;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    margin-right: 15px;
+    width: 60px;
+}
+
 #FREE_TEXT {
     margin-left: 15px;
 }
