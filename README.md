@@ -75,6 +75,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     showBandWidth: true,
     showRate: true,
     showClient: true,
+    showClientRate: true,
     showFreePlayer: true,
     showMissedCall: true,
     maxMissed: 3,
@@ -98,6 +99,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | showBandWidth | Affiche la bande passante | Boolean | true |
 | showRate | Affiche le débit utilisé | Boolean | true |
 | showClient | Affiche la liste des appareils | Boolean | true |
+| showClientRate | Affiche le débit de l'appareil | Boolean | true |
 | showFreePlayer | Affiche les Freebox Player | Boolean | true |
 | showMissedCall | Affiche les appels manqués | Boolean | true |
 | maxMissed | Nombre d'appel maximum à afficher | Number | 3 |
