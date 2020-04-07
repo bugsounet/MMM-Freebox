@@ -13,6 +13,8 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Ping de votre mirroir vers google.fr
  * Appels manqués
 
+## Update
+ * V1.1 : affichage des débits par appareils
 ## Screenshoot
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
 
