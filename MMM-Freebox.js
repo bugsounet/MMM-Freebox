@@ -14,6 +14,7 @@ Module.register("MMM-Freebox", {
     showBandWidth: true,
     showRate: true,
     showClient: true,
+    showClientRate: true,
     showFreePlayer: true,
     showMissedCall: true,
     maxMissed: 3,
@@ -164,9 +165,12 @@ Module.register("MMM-Freebox", {
           clientName.textContent = cache.name
         }
 
+        /** debit client **/
         var clientDebit = clientSelect.querySelector("#FREE_RATE")
+        if (this.config.showClientRate) clientDebit.classList.remove("hidden")
         clientDebit.textContent = client.debit ? client.debit + " ko/s" : ""
 
+        /** bouton **/
         var clientStatus = clientSelect.querySelector("INPUT")
         var clientIcon = clientSelect.querySelector("#FREE_ICON")
         var clientBouton = clientSelect.querySelector(".switch")
@@ -327,6 +331,7 @@ Module.register("MMM-Freebox", {
           var clientDebit = document.createElement("div")
           clientDebit.id ="FREE_RATE"
           clientDebit.textContent = "0/0 ko/s"
+          clientDebit.classList.add("hidden")
           client.appendChild(clientDebit)
 
           var clientStatus = document.createElement("div")
