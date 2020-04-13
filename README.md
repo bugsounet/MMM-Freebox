@@ -83,7 +83,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     maxMissed: 3,
     showIP: true,
     showPing: true,
-    pingAdress: "google.fr"
+    pingAdress: "google.fr",
     textWidth: 250,
     excludeMac: [],
     sortBy: null,
