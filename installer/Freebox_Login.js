@@ -1,4 +1,5 @@
 const { FreeboxRegister } = require("freebox");
+var count = 1
 
 async function main() {
   const freeboxRegister = new FreeboxRegister({
@@ -13,4 +14,13 @@ async function main() {
   const access = await freeboxRegister.register();
 }
 
-main().catch(err => console.error(err));
+function retry() {
+  console.log("Retry... "+ count + "/10")
+  count++
+  main().catch(err => {
+    console.log("[Freebox][Error] " + err)
+    if (count < 11) retry()
+  })
+}
+
+main().catch(err => retry() ) 

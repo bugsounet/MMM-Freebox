@@ -253,7 +253,14 @@ module.exports = NodeHelper.create({
                 var macList = info.mac_list.map((mac_list)=>{return mac_list.mac})
                 macList.forEach(mac => {
                   if (client.l2ident.id == mac) {
-                    device.debit = (res[info.id].tx_bytes_rate/1000).toFixed(0)
+                    if (this.config.issue) {
+                      FB("[ISSUE]res: ", res)
+                      FB("[ISSUE]info: ", info)
+                      FB("[ISSUE]res sur info.id:" , res[info.id])
+                    }
+                    if (res[info.id] && res[info.id].tx_bytes_rate)
+                      device.debit = (res[info.id].tx_bytes_rate/1000).toFixed(0)
+                    else device.debit = "erreur"
                   }
                 })
               }
@@ -296,7 +303,7 @@ module.exports = NodeHelper.create({
   },
 
   Ping: function() {
-    ping.promise.probe("google.fr",
+    ping.promise.probe(this.config.pingAdress,
       {
         timeout: 2,
         extra: ['-4']
