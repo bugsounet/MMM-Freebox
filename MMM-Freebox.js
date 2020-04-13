@@ -20,6 +20,7 @@ Module.register("MMM-Freebox", {
     maxMissed: 3,
     showIP: true,
     showPing: true,
+    pingAdress: "google.fr",
     textWidth: 250,
     excludeMac: [],
     sortBy: null,
@@ -387,7 +388,7 @@ Module.register("MMM-Freebox", {
       ping.appendChild(pingIcon)
       var pingText = document.createElement("div")
       pingText.id = "FREE_TEXT"
-      pingText.textContent = "Ping Google:"
+      pingText.textContent = "Ping:"
       ping.appendChild(pingText)
       var pingDisplay= document.createElement("div")
       pingDisplay.id = "FREE_VALUE"

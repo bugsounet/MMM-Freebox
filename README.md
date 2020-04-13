@@ -83,6 +83,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     maxMissed: 3,
     showIP: true,
     showPing: true,
+    pingAdress: "google.fr",
     textWidth: 250,
     excludeMac: [],
     sortBy: null,
@@ -107,6 +108,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | maxMissed | Nombre d'appel maximum à afficher | Number | 3 |
 | showIP | Affiche l'adresse ip de connexion | Boolean | true |
 | showPing | Affiche le ping entre le mirroir et google.fr | Boolean | true |
+| pingAdress| personalisation de l'adresse a ping | String | google.fr |
 | textWidth | Largeur du texte à afficher (mini: 220) | Number | 250 |
 | excludeMac | Ne pas afficher les appareils connectés avec certaines adresses MAC | Array | [] |
 | sortBy | Classement des appareils connectés par : type, name, mac ou null pour classement par defaut| String | null |
@@ -119,6 +121,10 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
  * Utilisez l'application freebox sur votre téléphone (Appareils Connectés)
 
 ## Change Log
+
+### 2020-04-13
+- Review npm install et le script d'association
+- Ajout pingAdress afin de personnaliser l'adresse a ping
 
 ### 2020-03-30
 - Initial Release
