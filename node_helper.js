@@ -253,14 +253,12 @@ module.exports = NodeHelper.create({
                 var macList = info.mac_list.map((mac_list)=>{return mac_list.mac})
                 macList.forEach(mac => {
                   if (client.l2ident.id == mac) {
-                    if (this.config.issue) {
-                      FB("[ISSUE]res: ", res)
-                      FB("[ISSUE]info: ", info)
-                      FB("[ISSUE]res sur info.id:" , res[info.id])
-                    }
+                    // devialet patch ou ... hub / cpl ?
+                    // bizarre ce crash... il est pas systématique
+                    // dans tous les cas, si erreur, je sors la valeur à 0
                     if (res[info.id] && res[info.id].tx_bytes_rate)
                       device.debit = (res[info.id].tx_bytes_rate/1000).toFixed(0)
-                    else device.debit = "erreur"
+                    else device.debit = "0"
                   }
                 })
               }
