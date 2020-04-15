@@ -2,19 +2,28 @@
 
 MMM-Freebox est un module pour le projet [MagicMirror](https://github.com/MichMich/MagicMirror) par [Michael Teeuw](https://github.com/MichMich).
 
-Il permet d'afficher, sur votre Mirroir, divers informations de votre Freebox en temps réél.
+Il permet d'afficher, sur votre Mirroir, divers informations de votre [Freebox](https://www.free.fr/freebox/) en temps réél.
 
 Plusieurs modules sont disponibles et permet l'affichage suivant:
 
  * Bande Passante.
  * Adresse IP.
  * Appareils connectés
- * Débit utilisé.
- * Ping de votre mirroir vers google.fr
- * Appels manqués
+ * Débit utilisé (total et/ou par appareil)
+ * Ping de votre mirroir vers google.fr (ou autre)
+ * Appels manqués.
 
 ## Update
- * V1.1 : affichage des débits par appareils
+ * v1.2.1 (15/04/2020)
+   * **FIX**: si erreur de récupération débit d'un appareil -> force valeur à 0
+ * v1.2.0 (13-04-2020)
+   * **FIX**: correction affichage par appareils (Freebox devialet) 
+   * **ADD**: Ajout de l'adresse du ping personalisé (pingAdress)
+   * **FIX**: Revu npm install et le script d'association
+ * v1.1.0 (07-04-2020)
+   * **ADD**: affichage des débits par appareils
+ * v1.0.0 (30-03-2020)
+   * Initial release
 ## Screenshoot
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
 
@@ -25,10 +34,10 @@ git clone https://github.com/bugsounet/MMM-Freebox.git
 cd MMM-Freebox
 npm install
 ```
-Associer votre MMM-Freebox a votre Freebox Server.
+Associer votre MMM-Freebox à votre Freebox Server.
 
-Sauvegarder precieusement les informations de connexion de votre freebox. 
-NE PAS LES DIVULGER
+Sauvegarder précieusement les informations de connexion de votre freebox. 
+**NE PAS LES DIVULGER**
 
 ```js
 { app_token: '<token>',
@@ -120,18 +129,9 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
  * Utilisez l'interface FreeboxOS de votre Freebox Server (Periphériques Réseau)
  * Utilisez l'application freebox sur votre téléphone (Appareils Connectés)
 
-## Change Log
-
-### 2020-04-13
-- Review npm install et le script d'association
-- Ajout pingAdress afin de personnaliser l'adresse a ping
-
-### 2020-03-30
-- Initial Release
-
 ## Notes:
  - N'ayant pas la fibre, merci de me faire des remontés sur le comportement de ce module !
- - Les essais ont été effectué avec des Freebox Mini 4k et Freebox Revolution.
- - Pour les autres Freebox Server, je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
+ - Les essais ont été effectué avec des Freebox Mini 4k, Freebox Revolution et Freebox Devialet.
+ - Je n'ai pas encore de retour sur la Freebox One, je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
  - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
  - En cas de souci, ne pas hésiter a ouvrir une ISSUE
