@@ -181,10 +181,14 @@ Module.register("MMM-Freebox", {
         if (this.config.showIcon) clientIcon.classList.remove("hidden")
         else clientIcon.classList.add("hidden")
 
+        /** Eclude @mac **/
         if (cache.show && excludeMac.indexOf(mac) == "-1") {
           if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
           else if (!this.config.activeOnly) clientSelect.classList.remove("hidden")
         }
+
+        /** activeOnly **/
+        if (this.config.activeOnly && !client.active) clientSelect.classList.add("hidden")
       }
     }
 
