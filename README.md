@@ -14,6 +14,8 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Appels manqués.
 
 ## Update
+ * v1.2.2 (18/04/2020)
+   * **FIX**: rafraichissement si activeOnly actif
  * v1.2.1 (15/04/2020)
    * **FIX**: si erreur de récupération débit d'un appareil -> force valeur à 0
  * v1.2.0 (13-04-2020)
