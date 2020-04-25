@@ -30,16 +30,22 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
 
 ## Installation
-Clonez le module dans votre dossier de module de MagicMirror et exécutez `npm install` dans le répertoire du module.
+ * Clonez le module dans votre dossier de module de MagicMirror et exécutez `npm install` dans le répertoire du module.
 ```sh
 git clone https://github.com/bugsounet/MMM-Freebox.git
 cd MMM-Freebox
 npm install
 ```
-Associer votre MMM-Freebox à votre Freebox Server.
+  * Associer votre MMM-Freebox à votre Freebox Server.
 
-Sauvegarder précieusement les informations de connexion de votre freebox. 
-**NE PAS LES DIVULGER**
+```sh
+Register MMM-Freebox to Freebox Server [Y/n] 
+Your choice: y
+Please check your Freebox Server LCD screen and authorize application access to register your app.
+```
+  * Validez l'association par la flèche de droite de l'écran LCD de votre Freebox Server.
+  
+  * Sauvegarder précieusement les informations de connexion de votre freebox. 
 
 ```js
 { app_token: '<token>',
@@ -50,6 +56,9 @@ Sauvegarder précieusement les informations de connexion de votre freebox.
   api_version: '6.0'
 }
 ```
+
+### **Attention:** Les informations fournies par la Freebox sont à considérer comme des identifiants !
+### Ne JAMAIS les divulguer car cela permet d'avoir un accès à votre freebox à distance !
 
 ## Configuration
 Pour afficher le module, inserez ceci dans votre ficher `config.js`
@@ -109,7 +118,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | updateDelay | Delai de mise à jour en ms | Number | 1 * 1000 (1 sec) |
 | activeOnly | Affiche uniquement les appareils connectés | Boolean | false |
 | showIcon| Affiche les icones | Boolean | true |
-| showButton | Affiche les boutons de status de connexion | Boolean | true) |
+| showButton | Affiche les boutons de status de connexion | Boolean | true |
 | showBandWidth | Affiche la bande passante | Boolean | true |
 | showRate | Affiche le débit utilisé | Boolean | true |
 | showClient | Affiche la liste des appareils | Boolean | true |
