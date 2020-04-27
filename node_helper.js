@@ -69,7 +69,7 @@ async function Freebox_OS(token,id,domain,port,clientRate, callLog) {
   }
 
   bandwidth = (cnx.data.result.bandwidth_down/1000000).toFixed(2) + "/" + (cnx.data.result.bandwidth_up/1000000).toFixed(2)
-  debit = (cnx.data.result.rate_down/1000).toFixed(0) + "/" + (cnx.data.result.rate_up/1000).toFixed(0)
+  debit = (cnx.data.result.rate_down/1000).toFixed(0) + " ko/s  -  " + (cnx.data.result.rate_up/1000).toFixed(0) //RTavernier
   type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
   degroup = (cnx.data.result.type == "rfc2684") ? true : false
 

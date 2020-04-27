@@ -17,6 +17,7 @@ Module.register("MMM-Freebox", {
     showClientRate: true,
     showFreePlayer: true,
     showMissedCall: true,
+    showVPNUsers: true,
     maxMissed: 3,
     showIP: true,
     showPing: true,
@@ -26,7 +27,8 @@ Module.register("MMM-Freebox", {
     sortBy: null,
     debug: false,
     verbose: false,
-    dev: false
+    dev: false,
+    debitText: "Débit total utilisé : "
   },
 
   start: function () {
@@ -44,7 +46,8 @@ Module.register("MMM-Freebox", {
       "Cache": {},
       "Calls" : [],
       "MissedCall": 0,
-      "Ping": null
+      "Ping": null,
+      "VPNUsers": [],
     }
 
     this.maxMissedCall = 0
@@ -116,6 +119,7 @@ Module.register("MMM-Freebox", {
     this.Freebox.IP = payload.IP
     this.Freebox.Clients = payload.Clients
     this.Freebox.Calls = payload.Calls
+    this.Freebox.VPNUsers = payload.VPNUsers
     this.Freebox.Ping = payload.Ping
     FB("Result:", this.Freebox)
     this.displayDom()
@@ -198,7 +202,7 @@ Module.register("MMM-Freebox", {
     var debitValue = debit.querySelector("#FREE_VALUE")
     if (this.config.showIcon) debitIcon.classList.remove("hidden")
     if (this.config.showRate) debit.classList.remove("hidden")
-    debitValue.textContent = this.Freebox.Debit + " Ko/s"
+    debitValue.textContent = this.Freebox.Debit + " ko/s" 
 
     /** Affichage Ping en temps réél **/
     var ping = document.getElementById("FREE_PING")
@@ -237,6 +241,31 @@ Module.register("MMM-Freebox", {
         whoDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") + " :"
       }
     }
+
+    /** Utilisateurs VPN **/
+    if  (this.Freebox.nbVPNUsers > 0) {
+      var vpn = document.getElementById("FREE_VPN")
+      if (this.config.showVPNUsers) call.classList.remove("hidden")
+
+      for (let [nb, value] of Object.entries(this.Freebox.VPNUsers)) { // Verifier qu'on parcours bien le tableau
+        var vpnUser = document.getElementsByClassName("VPNUSER_" + nb)
+        if (this.config.showVPNUsers) vpnUser[0].classList.remove("hidden")
+        var vpnType = vpnUser[0].querySelector("#FREE_TYPE")
+        var vpnIP = vpnUser[0].querySelector("#FREE_IP")
+        var vpnRX = vpnUser[0].querySelector("#FREE_RX")
+        var vpnTX = vpnUser[0].querySelector("#FREE_TX")
+        var vpnDate = vpnUser[0].querySelector("#FREE_DATE")
+        vpnUser.textContent = value.user
+        vpnType.textContent = value.vpn
+        vpnIP.textContent   = value.src_ip
+        vpnRX.textContent   = value.rx_bytes
+        vpnTX.textContent   = value.tx_bytes
+        vpnDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") 
+      }
+    }
+
+
+
   },
 
   ScanClient: function () {
@@ -373,7 +402,7 @@ Module.register("MMM-Freebox", {
       debit.appendChild(debitIcon)
       var debitText = document.createElement("div")
       debitText.id = "FREE_TEXT"
-      debitText.textContent = "Débit Total utilisé:"
+      debitText.textContent = this.config.debitText 
       debit.appendChild(debitText)
       var debitDisplay= document.createElement("div")
       debitDisplay.id = "FREE_VALUE"
@@ -392,7 +421,7 @@ Module.register("MMM-Freebox", {
       ping.appendChild(pingIcon)
       var pingText = document.createElement("div")
       pingText.id = "FREE_TEXT"
-      pingText.textContent = "Ping:"
+      pingText.textContent = "Ping :"
       ping.appendChild(pingText)
       var pingDisplay= document.createElement("div")
       pingDisplay.id = "FREE_VALUE"
@@ -440,9 +469,59 @@ Module.register("MMM-Freebox", {
           wrapper.appendChild(who)
         }
       }
+    
+      
+      /** Utilisateurs VPN **/
+      
+      var vpn = document.createElement("div")
+      vpn.id = "FREE_VPN"
+      vpn.classList.add("hidden")
+      var vpnUsers = document.createElement("div")
+      vpnUsers.id = "FREE_VPNUSERS"
+      vpn.appendChild(vpnUsers)
+
+      wrapper.appendChild(vpn)
+
+      if (this.Freebox.nbVPNUsers > 0) {
+
+        for (var x =0;x < this.nbVPNUsers; x++) {
+
+          var vpnUser = document.createElement("div")
+          vpnUser.id = "FREE_VPNUSER"
+          vpnUser.className= "VPNUSER_"+ x
+          vpnUser.classList.add("hidden")
+
+          var vpnType = document.createElement("div")
+          vpnType.id = "FREE_VPNTYPE"
+          vpnType.className = "type"
+          vpnType.classList.add("hidden")
+          vpnUser.appendChild(vpnType)
+
+          var vpnIp = document.createElement("div")
+          vpnIp.id = "FREE_VPNIP"
+          vpnUser.appendChild(vpnIp)
+
+	  var vpnRx = document.createElement("div")
+          vpnRx.id = "FREE_VPNRX"
+          vpnUser.appendChild(vpnRx)
+
+          var vpnTx = document.createElement("div")
+          vpnTx.id = "FREE_VPNTX"
+          vpnUser.appendChild(vpnTx)
+
+	  var vpnDate = document.createElement("div")
+          vpnDate.id = "FREE_VPNDATE"
+          vpnUser.appendChild(vpnDate)
+
+          wrapper.appendChild(vpnUser)
+        }
+      }
     }
+
+
     return wrapper
-	},
+
+  },
 
 /*****************************************/
 
