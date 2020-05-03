@@ -5,7 +5,7 @@ var ping = require('ping');
 
 FB = (...args) => { /* do nothing */ }
 
-async function Freebox_OS(token,id,domain,port,clientRate, callLog) {
+async function Freebox_OS(token,id,domain,port,clientRate, callLog, vpnUser) {
   var rate
   var output
   const freebox = new Freebox({
@@ -67,6 +67,14 @@ async function Freebox_OS(token,id,domain,port,clientRate, callLog) {
       url:"switch/port/4/stats",
     });
   }
+  if (vpnUser) {
+    var vpnUsers = await freebox.request({
+      method: "GET",
+      url:"vpn/connection/",
+    });
+  }
+
+ 
 
   bandwidth = (cnx.data.result.bandwidth_down/1000000).toFixed(2) + "/" + (cnx.data.result.bandwidth_up/1000000).toFixed(2)
   debit = (cnx.data.result.rate_down/1000).toFixed(0) + " ko/s  -  " + (cnx.data.result.rate_up/1000).toFixed(0) //RTavernier
@@ -86,7 +94,8 @@ async function Freebox_OS(token,id,domain,port,clientRate, callLog) {
     1: clientRate ? eth1.data.result : null,
     2: clientRate ? eth2.data.result : null,
     3: clientRate ? eth3.data.result : null,
-    4: clientRate ? eth4.data.result : null
+    4: clientRate ? eth4.data.result : null,
+    VPNUser: vpnUser ? vpnUsers.data.result: null,
   }
 
   await freebox.logout()
@@ -103,7 +112,7 @@ module.exports = NodeHelper.create({
   },
 
   Freebox: function (token,id,domain,port) {
-    Freebox_OS(token,id,domain,port,this.config.showClientRate,this.config.showMissedCall).then(
+    Freebox_OS(token,id,domain,port,this.config.showClientRate,this.config.showMissedCall,this.config.showVPNUsers).then(
       (res) => {
         if (!this.init) this.makeCache(res)
         else this.makeResult(res)
@@ -168,6 +177,15 @@ module.exports = NodeHelper.create({
       var missed = filtered.length
       this.sendInfo("MISSED_CALL", missed)
     }
+
+    if (this.config.showVPNUsers) { //verifier que ça fonctionne
+      var nbVPNUser = 0
+      if (res.VPNUser)
+	nbVPNUser = res.VPNUser.length
+      
+      this.sendInfo("NB_VPN_USER", nbVPNUser)
+    }
+
     this.sendInfo("INITIALIZED", this.cache)
 
   },
@@ -225,6 +243,9 @@ module.exports = NodeHelper.create({
     res.Calls= {}
     res.Calls.who = []
     res.Calls.missed = 0
+    res.VPNUsers = {}
+    res.VPNUsers.who = []
+    res.VPNUsers.nb = 0
     var device = {}
     /** Array of client with used value in object **/
     if (Object.keys(res.Client).length > 0) {
@@ -286,6 +307,35 @@ module.exports = NodeHelper.create({
       res.Calls.missed = missed
     }
 
+    if (this.config.showVPNUsers) {
+      var nbVPNUser = 0
+
+      if (res.VPNUser)
+         nbVPNUser = res.VPNUser.length
+
+      var vpnUser = {}
+	
+      if (nbVPNUser > 0) {
+      	res.VPNUser.forEach(function(x)
+	{
+            vpnUser = {
+            user:       x.user,
+            vpn:        x.vpn,
+            src_ip:     x.src_ip,
+            rx_bytes:   x.rx_bytes,
+            tx_bytes:   x.tx_bytes,
+            date:       x.auth_time,
+            new:        x.new // verifier ça donne undefined
+          }
+          res.VPNUsers.who.push(vpnUser)
+
+      	});
+
+      	res.VPNUsers.nb = nbVPNUser
+      }
+    }
+
+
     /** delete all Freebox result **/
     delete res.Call
     delete res.Client
@@ -295,6 +345,7 @@ module.exports = NodeHelper.create({
     delete res[4]
     delete res.Wifi
     delete res.EthCnx
+    delete res.VPNUser
 
     res.Ping = this.config.showPing ? this.pingValue : null
     this.sendInfo("RESULT", res)

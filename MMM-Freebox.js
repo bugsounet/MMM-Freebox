@@ -48,6 +48,7 @@ Module.register("MMM-Freebox", {
       "MissedCall": 0,
       "Ping": null,
       "VPNUsers": [],
+      "nbVPNUser": 0,
     }
 
     this.maxMissedCall = 0
@@ -84,6 +85,10 @@ Module.register("MMM-Freebox", {
       case "RESULT":
         this.result(payload)
         break
+      case "NB_VPN_USER":
+        this.Freebox.nbVPNUser = payload
+        break
+
     }
   },
 
@@ -137,6 +142,7 @@ Module.register("MMM-Freebox", {
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
     bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':') + this.Freebox.Bandwidth + " Mb/s"
+    
 
     /** Adresse IP **/
     var IP = document.getElementById("FREE_IP")
@@ -243,24 +249,18 @@ Module.register("MMM-Freebox", {
     }
 
     /** Utilisateurs VPN **/
-    if  (this.Freebox.nbVPNUsers > 0) {
-      var vpn = document.getElementById("FREE_VPN")
-      if (this.config.showVPNUsers) call.classList.remove("hidden")
-
-      for (let [nb, value] of Object.entries(this.Freebox.VPNUsers)) { // Verifier qu'on parcours bien le tableau
+    if  (this.Freebox.VPNUsers.nb > 0) {
+      for (let [nb, value] of Object.entries(this.Freebox.VPNUsers.who)) { // Verifier qu'on parcours bien le tableau
         var vpnUser = document.getElementsByClassName("VPNUSER_" + nb)
         if (this.config.showVPNUsers) vpnUser[0].classList.remove("hidden")
-        var vpnType = vpnUser[0].querySelector("#FREE_TYPE")
-        var vpnIP = vpnUser[0].querySelector("#FREE_IP")
-        var vpnRX = vpnUser[0].querySelector("#FREE_RX")
-        var vpnTX = vpnUser[0].querySelector("#FREE_TX")
-        var vpnDate = vpnUser[0].querySelector("#FREE_DATE")
-        vpnUser.textContent = value.user
-        vpnType.textContent = value.vpn
-        vpnIP.textContent   = value.src_ip
-        vpnRX.textContent   = value.rx_bytes
-        vpnTX.textContent   = value.tx_bytes
-        vpnDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") 
+        var vpnLogin = vpnUser[0].querySelector("#FREE_VPNLOGIN")
+        var vpnType  = vpnUser[0].querySelector("#FREE_VPNTYPE")
+        var vpnRXTX    = vpnUser[0].querySelector("#FREE_VPNRXTX")
+        var vpnDate  = vpnUser[0].querySelector("#FREE_VPNDATE")
+        vpnLogin.innerHTML = value.user 
+        vpnType.innerHTML = value.vpn +"<br/> (" + value.src_ip +")"
+        vpnRXTX.innerHTML    = this.oKoMoGo(value.rx_bytes)+ " &#8659 <br/> " + this.oKoMoGo(value.tx_bytes) + " &#8657"
+        vpnDate.innerHTML  = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm") 
       }
     }
 
@@ -472,48 +472,41 @@ Module.register("MMM-Freebox", {
     
       
       /** Utilisateurs VPN **/
-      
-      var vpn = document.createElement("div")
-      vpn.id = "FREE_VPN"
-      vpn.classList.add("hidden")
-      var vpnUsers = document.createElement("div")
-      vpnUsers.id = "FREE_VPNUSERS"
-      vpn.appendChild(vpnUsers)
+      if (this.Freebox.nbVPNUser > 0) {
+	var table = document.createElement("table")
+        table.id = "vpnUsersTable"
+        table.className = "xsmall"
+	table.style.borderSpacing = "10px 3px"
+	wrapper.appendChild(table)
 
-      wrapper.appendChild(vpn)
+        for (var x = 0 ; x < this.Freebox.nbVPNUser; x++) {
 
-      if (this.Freebox.nbVPNUsers > 0) {
-
-        for (var x =0;x < this.nbVPNUsers; x++) {
-
-          var vpnUser = document.createElement("div")
+	  var vpnUser = document.createElement("tr")
           vpnUser.id = "FREE_VPNUSER"
           vpnUser.className= "VPNUSER_"+ x
           vpnUser.classList.add("hidden")
+	  table.appendChild(vpnUser)
 
-          var vpnType = document.createElement("div")
+          var vpnLogin = document.createElement("td")
+          vpnLogin.id = "FREE_VPNLOGIN"
+          vpnLogin.className = "bright"
+          vpnUser.appendChild(vpnLogin)
+
+          var vpnType = document.createElement("td")
           vpnType.id = "FREE_VPNTYPE"
-          vpnType.className = "type"
-          vpnType.classList.add("hidden")
+          vpnType.style.textAlign = "center"
           vpnUser.appendChild(vpnType)
 
-          var vpnIp = document.createElement("div")
-          vpnIp.id = "FREE_VPNIP"
-          vpnUser.appendChild(vpnIp)
+	  var vpnRxTx = document.createElement("td")
+          vpnRxTx.id = "FREE_VPNRXTX"
+          vpnUser.appendChild(vpnRxTx)
 
-	  var vpnRx = document.createElement("div")
-          vpnRx.id = "FREE_VPNRX"
-          vpnUser.appendChild(vpnRx)
-
-          var vpnTx = document.createElement("div")
-          vpnTx.id = "FREE_VPNTX"
-          vpnUser.appendChild(vpnTx)
-
-	  var vpnDate = document.createElement("div")
+	  var vpnDate = document.createElement("td")
           vpnDate.id = "FREE_VPNDATE"
+          vpnDate.style.textAlign = "center"
           vpnUser.appendChild(vpnDate)
 
-          wrapper.appendChild(vpnUser)
+          //wrapper.appendChild(vpnUser)
         }
       }
     }
@@ -531,5 +524,20 @@ Module.register("MMM-Freebox", {
 
   getStyles: function() {
     return ["MMM-Freebox.css"]
-  }
+  },
+	
+  // Affichage humaan readable des octests
+  oKoMoGo: function(octet) {
+  	if (octet>1000000000){
+        	octet=octet/1000000000 + 'Go'
+        }else if (octet>1000000){
+                octet=octet/1000000 + 'Mo'
+        }else if (octet>1000){
+                octet=octet/1000 + 'Ko'
+        }else {
+                octet=octet + 'o'
+        }
+     	return octet
+  },
+
 });
