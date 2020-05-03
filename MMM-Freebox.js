@@ -249,6 +249,14 @@ Module.register("MMM-Freebox", {
     }
 
     /** Utilisateurs VPN **/
+    if (this.Freebox.VPNUsers.nb != this.Freebox.nbVPNUser) {
+      clearInterval(this.update)
+      this.update = null
+      FB("Connection/Deco VPN - Rechargement du cache.")
+      return this.sendSocketNotification("CACHE")
+    }
+
+
     if  (this.Freebox.VPNUsers.nb > 0) {
       for (let [nb, value] of Object.entries(this.Freebox.VPNUsers.who)) { // Verifier qu'on parcours bien le tableau
         var vpnUser = document.getElementsByClassName("VPNUSER_" + nb)
