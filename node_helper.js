@@ -109,7 +109,7 @@ module.exports = NodeHelper.create({
         else this.makeResult(res)
       },
       (err) => { 
-        console.log("[Freebox] " + err)
+        FB("[Freebox] " + err)
         if (!this.init) this.scan() 
       }
     )
