@@ -17,6 +17,7 @@ Module.register("MMM-Freebox", {
     showClientRate: true,
     showFreePlayer: true,
     showMissedCall: true,
+    showVPNUsers: true,
     maxMissed: 3,
     showIP: true,
     showPing: true,
@@ -26,7 +27,8 @@ Module.register("MMM-Freebox", {
     sortBy: null,
     debug: false,
     verbose: false,
-    dev: false
+    dev: false,
+    debitText: "Débit total utilisé : "
   },
 
   start: function () {
@@ -44,7 +46,9 @@ Module.register("MMM-Freebox", {
       "Cache": {},
       "Calls" : [],
       "MissedCall": 0,
-      "Ping": null
+      "Ping": null,
+      "VPNUsers": [],
+      "nbVPNUser": 0,
     }
 
     this.maxMissedCall = 0
@@ -81,6 +85,10 @@ Module.register("MMM-Freebox", {
       case "RESULT":
         this.result(payload)
         break
+      case "NB_VPN_USER":
+        this.Freebox.nbVPNUser = payload
+        break
+
     }
   },
 
@@ -116,6 +124,7 @@ Module.register("MMM-Freebox", {
     this.Freebox.IP = payload.IP
     this.Freebox.Clients = payload.Clients
     this.Freebox.Calls = payload.Calls
+    this.Freebox.VPNUsers = payload.VPNUsers
     this.Freebox.Ping = payload.Ping
     FB("Result:", this.Freebox)
     this.displayDom()
@@ -133,6 +142,7 @@ Module.register("MMM-Freebox", {
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
     bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':') + this.Freebox.Bandwidth + " Mb/s"
+    
 
     /** Adresse IP **/
     var IP = document.getElementById("FREE_IP")
@@ -198,7 +208,7 @@ Module.register("MMM-Freebox", {
     var debitValue = debit.querySelector("#FREE_VALUE")
     if (this.config.showIcon) debitIcon.classList.remove("hidden")
     if (this.config.showRate) debit.classList.remove("hidden")
-    debitValue.textContent = this.Freebox.Debit + " Ko/s"
+    debitValue.textContent = this.Freebox.Debit + " ko/s" 
 
     /** Affichage Ping en temps réél **/
     var ping = document.getElementById("FREE_PING")
@@ -237,6 +247,33 @@ Module.register("MMM-Freebox", {
         whoDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") + " :"
       }
     }
+
+    /** Utilisateurs VPN **/
+    if (this.Freebox.VPNUsers.nb != this.Freebox.nbVPNUser) {
+      clearInterval(this.update)
+      this.update = null
+      FB("Connection/Deco VPN - Rechargement du cache.")
+      return this.sendSocketNotification("CACHE")
+    }
+
+
+    if  (this.Freebox.VPNUsers.nb > 0) {
+      for (let [nb, value] of Object.entries(this.Freebox.VPNUsers.who)) { // Verifier qu'on parcours bien le tableau
+        var vpnUser = document.getElementsByClassName("VPNUSER_" + nb)
+        if (this.config.showVPNUsers) vpnUser[0].classList.remove("hidden")
+        var vpnLogin = vpnUser[0].querySelector("#FREE_VPNLOGIN")
+        var vpnType  = vpnUser[0].querySelector("#FREE_VPNTYPE")
+        var vpnRXTX    = vpnUser[0].querySelector("#FREE_VPNRXTX")
+        var vpnDate  = vpnUser[0].querySelector("#FREE_VPNDATE")
+        vpnLogin.innerHTML = value.user 
+        vpnType.innerHTML = value.vpn +"<br/> (" + value.src_ip +")"
+        vpnRXTX.innerHTML    = this.oKoMoGo(value.rx_bytes)+ " &#8659 <br/> " + this.oKoMoGo(value.tx_bytes) + " &#8657"
+        vpnDate.innerHTML  = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm") 
+      }
+    }
+
+
+
   },
 
   ScanClient: function () {
@@ -373,7 +410,7 @@ Module.register("MMM-Freebox", {
       debit.appendChild(debitIcon)
       var debitText = document.createElement("div")
       debitText.id = "FREE_TEXT"
-      debitText.textContent = "Débit Total utilisé:"
+      debitText.textContent = this.config.debitText 
       debit.appendChild(debitText)
       var debitDisplay= document.createElement("div")
       debitDisplay.id = "FREE_VALUE"
@@ -392,7 +429,7 @@ Module.register("MMM-Freebox", {
       ping.appendChild(pingIcon)
       var pingText = document.createElement("div")
       pingText.id = "FREE_TEXT"
-      pingText.textContent = "Ping:"
+      pingText.textContent = "Ping :"
       ping.appendChild(pingText)
       var pingDisplay= document.createElement("div")
       pingDisplay.id = "FREE_VALUE"
@@ -440,9 +477,52 @@ Module.register("MMM-Freebox", {
           wrapper.appendChild(who)
         }
       }
+    
+      
+      /** Utilisateurs VPN **/
+      if (this.Freebox.nbVPNUser > 0) {
+	var table = document.createElement("table")
+        table.id = "vpnUsersTable"
+        table.className = "xsmall"
+	table.style.borderSpacing = "10px 3px"
+	wrapper.appendChild(table)
+
+        for (var x = 0 ; x < this.Freebox.nbVPNUser; x++) {
+
+	  var vpnUser = document.createElement("tr")
+          vpnUser.id = "FREE_VPNUSER"
+          vpnUser.className= "VPNUSER_"+ x
+          vpnUser.classList.add("hidden")
+	  table.appendChild(vpnUser)
+
+          var vpnLogin = document.createElement("td")
+          vpnLogin.id = "FREE_VPNLOGIN"
+          vpnLogin.className = "bright"
+          vpnUser.appendChild(vpnLogin)
+
+          var vpnType = document.createElement("td")
+          vpnType.id = "FREE_VPNTYPE"
+          vpnType.style.textAlign = "center"
+          vpnUser.appendChild(vpnType)
+
+	  var vpnRxTx = document.createElement("td")
+          vpnRxTx.id = "FREE_VPNRXTX"
+          vpnUser.appendChild(vpnRxTx)
+
+	  var vpnDate = document.createElement("td")
+          vpnDate.id = "FREE_VPNDATE"
+          vpnDate.style.textAlign = "center"
+          vpnUser.appendChild(vpnDate)
+
+          //wrapper.appendChild(vpnUser)
+        }
+      }
     }
+
+
     return wrapper
-	},
+
+  },
 
 /*****************************************/
 
@@ -452,5 +532,20 @@ Module.register("MMM-Freebox", {
 
   getStyles: function() {
     return ["MMM-Freebox.css"]
-  }
+  },
+	
+  // Affichage humaan readable des octests
+  oKoMoGo: function(octet) {
+  	if (octet>1000000000){
+        	octet=octet/1000000000 + 'Go'
+        }else if (octet>1000000){
+                octet=octet/1000000 + 'Mo'
+        }else if (octet>1000){
+                octet=octet/1000 + 'Ko'
+        }else {
+                octet=octet + 'o'
+        }
+     	return octet
+  },
+
 });
