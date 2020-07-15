@@ -14,6 +14,11 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Appels manqués.
 
 ## Update
+ * V1.3.0 (15/07/2020)
+   * Probleme côté Free avec le protocole SSL (utilisation du mode HTTP en attendant)
+   * Creation de la nouvelle librairie API Freebox
+   * Pre-code pour le VPN
+   * Nouveau format de configuration (uniquement le token est necessaire)
  * v1.2.2 (18/04/2020)
    * **FIX**: rafraichissement si activeOnly actif
  * v1.2.1 (15/04/2020)
@@ -41,20 +46,14 @@ npm install
 ```sh
 Register MMM-Freebox to Freebox Server [Y/n] 
 Your choice: y
-Please check your Freebox Server LCD screen and authorize application access to register your app.
+Merci de vérifier votre écran LCD de votre Freebox Server et autoriser l'enregistrement de l'application.
 ```
   * Validez l'association par la flèche de droite de l'écran LCD de votre Freebox Server.
   
-  * Sauvegarder précieusement les informations de connexion de votre freebox. 
+  * Sauvegarder précieusement l'information de connexion. 
 
 ```js
-{ app_token: '<token>',
-  app_id: 'fbx.MMM-Freebox',
-  api_domain: '<domain>.fbxos.fr',
-  https_port: <port>,
-  api_base_url: '/api/',
-  api_version: '6.0'
-}
+token: "<token>",
 ```
 
 ### **Attention:** Les informations fournies par la Freebox sont à considérer comme des identifiants !
@@ -65,15 +64,13 @@ Pour afficher le module, inserez ceci dans votre ficher `config.js`
 
 ### Configuration Minimale
 
-Remplacer par les valeurs de connexion fourni par votre Freebox Server.
+Remplacer le tokden la valeurs de connexion fourni par votre Freebox Server.
 ```js
 {
   module: "MMM-Freebox",
   position: "top_center",
   config: {
-    app_token: '<token>',
-    api_domain: '<domain>.fbxos.fr',
-    https_port: <port>,
+    token: "<token>",
   }
 },
 ```
@@ -85,11 +82,8 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
   module: 'MMM-Freebox',
   position: 'top_center',
   config: {
-    /** remplacer ci-dessous par vos valeurs **/
-    app_token:  '<token>',
-    api_domain: '<domain>.fbxos.fr',
-    https_port:  <port>,
-    /**  **/
+    /** remplacer le token par votre valeur **/
+    token:  '<token>',
     updateDelay:  1 * 1000,
     activeOnly: false,
     showIcon: true,
@@ -141,7 +135,6 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
  * Utilisez l'application freebox sur votre téléphone (Appareils Connectés)
 
 ## Notes:
- - N'ayant pas la fibre, merci de me faire des remontés sur le comportement de ce module !
  - Les essais ont été effectué avec des Freebox Mini 4k, Freebox Revolution et Freebox Devialet.
  - Je n'ai pas encore de retour sur la Freebox One, je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
  - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
