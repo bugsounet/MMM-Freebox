@@ -271,6 +271,7 @@ Module.register("MMM-Freebox", {
     }
   },
 
+  /** scan main loop **/
   ScanClient: function () {
     clearInterval(this.update)
     this.update = null
@@ -285,6 +286,19 @@ Module.register("MMM-Freebox", {
         this.ScanClient()
       }
     }, 1000);
+  },
+
+  /** ne scan pas si le module est suspendu **/
+  suspend: function() {
+    clearInterval(this.update)
+    this.update = null
+    console.log("MMM-Freebox is suspended.")
+  },
+
+  /** reprend le scan si le module est actif **/
+  resume: function() {
+    this.ScanClient()
+    console.log("MMM-Freebox is resumed.")
   },
 
   getDom: function () {
