@@ -84,7 +84,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
   config: {
     /** remplacer le token par votre valeur **/
     token:  "<token>",
-    updateDelay:  1 * 1000,
+    updateDelay:  5 * 1000,
     activeOnly: false,
     showIcon: true,
     showButton: true,
@@ -109,7 +109,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 
 | Option  | Description | Type | Defaut |
 | ------- | --- | --- | --- |
-| updateDelay | Delai de mise à jour en ms | Number | 1 * 1000 (1 sec) |
+| updateDelay | Delai de mise à jour en ms | Number | 5 * 1000 (5 sec) |
 | activeOnly | Affiche uniquement les appareils connectés | Boolean | false |
 | showIcon| Affiche les icones | Boolean | true |
 | showButton | Affiche les boutons de status de connexion | Boolean | true |
