@@ -83,7 +83,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
   position: 'top_center',
   config: {
     /** remplacer le token par votre valeur **/
-    token:  '<token>',
+    token:  "<token>",
     updateDelay:  1 * 1000,
     activeOnly: false,
     showIcon: true,
