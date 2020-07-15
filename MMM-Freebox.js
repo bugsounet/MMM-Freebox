@@ -3,11 +3,8 @@ FB = (...arg) => { /* do nothing */ }
 Module.register("MMM-Freebox", {
 
   defaults: {
-    updateDelay:  1 * 1000,
-    app_token: "",
-    app_id: 'fbx.MMM-Freebox',
-    api_domain: "",
-    https_port: 0,
+    updateDelay:  5 * 1000,
+    token: "",
     activeOnly: false,
     showIcon: true,
     showButton: true,
@@ -17,7 +14,7 @@ Module.register("MMM-Freebox", {
     showClientRate: true,
     showFreePlayer: true,
     showMissedCall: true,
-    showVPNUsers: true,
+    showVPNUsers: false, // disabled by default. I will see your code to do better
     maxMissed: 3,
     showIP: true,
     showPing: true,
@@ -208,7 +205,7 @@ Module.register("MMM-Freebox", {
     var debitValue = debit.querySelector("#FREE_VALUE")
     if (this.config.showIcon) debitIcon.classList.remove("hidden")
     if (this.config.showRate) debit.classList.remove("hidden")
-    debitValue.textContent = this.Freebox.Debit + " ko/s" 
+    debitValue.textContent = this.Freebox.Debit
 
     /** Affichage Ping en temps réél **/
     var ping = document.getElementById("FREE_PING")
@@ -257,23 +254,21 @@ Module.register("MMM-Freebox", {
     }
 
 
+    /** @todo: faire mieux ;) **/
     if  (this.Freebox.VPNUsers.nb > 0) {
       for (let [nb, value] of Object.entries(this.Freebox.VPNUsers.who)) { // Verifier qu'on parcours bien le tableau
         var vpnUser = document.getElementsByClassName("VPNUSER_" + nb)
         if (this.config.showVPNUsers) vpnUser[0].classList.remove("hidden")
         var vpnLogin = vpnUser[0].querySelector("#FREE_VPNLOGIN")
         var vpnType  = vpnUser[0].querySelector("#FREE_VPNTYPE")
-        var vpnRXTX    = vpnUser[0].querySelector("#FREE_VPNRXTX")
+        var vpnRXTX  = vpnUser[0].querySelector("#FREE_VPNRXTX")
         var vpnDate  = vpnUser[0].querySelector("#FREE_VPNDATE")
         vpnLogin.innerHTML = value.user 
         vpnType.innerHTML = value.vpn +"<br/> (" + value.src_ip +")"
-        vpnRXTX.innerHTML    = this.oKoMoGo(value.rx_bytes)+ " &#8659 <br/> " + this.oKoMoGo(value.tx_bytes) + " &#8657"
-        vpnDate.innerHTML  = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm") 
+        vpnRXTX.innerHTML = this.oKoMoGo(value.rx_bytes)+ " &#8659 <br/> " + this.oKoMoGo(value.tx_bytes) + " &#8657"
+        vpnDate.innerHTML = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm")
       }
     }
-
-
-
   },
 
   ScanClient: function () {
@@ -480,20 +475,20 @@ Module.register("MMM-Freebox", {
     
       
       /** Utilisateurs VPN **/
+      /** @todo: a simplifier sans tableau **/
       if (this.Freebox.nbVPNUser > 0) {
-	var table = document.createElement("table")
+        var table = document.createElement("table")
         table.id = "vpnUsersTable"
         table.className = "xsmall"
-	table.style.borderSpacing = "10px 3px"
-	wrapper.appendChild(table)
+        table.style.borderSpacing = "10px 3px"
+        wrapper.appendChild(table)
 
         for (var x = 0 ; x < this.Freebox.nbVPNUser; x++) {
-
-	  var vpnUser = document.createElement("tr")
+         var vpnUser = document.createElement("tr")
           vpnUser.id = "FREE_VPNUSER"
           vpnUser.className= "VPNUSER_"+ x
           vpnUser.classList.add("hidden")
-	  table.appendChild(vpnUser)
+          table.appendChild(vpnUser)
 
           var vpnLogin = document.createElement("td")
           vpnLogin.id = "FREE_VPNLOGIN"
@@ -505,11 +500,11 @@ Module.register("MMM-Freebox", {
           vpnType.style.textAlign = "center"
           vpnUser.appendChild(vpnType)
 
-	  var vpnRxTx = document.createElement("td")
+          var vpnRxTx = document.createElement("td")
           vpnRxTx.id = "FREE_VPNRXTX"
           vpnUser.appendChild(vpnRxTx)
 
-	  var vpnDate = document.createElement("td")
+          var vpnDate = document.createElement("td")
           vpnDate.id = "FREE_VPNDATE"
           vpnDate.style.textAlign = "center"
           vpnUser.appendChild(vpnDate)
@@ -518,8 +513,6 @@ Module.register("MMM-Freebox", {
         }
       }
     }
-
-
     return wrapper
 
   },
@@ -533,19 +526,20 @@ Module.register("MMM-Freebox", {
   getStyles: function() {
     return ["MMM-Freebox.css"]
   },
-	
+
   // Affichage humaan readable des octests
+  // @todo: calc this in node_helper
   oKoMoGo: function(octet) {
-  	if (octet>1000000000){
-        	octet=octet/1000000000 + 'Go'
-        }else if (octet>1000000){
-                octet=octet/1000000 + 'Mo'
-        }else if (octet>1000){
-                octet=octet/1000 + 'Ko'
-        }else {
-                octet=octet + 'o'
-        }
-     	return octet
+   if (octet>1000000000){
+     octet=octet/1000000000 + 'Go'
+   }else if (octet>1000000){
+     octet=octet/1000000 + 'Mo'
+   }else if (octet>1000){
+     octet=octet/1000 + 'Ko'
+   }else {
+     octet=octet + 'o'
+   }
+   return octet
   },
 
 });
