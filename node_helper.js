@@ -158,14 +158,14 @@ module.exports = NodeHelper.create({
         }
         if (this.config.showClientRate) {
           /** rate of wifi devices **/
-          if (Object.keys(res.Wifi2g).length > 0) {
+          if (res.Wifi2g && Object.keys(res.Wifi2g).length > 0) {
             for (let [item, info] of Object.entries(res.Wifi2g)) {
               if (client.l2ident.id == info.mac) {
                 device.debit = this.convert(info.tx_rate,0)
               }
             }
           }
-          if (Object.keys(res.Wifi5g).length > 0) {
+          if (res.Wifi5g && Object.keys(res.Wifi5g).length > 0) {
             for (let [item, info] of Object.entries(res.Wifi5g)) {
               if (client.l2ident.id == info.mac) {
                 device.debit = this.convert(info.tx_rate,0)
@@ -173,7 +173,7 @@ module.exports = NodeHelper.create({
             }
           }
           /** rate of eth devices **/
-          if (Object.keys(res.EthCnx).length > 0) {
+          if (res.EthCnx && Object.keys(res.EthCnx).length > 0) {
             for (let [item, info] of Object.entries(res.EthCnx)) {
               if (info.mac_list) {
                 var macList = info.mac_list.map((mac_list)=>{return mac_list.mac})
