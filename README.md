@@ -14,11 +14,13 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Appels manqués.
 
 ## Update
- * V1.3.0 (15/07/2020)
+ * v1.3.0 - v1.3.1 (15/07/2020)
    * Probleme côté Free avec le protocole SSL (utilisation du mode HTTP en attendant)
    * Creation de la nouvelle librairie API Freebox
    * Pre-code pour le VPN
    * Nouveau format de configuration (uniquement le token est necessaire)
+   * Affichage client connecté en wifi 5g + debit
+   * Calcul et affichage des unités débit en live (Giga/Mega/Kilo octets)
  * v1.2.2 (18/04/2020)
    * **FIX**: rafraichissement si activeOnly actif
  * v1.2.1 (15/04/2020)

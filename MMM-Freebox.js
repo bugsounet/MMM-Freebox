@@ -138,7 +138,7 @@ Module.register("MMM-Freebox", {
     var bandWidthValue = bandWidth.querySelector("#FREE_VALUE")
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
-    bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':') + this.Freebox.Bandwidth + " Mb/s"
+    bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':') + this.Freebox.Bandwidth
     
 
     /** Adresse IP **/
@@ -176,7 +176,7 @@ Module.register("MMM-Freebox", {
         /** debit client **/
         var clientDebit = clientSelect.querySelector("#FREE_RATE")
         if (this.config.showClientRate) clientDebit.classList.remove("hidden")
-        clientDebit.textContent = client.debit ? client.debit + " ko/s" : ""
+        clientDebit.textContent = client.debit ? client.debit : ""
 
         /** bouton **/
         var clientStatus = clientSelect.querySelector("INPUT")
@@ -271,6 +271,7 @@ Module.register("MMM-Freebox", {
     }
   },
 
+  /** scan main loop **/
   ScanClient: function () {
     clearInterval(this.update)
     this.update = null
@@ -285,6 +286,19 @@ Module.register("MMM-Freebox", {
         this.ScanClient()
       }
     }, 1000);
+  },
+
+  /** ne scan pas si le module est suspendu **/
+  suspend: function() {
+    clearInterval(this.update)
+    this.update = null
+    console.log("MMM-Freebox is suspended.")
+  },
+
+  /** reprend le scan si le module est actif **/
+  resume: function() {
+    this.ScanClient()
+    console.log("MMM-Freebox is resumed.")
   },
 
   getDom: function () {
@@ -367,7 +381,7 @@ Module.register("MMM-Freebox", {
 
           var clientDebit = document.createElement("div")
           clientDebit.id ="FREE_RATE"
-          clientDebit.textContent = "0/0 ko/s"
+          clientDebit.textContent = "-"
           clientDebit.classList.add("hidden")
           client.appendChild(clientDebit)
 
