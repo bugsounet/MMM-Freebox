@@ -153,14 +153,22 @@ module.exports = NodeHelper.create({
           type: client.host_type,
           vendor: client.vendor_name,
           debit: null,
-          active: client.active
+          active: client.active,
+          access_type: client.access_type
         }
         if (this.config.showClientRate) {
           /** rate of wifi devices **/
-          if (Object.keys(res.Wifi).length > 0) {
-            for (let [item, info] of Object.entries(res.Wifi)) {
+          if (Object.keys(res.Wifi2g).length > 0) {
+            for (let [item, info] of Object.entries(res.Wifi2g)) {
               if (client.l2ident.id == info.mac) {
-                device.debit = (info.tx_rate/1000).toFixed(0)
+                device.debit = this.convert(info.tx_rate,0)
+              }
+            }
+          }
+          if (Object.keys(res.Wifi5g).length > 0) {
+            for (let [item, info] of Object.entries(res.Wifi5g)) {
+              if (client.l2ident.id == info.mac) {
+                device.debit = this.convert(info.tx_rate,0)
               }
             }
           }
@@ -175,7 +183,7 @@ module.exports = NodeHelper.create({
                     // bizarre ce crash... il est pas systématique
                     // dans tous les cas, si erreur, je sors la valeur à 0
                     if (res[info.id] && res[info.id].tx_bytes_rate)
-                      device.debit = (res[info.id].tx_bytes_rate/1000).toFixed(0)
+                      device.debit = this.convert(res[info.id].tx_bytes_rate,0)
                     else device.debit = "0"
                   }
                 })
@@ -236,7 +244,8 @@ module.exports = NodeHelper.create({
     delete res[2]
     delete res[3]
     delete res[4]
-    delete res.Wifi
+    delete res.Wifi2g
+    delete res.Wifi5g,
     delete res.EthCnx
     delete res.VPNUser
 
@@ -285,9 +294,14 @@ module.exports = NodeHelper.create({
     }
 
     if (clientRate) {
-      var wifiCnx = await freebox.request({
+      var wifi2gCnx = await freebox.request({
         method: "GET",
         url:"wifi/ap/0/stations/"
+      })
+
+      var wifi5gCnx = await freebox.request({
+        method: "GET",
+        url:"wifi/ap/1/stations/"
       })
 
       var ethCnx = await freebox.request({
@@ -323,8 +337,8 @@ module.exports = NodeHelper.create({
       })
     }
 
-    bandwidth = (cnx.data.result.bandwidth_down/1000000).toFixed(2) + "/" + (cnx.data.result.bandwidth_up/1000000).toFixed(2)
-    debit = (cnx.data.result.rate_down/1000).toFixed(0) + " ko/s - " + (cnx.data.result.rate_up/1000).toFixed(0) + " ko/s" //RTavernier and todo better !
+    bandwidth = this.convert(cnx.data.result.bandwidth_down,2,1) + " - " + this.convert(cnx.data.result.bandwidth_up,2,1)
+    debit = this.convert(cnx.data.result.rate_down,2) +" - " + this.convert(cnx.data.result.rate_up,2)
     type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
     degroup = (cnx.data.result.type == "rfc2684") ? true : false
 
@@ -336,7 +350,8 @@ module.exports = NodeHelper.create({
       IP: cnx.data.result.ipv4,
       Client: clients.data.result,
       Call: callLog ? calls.data.result: null,
-      Wifi: clientRate ? wifiCnx.data.result : null,
+      Wifi2g: clientRate ? wifi2gCnx.data.result : null,
+      Wifi5g: clientRate ? wifi5gCnx.data.result : null,
       EthCnx: clientRate ? ethCnx.data.result : null,
       1: clientRate ? eth1.data.result : null,
       2: clientRate ? eth2.data.result : null,
@@ -347,5 +362,19 @@ module.exports = NodeHelper.create({
 
     await freebox.logout()
     return output
-  }
+  },
+
+  /** converti les octets en G/M/K **/
+  convert: function(octet,FixTo, type=0) {
+   if (octet>1000000000){
+     octet=(octet/1000000000).toFixed(FixTo) + (type ? " Gb/s" : " go/s")
+   } else if (octet>1000000){
+     octet=(octet/1000000).toFixed(FixTo) + (type ? " Mb/s" : " mo/s")
+   } else if (octet>1000){
+     octet=(octet/1000).toFixed(FixTo) + (type ? " Kb/s" : " ko/s")
+   } else {
+     octet="0" + (type ? " Kb/s" : " ko/s")
+   }
+   return octet
+  },
 });
