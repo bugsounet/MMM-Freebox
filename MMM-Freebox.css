@@ -40,7 +40,7 @@
     overflow:hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
-    margin-right: 15px;
+    /* margin-right: 15px; */
     width: 60px;
 }
 
@@ -70,6 +70,7 @@
     white-space: nowrap;
 }
 
+#FREE_ACCESS.hidden,
 #FREE_IP.hidden,
 #FREE_DEBIT.hidden,
 #FREE_PING.hidden,
@@ -159,7 +160,6 @@
     background-image: url(resources/hub0.png);
 }
 
-
 #FREE_ICON.freebox_delta1 {
     background-image: url(resources/delta1.png);
 }
@@ -244,6 +244,83 @@
     background-image: url(resources/ping.png);
 }
 
+#FREE_ACCESS {
+    background-image: url(resources/black.png);
+    height: 16px;
+    width: 16px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: 0;
+}
+
+#FREE_ACCESS.black {
+    background-image: url(resources/black.png);
+}
+
+#FREE_ACCESS.wifi5_0,
+#FREE_ACCESS.wifi2_0 {
+    background-image: url(resources/signal0.png);
+}
+
+#FREE_ACCESS.wifi2_1 {
+    background-image: url(resources/signal2_1.png);
+}
+
+#FREE_ACCESS.wifi2_2 {
+    background-image: url(resources/signal2_2.png);
+}
+
+#FREE_ACCESS.wifi2_3 {
+    background-image: url(resources/signal2_3.png);
+}
+
+#FREE_ACCESS.wifi2_4 {
+    background-image: url(resources/signal2_4.png);
+}
+
+#FREE_ACCESS.wifi2_5 {
+    background-image: url(resources/signal2_5.png);
+}
+
+#FREE_ACCESS.wifi5_1 {
+    background-image: url(resources/signal5_1.png);
+}
+
+#FREE_ACCESS.wifi5_2 {
+    background-image: url(resources/signal5_2.png);
+}
+
+#FREE_ACCESS.wifi5_3 {
+    background-image: url(resources/signal5_3.png);
+}
+
+#FREE_ACCESS.wifi5_4 {
+    background-image: url(resources/signal5_4.png);
+}
+
+#FREE_ACCESS.wifi5_5 {
+    background-image: url(resources/signal5_5.png);
+}
+
+#FREE_ACCESS.ethernet1 {
+    background-image: url(resources/eth1.png);
+    background-position: inherit;
+}
+
+#FREE_ACCESS.ethernet2 {
+    background-image: url(resources/eth2.png);
+    background-position: inherit;
+}
+
+#FREE_ACCESS.ethernet3 {
+    background-image: url(resources/eth3.png);
+    background-position: inherit;
+}
+
+#FREE_ACCESS.ethernet4 {
+    background-image: url(resources/eth4.png);
+    background-position: inherit;
+}
 /* ------------ */
 
 input.switch-round + label {
@@ -256,6 +333,7 @@ input.switch-round + label {
   -ms-border-radius: 30px;
   -o-border-radius: 30px;
   border-radius: 30px;
+  margin-left: 15px;
 }
 input.switch-round + label:before, input.switch-round + label:after {
   display: block;
@@ -320,3 +398,24 @@ input.switch-round:checked + label:after {
 .hidden {
     display:none;
 }
+
+#FREE_VPN {
+  font-size: 15px;
+  line-height: 20px;
+}
+
+#FREE_VPNUSER {
+  display: inline-flex;
+}
+
+#FREE_VPNLOGIN {
+  margin-right: 15px;
+  line-height: 40px;
+}
+
+#FREEVPNDATE,
+#FREE_VPNRXTX,
+#FREE_VPNTYPE {
+  margin-right: 15px;
+}
+

@@ -14,7 +14,7 @@ module.exports = NodeHelper.create({
   },
 
   Freebox: function (token) {
-    this.Freebox_OS(token,this.config.showClientRate,this.config.showMissedCall,this.config.showVPNUsers).then(
+    this.Freebox_OS(token,this.config.showClientRate || this.config.showClientCnxType ,this.config.showMissedCall,this.config.showVPNUsers).then(
       (res) => {
         if (!this.init) this.makeCache(res)
         else this.makeResult(res)
@@ -53,7 +53,7 @@ module.exports = NodeHelper.create({
 
   sendInfo: function (noti, payload) {
     FB("Send notification: " + noti, this.config.verbose ? payload : "")
-    if(!this.config.dev) this.sendSocketNotification(noti, payload)
+    this.sendSocketNotification(noti, payload)
   },
 
   makeCache: function (res) {
@@ -75,7 +75,7 @@ module.exports = NodeHelper.create({
       this.sendInfo("MISSED_CALL", missed)
     }
 
-    if (this.config.showVPNUsers) { //verifier que ça fonctionne
+    if (this.config.showVPNUsers) {
       var nbVPNUser = 0
       if (res.VPNUser) nbVPNUser = res.VPNUser.length
 
@@ -83,7 +83,6 @@ module.exports = NodeHelper.create({
     }
 
     this.sendInfo("INITIALIZED", this.cache)
-
   },
 
   sortBy: function (data, sort) {
@@ -154,14 +153,22 @@ module.exports = NodeHelper.create({
           vendor: client.vendor_name,
           debit: null,
           active: client.active,
-          access_type: client.access_type
+          access_type: null,
+          signal: null,
+          signal_percent: null,
+          signal_bar: null,
+          eth: null
         }
-        if (this.config.showClientRate) {
+        if (this.config.showClientRate || this.config.showClientCnxType) {
           /** rate of wifi devices **/
           if (res.Wifi2g && Object.keys(res.Wifi2g).length > 0) {
             for (let [item, info] of Object.entries(res.Wifi2g)) {
               if (client.l2ident.id == info.mac) {
                 device.debit = this.convert(info.tx_rate,0)
+                device.access_type= "wifi2"
+                device.signal = info.signal
+                device.signal_percent = this.wifiPercent(info.signal)
+                device.signal_bar = this.wifiBar(device.signal_percent)
               }
             }
           }
@@ -169,6 +176,10 @@ module.exports = NodeHelper.create({
             for (let [item, info] of Object.entries(res.Wifi5g)) {
               if (client.l2ident.id == info.mac) {
                 device.debit = this.convert(info.tx_rate,0)
+                device.access_type= "wifi5"
+                device.signal = info.signal
+                device.signal_percent = this.wifiPercent(info.signal)
+                device.signal_bar = this.wifiBar(device.signal_percent)
               }
             }
           }
@@ -182,9 +193,16 @@ module.exports = NodeHelper.create({
                     // devialet patch ou ... hub / cpl ?
                     // bizarre ce crash... il est pas systématique
                     // dans tous les cas, si erreur, je sors la valeur à 0
-                    if (res[info.id] && res[info.id].tx_bytes_rate)
+                    if (res[info.id] && res[info.id].tx_bytes_rate) {
                       device.debit = this.convert(res[info.id].tx_bytes_rate,0)
-                    else device.debit = "0"
+                      device.access_type = "ethernet"
+                      device.eth = info.id
+                    }
+                    else {
+                      device.debit = "0"
+                      device.access_type = null
+                      devbice.eth = null
+                    }
                   }
                 })
               }
@@ -214,25 +232,23 @@ module.exports = NodeHelper.create({
 
     if (this.config.showVPNUsers) {
       var nbVPNUser = 0
+      var vpnUser = {}
 
       if (res.VPNUser)
          nbVPNUser = res.VPNUser.length
 
-      var vpnUser = {}
-
       if (nbVPNUser > 0) {
-        res.VPNUser.forEach(function(x) {
+        res.VPNUser.forEach((x)=> {
           vpnUser = {
             user:       x.user,
             vpn:        x.vpn,
             src_ip:     x.src_ip,
-            rx_bytes:   x.rx_bytes,
-            tx_bytes:   x.tx_bytes,
-            date:       x.auth_time,
-            new:        x.new // verifier ça donne undefined
+            rx_bytes:   this.convert(x.rx_bytes, null,2),
+            tx_bytes:   this.convert(x.tx_bytes, null,2),
+            date:       x.auth_time
           }
           res.VPNUsers.who.push(vpnUser)
-        });
+        })
         res.VPNUsers.nb = nbVPNUser
       }
     }
@@ -366,15 +382,35 @@ module.exports = NodeHelper.create({
 
   /** converti les octets en G/M/K **/
   convert: function(octet,FixTo, type=0) {
-   if (octet>1000000000){
-     octet=(octet/1000000000).toFixed(FixTo) + (type ? " Gb/s" : " go/s")
-   } else if (octet>1000000){
-     octet=(octet/1000000).toFixed(FixTo) + (type ? " Mb/s" : " mo/s")
-   } else if (octet>1000){
-     octet=(octet/1000).toFixed(FixTo) + (type ? " Kb/s" : " ko/s")
-   } else {
-     octet="0" + (type ? " Kb/s" : " ko/s")
-   }
-   return octet
+    if (octet>1000000000){
+      if (type == 2) octet=octet/1000000000 + " Go"
+      else octet=(octet/1000000000).toFixed(FixTo) + (type ? " Gb/s" : " Go/s")
+    } else if (octet>1000000){
+      if (type == 2) octet=octet/1000000 + " Mo"
+      else octet=(octet/1000000).toFixed(FixTo) + (type ? " Mb/s" : " Mo/s")
+    } else if (octet>1000){
+      if (type == 2) octet=octet/1000 + " Ko"
+      else octet=(octet/1000).toFixed(FixTo) + (type ? " Kb/s" : " Ko/s")
+    } else {
+      if (type == 2) octet=octet + " o"
+      else octet="0" + (type ? " Kb/s" : " Ko/s")
+    }
+    return octet
   },
+
+  /** Signal wifi en % **/
+  wifiPercent(dB) {
+    if(dB <= -100)
+      quality = 0;
+    else if(dB >= -50)
+      quality = 100;
+    else
+      quality = 2 * (dB + 100);
+    return quality
+  },
+
+  /** nbre de barre wifi selon % quality) **/
+  wifiBar(percent) {
+    return parseInt(((percent*5)/100).toFixed(0))
+  }
 });

@@ -12,8 +12,16 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Débit utilisé (total et/ou par appareil)
  * Ping de votre mirroir vers google.fr (ou autre)
  * Appels manqués.
+ * Utilisateurs connectés en VPN
+ * Type de connexion utilisé par les appareils
 
 ## Update
+ * v1.3.3 (04/08/2020)
+   * Affichage des clients connectés en wifi (2.4Ghz: vert, 5Ghz: bleu)
+   * Affichage des clients connectés en ethernet et indique le port de connexion
+   * Affichage des clients connectés en VPN (thx @wileck)
+ * v1.3.2 (16/07/2020)
+   * Fix crash au scan des clients
  * v1.3.0 - v1.3.1 (15/07/2020)
    * Probleme côté Free avec le protocole SSL (utilisation du mode HTTP en attendant)
    * Creation de la nouvelle librairie API Freebox
@@ -33,8 +41,10 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
    * **ADD**: affichage des débits par appareils
  * v1.0.0 (30-03-2020)
    * Initial release
-## Screenshoot
+## Screenshot
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
+![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen2.png)
+![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/VPNUsers.png)
 
 ## Installation
  * Clonez le module dans votre dossier de module de MagicMirror et exécutez `npm install` dans le répertoire du module.
@@ -94,6 +104,8 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     showRate: true,
     showClient: true,
     showClientRate: true,
+    showClientCnxType: true,
+    showVPNUsers: true,
     showFreePlayer: true,
     showMissedCall: true,
     maxMissed: 3,
@@ -119,6 +131,8 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | showRate | Affiche le débit utilisé | Boolean | true |
 | showClient | Affiche la liste des appareils | Boolean | true |
 | showClientRate | Affiche le débit de l'appareil | Boolean | true |
+| showClientCnxType | Affiche le type de connexion des appareils | Boolean | true |
+| showVPNUsers | Affiche les utilisateurs connectés via VPN | Boolean | true |
 | showFreePlayer | Affiche les Freebox Player | Boolean | true |
 | showMissedCall | Affiche les appels manqués | Boolean | true |
 | maxMissed | Nombre d'appel maximum à afficher | Number | 3 |
@@ -138,6 +152,6 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 
 ## Notes:
  - Les essais ont été effectué avec des Freebox Mini 4k, Freebox Revolution et Freebox Devialet.
- - Je n'ai pas encore de retour sur la Freebox One, je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
+ - Je n'ai pas encore de retour sur la Freebox One et POP je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
  - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
  - En cas de souci, ne pas hésiter a ouvrir une ISSUE

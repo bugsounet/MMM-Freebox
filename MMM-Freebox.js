@@ -12,9 +12,10 @@ Module.register("MMM-Freebox", {
     showRate: true,
     showClient: true,
     showClientRate: true,
+    showClientCnxType: true,
     showFreePlayer: true,
     showMissedCall: true,
-    showVPNUsers: false, // disabled by default. I will see your code to do better
+    showVPNUsers: true,
     maxMissed: 3,
     showIP: true,
     showPing: true,
@@ -85,7 +86,6 @@ Module.register("MMM-Freebox", {
       case "NB_VPN_USER":
         this.Freebox.nbVPNUser = payload
         break
-
     }
   },
 
@@ -173,6 +173,20 @@ Module.register("MMM-Freebox", {
           clientName.textContent = cache.name
         }
 
+        /** Wifi ou Eth ? **/
+        var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
+        if (this.config.showClientCnxType) {
+          clientAccess.classList.remove("hidden")
+          if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
+          else if (client.access_type == "wifi2") {
+            clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
+          }
+          else if (client.access_type == "wifi5") {
+            clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
+          }
+          else clientAccess.className = "black"
+        }
+
         /** debit client **/
         var clientDebit = clientSelect.querySelector("#FREE_RATE")
         if (this.config.showClientRate) clientDebit.classList.remove("hidden")
@@ -216,7 +230,6 @@ Module.register("MMM-Freebox", {
     pingValue.textContent = this.Freebox.Ping
 
     /** Appels manqués **/
-
     if (this.Freebox.Calls.missed != this.Freebox.MissedCall) {
       clearInterval(this.update)
       this.update = null
@@ -253,10 +266,8 @@ Module.register("MMM-Freebox", {
       return this.sendSocketNotification("CACHE")
     }
 
-
-    /** @todo: faire mieux ;) **/
     if  (this.Freebox.VPNUsers.nb > 0) {
-      for (let [nb, value] of Object.entries(this.Freebox.VPNUsers.who)) { // Verifier qu'on parcours bien le tableau
+      for (let [nb, value] of Object.entries(this.Freebox.VPNUsers.who)) {
         var vpnUser = document.getElementsByClassName("VPNUSER_" + nb)
         if (this.config.showVPNUsers) vpnUser[0].classList.remove("hidden")
         var vpnLogin = vpnUser[0].querySelector("#FREE_VPNLOGIN")
@@ -264,8 +275,8 @@ Module.register("MMM-Freebox", {
         var vpnRXTX  = vpnUser[0].querySelector("#FREE_VPNRXTX")
         var vpnDate  = vpnUser[0].querySelector("#FREE_VPNDATE")
         vpnLogin.innerHTML = value.user 
-        vpnType.innerHTML = value.vpn +"<br/> (" + value.src_ip +")"
-        vpnRXTX.innerHTML = this.oKoMoGo(value.rx_bytes)+ " &#8659 <br/> " + this.oKoMoGo(value.tx_bytes) + " &#8657"
+        vpnType.innerHTML = value.vpn +"<br/>(" + value.src_ip +")"
+        vpnRXTX.innerHTML = value.rx_bytes+ " &#8659<br/>" + value.tx_bytes + " &#8657"
         vpnDate.innerHTML = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm")
       }
     }
@@ -379,6 +390,12 @@ Module.register("MMM-Freebox", {
           clientName.textContent = setName
           client.appendChild(clientName)
 
+          var clientCnxType= document.createElement("div")
+          clientCnxType.id = "FREE_ACCESS"
+          clientCnxType.className= "black"
+          clientCnxType.classList.add("hidden")
+          client.appendChild(clientCnxType)
+
           var clientDebit = document.createElement("div")
           clientDebit.id ="FREE_RATE"
           clientDebit.textContent = "-"
@@ -489,41 +506,33 @@ Module.register("MMM-Freebox", {
     
       
       /** Utilisateurs VPN **/
-      /** @todo: a simplifier sans tableau **/
       if (this.Freebox.nbVPNUser > 0) {
-        var table = document.createElement("table")
-        table.id = "vpnUsersTable"
-        table.className = "xsmall"
-        table.style.borderSpacing = "10px 3px"
+        var table = document.createElement("div")
+        table.id = "FREE_VPN"
         wrapper.appendChild(table)
 
         for (var x = 0 ; x < this.Freebox.nbVPNUser; x++) {
-         var vpnUser = document.createElement("tr")
+         var vpnUser = document.createElement("div")
           vpnUser.id = "FREE_VPNUSER"
           vpnUser.className= "VPNUSER_"+ x
           vpnUser.classList.add("hidden")
           table.appendChild(vpnUser)
 
-          var vpnLogin = document.createElement("td")
+          var vpnLogin = document.createElement("div")
           vpnLogin.id = "FREE_VPNLOGIN"
-          vpnLogin.className = "bright"
           vpnUser.appendChild(vpnLogin)
 
-          var vpnType = document.createElement("td")
+          var vpnType = document.createElement("div")
           vpnType.id = "FREE_VPNTYPE"
-          vpnType.style.textAlign = "center"
           vpnUser.appendChild(vpnType)
 
-          var vpnRxTx = document.createElement("td")
+          var vpnRxTx = document.createElement("div")
           vpnRxTx.id = "FREE_VPNRXTX"
           vpnUser.appendChild(vpnRxTx)
 
-          var vpnDate = document.createElement("td")
+          var vpnDate = document.createElement("div")
           vpnDate.id = "FREE_VPNDATE"
-          vpnDate.style.textAlign = "center"
           vpnUser.appendChild(vpnDate)
-
-          //wrapper.appendChild(vpnUser)
         }
       }
     }
@@ -539,21 +548,5 @@ Module.register("MMM-Freebox", {
 
   getStyles: function() {
     return ["MMM-Freebox.css"]
-  },
-
-  // Affichage humaan readable des octests
-  // @todo: calc this in node_helper
-  oKoMoGo: function(octet) {
-   if (octet>1000000000){
-     octet=octet/1000000000 + 'Go'
-   }else if (octet>1000000){
-     octet=octet/1000000 + 'Mo'
-   }else if (octet>1000){
-     octet=octet/1000 + 'Ko'
-   }else {
-     octet=octet + 'o'
-   }
-   return octet
-  },
-
+  }
 });
