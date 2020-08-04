@@ -166,7 +166,7 @@ module.exports = NodeHelper.create({
             for (let [item, info] of Object.entries(res.Wifi2g)) {
               if (client.l2ident.id == info.mac) {
                 device.debit = this.convert(info.tx_rate,0)
-                device.access_type= "wifi"
+                device.access_type= "wifi2"
                 device.signal = info.signal
                 device.signal_percent = this.wifiPercent(info.signal)
                 device.signal_bar = this.wifiBar(device.signal_percent)
@@ -177,7 +177,7 @@ module.exports = NodeHelper.create({
             for (let [item, info] of Object.entries(res.Wifi5g)) {
               if (client.l2ident.id == info.mac) {
                 device.debit = this.convert(info.tx_rate,0)
-                device.access_type= "wifi"
+                device.access_type= "wifi5"
                 device.signal = info.signal
                 device.signal_percent = this.wifiPercent(info.signal)
                 device.signal_bar = this.wifiBar(device.signal_percent)

@@ -257,28 +257,49 @@
     background-image: url(resources/black.png);
 }
 
-#FREE_ACCESS.signal0 {
+#FREE_ACCESS.wifi5_0,
+#FREE_ACCESS.wifi2_0 {
     background-image: url(resources/signal0.png);
 }
 
-#FREE_ACCESS.signal1 {
-    background-image: url(resources/signal1.png);
+#FREE_ACCESS.wifi2_1 {
+    background-image: url(resources/signal2_1.png);
 }
 
-#FREE_ACCESS.signal2 {
-    background-image: url(resources/signal2.png);
+#FREE_ACCESS.wifi2_2 {
+    background-image: url(resources/signal2_2.png);
 }
 
-#FREE_ACCESS.signal3 {
-    background-image: url(resources/signal3.png);
+#FREE_ACCESS.wifi2_3 {
+    background-image: url(resources/signal2_3.png);
 }
 
-#FREE_ACCESS.signal4 {
-    background-image: url(resources/signal4.png);
+#FREE_ACCESS.wifi2_4 {
+    background-image: url(resources/signal2_4.png);
 }
 
-#FREE_ACCESS.signal5 {
-    background-image: url(resources/signal5.png);
+#FREE_ACCESS.wifi2_5 {
+    background-image: url(resources/signal2_5.png);
+}
+
+#FREE_ACCESS.wifi5_1 {
+    background-image: url(resources/signal5_1.png);
+}
+
+#FREE_ACCESS.wifi5_2 {
+    background-image: url(resources/signal5_2.png);
+}
+
+#FREE_ACCESS.wifi5_3 {
+    background-image: url(resources/signal5_3.png);
+}
+
+#FREE_ACCESS.wifi5_4 {
+    background-image: url(resources/signal5_4.png);
+}
+
+#FREE_ACCESS.wifi5_5 {
+    background-image: url(resources/signal5_5.png);
 }
 
 #FREE_ACCESS.ethernet1 {

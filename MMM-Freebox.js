@@ -179,8 +179,11 @@ Module.register("MMM-Freebox", {
         if (this.config.showClientCnxType) {
           clientAccess.classList.remove("hidden")
           if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
-          else if (client.access_type == "wifi") {
-            clientAccess.className ="signal"+ (client.signal_bar ? client.signal_bar : 0)
+          else if (client.access_type == "wifi2") {
+            clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
+          }
+          else if (client.access_type == "wifi5") {
+            clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
           }
           else clientAccess.className = "black"
         }
