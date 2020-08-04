@@ -14,7 +14,7 @@ module.exports = NodeHelper.create({
   },
 
   Freebox: function (token) {
-    this.Freebox_OS(token,this.config.showClientRate,this.config.showMissedCall,this.config.showVPNUsers).then(
+    this.Freebox_OS(token,this.config.showClientRate || this.config.showClientCnxType ,this.config.showMissedCall,this.config.showVPNUsers).then(
       (res) => {
         if (!this.init) this.makeCache(res)
         else this.makeResult(res)
@@ -53,7 +53,7 @@ module.exports = NodeHelper.create({
 
   sendInfo: function (noti, payload) {
     FB("Send notification: " + noti, this.config.verbose ? payload : "")
-    if(!this.config.dev) this.sendSocketNotification(noti, payload)
+    this.sendSocketNotification(noti, payload)
   },
 
   makeCache: function (res) {
@@ -154,14 +154,21 @@ module.exports = NodeHelper.create({
           vendor: client.vendor_name,
           debit: null,
           active: client.active,
-          access_type: client.access_type
+          access_type: null,
+          signal: null,
+          signal_percent: null,
+          signal_bar: null
         }
-        if (this.config.showClientRate) {
+        if (this.config.showClientRate || this.config.showClientCnxType) {
           /** rate of wifi devices **/
           if (res.Wifi2g && Object.keys(res.Wifi2g).length > 0) {
             for (let [item, info] of Object.entries(res.Wifi2g)) {
               if (client.l2ident.id == info.mac) {
                 device.debit = this.convert(info.tx_rate,0)
+                device.access_type= "wifi"
+                device.signal = info.signal
+                device.signal_percent = (2*(info.signal+100)) >= 100 ? 100 : (2*(info.signal+100 ))
+                device.signal_bar = parseInt(((device.signal_percent*5)/100).toFixed(0))
               }
             }
           }
@@ -169,6 +176,10 @@ module.exports = NodeHelper.create({
             for (let [item, info] of Object.entries(res.Wifi5g)) {
               if (client.l2ident.id == info.mac) {
                 device.debit = this.convert(info.tx_rate,0)
+                device.access_type= "wifi"
+                device.signal = info.signal
+                device.signal_percent = (2*(info.signal+100)) >= 100 ? 100 : (2*(info.signal+100 ))
+                device.signal_bar = parseInt(((device.signal_percent*5)/100).toFixed(0))
               }
             }
           }
@@ -182,9 +193,14 @@ module.exports = NodeHelper.create({
                     // devialet patch ou ... hub / cpl ?
                     // bizarre ce crash... il est pas systématique
                     // dans tous les cas, si erreur, je sors la valeur à 0
-                    if (res[info.id] && res[info.id].tx_bytes_rate)
+                    if (res[info.id] && res[info.id].tx_bytes_rate) {
                       device.debit = this.convert(res[info.id].tx_bytes_rate,0)
-                    else device.debit = "0"
+                      device.access_type = "ethernet"
+                    }
+                    else {
+                      device.debit = "0"
+                      device.access_type = null
+                    }
                   }
                 })
               }
@@ -367,13 +383,13 @@ module.exports = NodeHelper.create({
   /** converti les octets en G/M/K **/
   convert: function(octet,FixTo, type=0) {
    if (octet>1000000000){
-     octet=(octet/1000000000).toFixed(FixTo) + (type ? " Gb/s" : " go/s")
+     octet=(octet/1000000000).toFixed(FixTo) + (type ? " Gb/s" : " Go/s")
    } else if (octet>1000000){
-     octet=(octet/1000000).toFixed(FixTo) + (type ? " Mb/s" : " mo/s")
+     octet=(octet/1000000).toFixed(FixTo) + (type ? " Mb/s" : " Mo/s")
    } else if (octet>1000){
-     octet=(octet/1000).toFixed(FixTo) + (type ? " Kb/s" : " ko/s")
+     octet=(octet/1000).toFixed(FixTo) + (type ? " Kb/s" : " Ko/s")
    } else {
-     octet="0" + (type ? " Kb/s" : " ko/s")
+     octet="0" + (type ? " Kb/s" : " Ko/s")
    }
    return octet
   },

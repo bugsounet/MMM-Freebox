@@ -12,6 +12,7 @@ Module.register("MMM-Freebox", {
     showRate: true,
     showClient: true,
     showClientRate: true,
+    showClientCnxType: true,
     showFreePlayer: true,
     showMissedCall: true,
     showVPNUsers: false, // disabled by default. I will see your code to do better
@@ -173,6 +174,14 @@ Module.register("MMM-Freebox", {
           clientName.textContent = cache.name
         }
 
+        /** Wifi ou Eth ? **/
+        var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
+        if (this.config.showClientCnxType) clientAccess.classList.remove("hidden")
+        if (client.access_type == "ethernet") clientAccess.classList.add("ethernet")
+        else if (client.access_type == "wifi") {
+          clientAccess.classList.add("signal"+ (client.signal_bar ? client.signal_bar : 0))
+        }
+        else clientAccess.classList.add("black")
         /** debit client **/
         var clientDebit = clientSelect.querySelector("#FREE_RATE")
         if (this.config.showClientRate) clientDebit.classList.remove("hidden")
@@ -216,7 +225,6 @@ Module.register("MMM-Freebox", {
     pingValue.textContent = this.Freebox.Ping
 
     /** Appels manqués **/
-
     if (this.Freebox.Calls.missed != this.Freebox.MissedCall) {
       clearInterval(this.update)
       this.update = null
@@ -378,6 +386,12 @@ Module.register("MMM-Freebox", {
           clientName.style.width= this.config.textWidth + "px"
           clientName.textContent = setName
           client.appendChild(clientName)
+
+          var clientCnxType= document.createElement("div")
+          clientCnxType.id = "FREE_ACCESS"
+          clientCnxType.className= "black"
+          clientCnxType.classList.add("hidden")
+          client.appendChild(clientCnxType)
 
           var clientDebit = document.createElement("div")
           clientDebit.id ="FREE_RATE"
