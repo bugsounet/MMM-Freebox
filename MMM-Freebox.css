@@ -281,8 +281,24 @@
     background-image: url(resources/signal5.png);
 }
 
-#FREE_ACCESS.ethernet {
-    background-image: url(resources/eth.png);
+#FREE_ACCESS.ethernet1 {
+    background-image: url(resources/eth1.png);
+    background-position: inherit;
+}
+
+#FREE_ACCESS.ethernet2 {
+    background-image: url(resources/eth2.png);
+    background-position: inherit;
+}
+
+#FREE_ACCESS.ethernet3 {
+    background-image: url(resources/eth3.png);
+    background-position: inherit;
+}
+
+#FREE_ACCESS.ethernet4 {
+    background-image: url(resources/eth4.png);
+    background-position: inherit;
 }
 /* ------------ */
 

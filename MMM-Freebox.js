@@ -176,12 +176,15 @@ Module.register("MMM-Freebox", {
 
         /** Wifi ou Eth ? **/
         var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
-        if (this.config.showClientCnxType) clientAccess.classList.remove("hidden")
-        if (client.access_type == "ethernet") clientAccess.classList.add("ethernet")
-        else if (client.access_type == "wifi") {
-          clientAccess.classList.add("signal"+ (client.signal_bar ? client.signal_bar : 0))
+        if (this.config.showClientCnxType) {
+          clientAccess.classList.remove("hidden")
+          if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
+          else if (client.access_type == "wifi") {
+            clientAccess.className ="signal"+ (client.signal_bar ? client.signal_bar : 0)
+          }
+          else clientAccess.className = "black"
         }
-        else clientAccess.classList.add("black")
+
         /** debit client **/
         var clientDebit = clientSelect.querySelector("#FREE_RATE")
         if (this.config.showClientRate) clientDebit.classList.remove("hidden")

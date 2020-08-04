@@ -157,7 +157,8 @@ module.exports = NodeHelper.create({
           access_type: null,
           signal: null,
           signal_percent: null,
-          signal_bar: null
+          signal_bar: null,
+          eth: null
         }
         if (this.config.showClientRate || this.config.showClientCnxType) {
           /** rate of wifi devices **/
@@ -167,8 +168,8 @@ module.exports = NodeHelper.create({
                 device.debit = this.convert(info.tx_rate,0)
                 device.access_type= "wifi"
                 device.signal = info.signal
-                device.signal_percent = (2*(info.signal+100)) >= 100 ? 100 : (2*(info.signal+100 ))
-                device.signal_bar = parseInt(((device.signal_percent*5)/100).toFixed(0))
+                device.signal_percent = this.wifiPercent(info.signal)
+                device.signal_bar = this.wifiBar(device.signal_percent)
               }
             }
           }
@@ -178,8 +179,8 @@ module.exports = NodeHelper.create({
                 device.debit = this.convert(info.tx_rate,0)
                 device.access_type= "wifi"
                 device.signal = info.signal
-                device.signal_percent = (2*(info.signal+100)) >= 100 ? 100 : (2*(info.signal+100 ))
-                device.signal_bar = parseInt(((device.signal_percent*5)/100).toFixed(0))
+                device.signal_percent = this.wifiPercent(info.signal)
+                device.signal_bar = this.wifiBar(device.signal_percent)
               }
             }
           }
@@ -196,10 +197,12 @@ module.exports = NodeHelper.create({
                     if (res[info.id] && res[info.id].tx_bytes_rate) {
                       device.debit = this.convert(res[info.id].tx_bytes_rate,0)
                       device.access_type = "ethernet"
+                      device.eth = info.id
                     }
                     else {
                       device.debit = "0"
                       device.access_type = null
+                      devbice.eth = null
                     }
                   }
                 })
@@ -393,4 +396,20 @@ module.exports = NodeHelper.create({
    }
    return octet
   },
+
+  /** Signal wifi en % **/
+  wifiPercent(dB) {
+    if(dB <= -100)
+      quality = 0;
+    else if(dB >= -50)
+      quality = 100;
+    else
+      quality = 2 * (dB + 100);
+    return quality
+  },
+
+  /** nbre de barre wifi selon % quality) **/
+  wifiBar(percent) {
+    return parseInt(((percent*5)/100).toFixed(0))
+  }
 });
