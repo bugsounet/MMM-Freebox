@@ -398,3 +398,24 @@ input.switch-round:checked + label:after {
 .hidden {
     display:none;
 }
+
+#FREE_VPN {
+  font-size: 15px;
+  line-height: 20px;
+}
+
+#FREE_VPNUSER {
+  display: inline-flex;
+}
+
+#FREE_VPNLOGIN {
+  margin-right: 15px;
+  line-height: 40px;
+}
+
+#FREEVPNDATE,
+#FREE_VPNRXTX,
+#FREE_VPNTYPE {
+  margin-right: 15px;
+}
+

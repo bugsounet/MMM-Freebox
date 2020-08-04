@@ -75,7 +75,7 @@ module.exports = NodeHelper.create({
       this.sendInfo("MISSED_CALL", missed)
     }
 
-    if (this.config.showVPNUsers) { //verifier que ça fonctionne
+    if (this.config.showVPNUsers) {
       var nbVPNUser = 0
       if (res.VPNUser) nbVPNUser = res.VPNUser.length
 
@@ -83,7 +83,6 @@ module.exports = NodeHelper.create({
     }
 
     this.sendInfo("INITIALIZED", this.cache)
-
   },
 
   sortBy: function (data, sort) {
@@ -233,25 +232,23 @@ module.exports = NodeHelper.create({
 
     if (this.config.showVPNUsers) {
       var nbVPNUser = 0
+      var vpnUser = {}
 
       if (res.VPNUser)
          nbVPNUser = res.VPNUser.length
 
-      var vpnUser = {}
-
       if (nbVPNUser > 0) {
-        res.VPNUser.forEach(function(x) {
+        res.VPNUser.forEach((x)=> {
           vpnUser = {
             user:       x.user,
             vpn:        x.vpn,
             src_ip:     x.src_ip,
-            rx_bytes:   x.rx_bytes,
-            tx_bytes:   x.tx_bytes,
-            date:       x.auth_time,
-            new:        x.new // verifier ça donne undefined
+            rx_bytes:   this.convert(x.rx_bytes, null,2),
+            tx_bytes:   this.convert(x.tx_bytes, null,2),
+            date:       x.auth_time
           }
           res.VPNUsers.who.push(vpnUser)
-        });
+        })
         res.VPNUsers.nb = nbVPNUser
       }
     }
@@ -385,16 +382,20 @@ module.exports = NodeHelper.create({
 
   /** converti les octets en G/M/K **/
   convert: function(octet,FixTo, type=0) {
-   if (octet>1000000000){
-     octet=(octet/1000000000).toFixed(FixTo) + (type ? " Gb/s" : " Go/s")
-   } else if (octet>1000000){
-     octet=(octet/1000000).toFixed(FixTo) + (type ? " Mb/s" : " Mo/s")
-   } else if (octet>1000){
-     octet=(octet/1000).toFixed(FixTo) + (type ? " Kb/s" : " Ko/s")
-   } else {
-     octet="0" + (type ? " Kb/s" : " Ko/s")
-   }
-   return octet
+    if (octet>1000000000){
+      if (type == 2) octet=octet/1000000000 + " Go"
+      else octet=(octet/1000000000).toFixed(FixTo) + (type ? " Gb/s" : " Go/s")
+    } else if (octet>1000000){
+      if (type == 2) octet=octet/1000000 + " Mo"
+      else octet=(octet/1000000).toFixed(FixTo) + (type ? " Mb/s" : " Mo/s")
+    } else if (octet>1000){
+      if (type == 2) octet=octet/1000 + " Ko"
+      else octet=(octet/1000).toFixed(FixTo) + (type ? " Kb/s" : " Ko/s")
+    } else {
+      if (type == 2) octet=octet + " o"
+      else octet="0" + (type ? " Kb/s" : " Ko/s")
+    }
+    return octet
   },
 
   /** Signal wifi en % **/
