@@ -12,17 +12,8 @@ module.exports = NodeHelper.create({
     this.init = false
     this.pingValue = null
     this.channelInfo = {}
+    this.bouquetID= null,
     this.FreeboxTV = {}
-    this.FreeboxTVChannel = {
-      "0": "Mosaïque" ,
-      "1": "TF1",
-      "2": "France 2",
-      "3": "France 3",
-      "4": "Canal +",
-      "5": "France 5",
-      "6": "M6",
-      "999": "Mire FREEBOX"
-    }
   },
 
   Freebox: function (token) {
@@ -92,7 +83,8 @@ module.exports = NodeHelper.create({
       if (res.VPNUser) nbVPNUser = res.VPNUser.length
       this.sendInfo("NB_VPN_USER", nbVPNUser)
     }
-    this.Channel(this.channelInfo)
+
+    if (this.config.showPlayerInfo) this.bouquetQuery(this.config.token)
     this.sendInfo("INITIALIZED", this.cache)
   },
 
@@ -271,26 +263,28 @@ module.exports = NodeHelper.create({
         res.VPNUsers.nb = nbVPNUser
       }
     }
-    /** test TV **/
-    this.player = res.playerInfo
-    this.volume = res.playerVolume
-    if (this.player && this.player.success && this.player.result && (this.player.result.power_state == "running") && this.player.result.foreground_app) {
-      if (this.player.result.foreground_app.package == "fr.freebox.tv") {
-        var channel = this.player.result.foreground_app.cur_url.split("channel=")[1]
-        res.Player.channel = channel
-        res.Player.power = true
-        //console.log(this.FreeboxTV[this.FreeboxTVChannel[channel]])
-        res.Player.logo = this.FreeboxTV[this.FreeboxTVChannel[channel]] ? "http://mafreebox.free.fr/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[this.FreeboxTVChannel[channel]] : "inconnu!" 
-      }
-    }
-    else res.Player.power = false
 
-    if (this.volume && this.volume.success && this.volume.result) {
-      //console.log(this.volume)
-      if (this.volume.result.mute) res.Player.mute = this.volume.result.mute
-      if (this.volume.result.volume) res.Player.volume = this.volume.result.volume
+    if (this.config.showPlayerInfo) {
+      /** test TV **/
+      this.player = res.playerInfo
+      this.volume = res.playerVolume
+      if (this.player && this.player.success && this.player.result && (this.player.result.power_state == "running") && this.player.result.foreground_app) {
+        if (this.player.result.foreground_app.package == "fr.freebox.tv") {
+          var channel = this.player.result.foreground_app.cur_url.split("channel=")[1]
+          res.Player.channel = channel
+          res.Player.power = true
+          res.Player.logo = this.FreeboxTV[channel] ? "http://mafreebox.free.fr/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[channel] : "inconnu!" 
+        }
+      }
+      else res.Player.power = false
+
+      if (this.volume && this.volume.success && this.volume.result) {
+        //console.log(this.volume)
+        if (this.volume.result.mute) res.Player.mute = this.volume.result.mute
+        if (this.volume.result.volume) res.Player.volume = this.volume.result.volume
+      }
+      //console.log("PlayerInfo", this.player)
     }
-    //console.log("PlayerInfo", this.player)
 
     /** delete all Freebox result **/
     delete res.Call
@@ -404,13 +398,6 @@ module.exports = NodeHelper.create({
       url:"player/1/api/v8/control/volume"
     })
 
-    if (!this.init) {
-      var channelInfo = await freebox.request({
-        method: "GET",
-        url:"tv/channels/"
-      })
-    }
-
     bandwidth = this.convert(cnx.data.result.bandwidth_down,2,1) + " - " + this.convert(cnx.data.result.bandwidth_up,2,1)
     debit = this.convert(cnx.data.result.rate_down,2) +" - " + this.convert(cnx.data.result.rate_up,2)
     type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
@@ -435,7 +422,6 @@ module.exports = NodeHelper.create({
       playerInfo: playerInfo ? playerInfo.data : null,
       playerVolume: playerVolume ? playerVolume.data : null
     }
-    if (!this.init) this.channelInfo= channelInfo.data
 
     await freebox.logout()
     return output
@@ -475,14 +461,57 @@ module.exports = NodeHelper.create({
     return parseInt(((percent*5)/100).toFixed(0))
   },
 
-  Channel(channel) {
-    if (Object.keys(channel).length > 0) {
-      for (let [item, value] of Object.entries(channel.result)) {
-        if (!value.name) console.log("[Freebox] hein!? la chaine n'as pas de nom !", item)
-        else this.FreeboxTV[value.name] = item +".png"
-      }
+  bouquetQuery: async function(token) {
+    const freebox = new Freebox(token)
+    await freebox.login()
+    var data= {}
+
+    const bouquets = await freebox.request({
+      method: "GET",
+      url: "tv/bouquets/"
+    })
+    data = bouquets.data
+    await freebox.logout()
+
+    if (data.success && data.result && data.result.length) {
+      data.result.forEach((x) => {
+        if (x.name == "Freebox TV") {
+          this.bouquetID = x.id
+          console.log("[Freebox] Numéro du Bouquet Freebox trouvé:", this.bouquetID)
+          this.ChannelLogo(this.config.token,this.bouquetID)
+        }
+      })
     }
-    console.log("[Freebox] Nombre de chaines trouvé:",Object.keys(this.FreeboxTV).length)
-    console.log("[Freebox] Nombre de chaines activé:", Object.keys(this.FreeboxTVChannel).length)
+    else console.log("[Freebox] Erreur Bouquet !?")
+  },
+
+  ChannelLogo: async function(token, bouquet) {
+    const freebox = new Freebox(token)
+    await freebox.login()
+    var data= {}
+    this.FreeboxTV = {}
+
+    const channels = await freebox.request({
+      method: "GET",
+      url: `tv/bouquets/${bouquet}/channels`
+    })
+    data = channels.data
+    await freebox.logout()
+    if (data.success && data.result && data.result.length) {
+      data.result.forEach((x) => {
+        this.FreeboxTV[x.number] = x.uuid + ".png"
+      })
+    }
+
+    /** Ajout de quelques logos manquant **/
+    this.FreeboxTV["0"] = "uuid-webtv-234.png" // mosaïque
+    this.FreeboxTV["46"] = "uuid-webtv-1098.png" // A la une Canal+
+    this.FreeboxTV["106"] = "uuid-webtv-659.png" // canal+ Séries
+    this.FreeboxTV["107"] = "uuid-webtv-947.png" // abctek
+    this.FreeboxTV["108"] = "uuid-webtv-946.png" // disneytek
+    this.FreeboxTV["130"] = "uuid-webtv-1319.png" // Netflix
+    this.FreeboxTV["300"] = "uuid-webtv-427.png" // mosaïque France 3
+
+    console.log("[Freebox] Nombre chaines trouvé:",Object.keys(this.FreeboxTV).length)
   }
 });

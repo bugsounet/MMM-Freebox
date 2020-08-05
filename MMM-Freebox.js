@@ -16,6 +16,7 @@ Module.register("MMM-Freebox", {
     showFreePlayer: true,
     showMissedCall: true,
     showVPNUsers: true,
+    showPlayerInfo: true, // Beta only for testing !
     maxMissed: 3,
     showIP: true,
     showPing: true,
