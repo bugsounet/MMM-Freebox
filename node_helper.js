@@ -11,6 +11,18 @@ module.exports = NodeHelper.create({
     this.freebox = null
     this.init = false
     this.pingValue = null
+    this.channelInfo = {}
+    this.FreeboxTV = {}
+    this.FreeboxTVChannel = {
+      "0": "Mosaïque" ,
+      "1": "TF1",
+      "2": "France 2",
+      "3": "France 3",
+      "4": "Canal +",
+      "5": "France 5",
+      "6": "M6",
+      "999": "Mire FREEBOX"
+    }
   },
 
   Freebox: function (token) {
@@ -78,10 +90,9 @@ module.exports = NodeHelper.create({
     if (this.config.showVPNUsers) {
       var nbVPNUser = 0
       if (res.VPNUser) nbVPNUser = res.VPNUser.length
-
       this.sendInfo("NB_VPN_USER", nbVPNUser)
     }
-
+    this.Channel(this.channelInfo)
     this.sendInfo("INITIALIZED", this.cache)
   },
 
@@ -141,6 +152,14 @@ module.exports = NodeHelper.create({
     res.VPNUsers = {}
     res.VPNUsers.who = []
     res.VPNUsers.nb = 0
+    res.Player = {
+      power: false,
+      channel: null,
+      logo: null,
+      volume: 0,
+      mute: false
+    }
+
     var device = {}
 
     /** Array of client with used value in object **/
@@ -252,6 +271,26 @@ module.exports = NodeHelper.create({
         res.VPNUsers.nb = nbVPNUser
       }
     }
+    /** test TV **/
+    this.player = res.playerInfo
+    this.volume = res.playerVolume
+    if (this.player && this.player.success && this.player.result && (this.player.result.power_state == "running") && this.player.result.foreground_app) {
+      if (this.player.result.foreground_app.package == "fr.freebox.tv") {
+        var channel = this.player.result.foreground_app.cur_url.split("channel=")[1]
+        res.Player.channel = channel
+        res.Player.power = true
+        //console.log(this.FreeboxTV[this.FreeboxTVChannel[channel]])
+        res.Player.logo = this.FreeboxTV[this.FreeboxTVChannel[channel]] ? "http://mafreebox.free.fr/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[this.FreeboxTVChannel[channel]] : "inconnu!" 
+      }
+    }
+    else res.Player.power = false
+
+    if (this.volume && this.volume.success && this.volume.result) {
+      //console.log(this.volume)
+      if (this.volume.result.mute) res.Player.mute = this.volume.result.mute
+      if (this.volume.result.volume) res.Player.volume = this.volume.result.volume
+    }
+    //console.log("PlayerInfo", this.player)
 
     /** delete all Freebox result **/
     delete res.Call
@@ -264,6 +303,8 @@ module.exports = NodeHelper.create({
     delete res.Wifi5g,
     delete res.EthCnx
     delete res.VPNUser
+    delete res.playerInfo
+    delete res.playerVolume
 
     res.Ping = this.config.showPing ? this.pingValue : null
     this.sendInfo("RESULT", res)
@@ -353,6 +394,23 @@ module.exports = NodeHelper.create({
       })
     }
 
+    var playerInfo = await freebox.request({
+      method: "GET",
+      url:"player/1/api/v8/status/"
+    })
+
+    var playerVolume = await freebox.request({
+      method: "GET",
+      url:"player/1/api/v8/control/volume"
+    })
+
+    if (!this.init) {
+      var channelInfo = await freebox.request({
+        method: "GET",
+        url:"tv/channels/"
+      })
+    }
+
     bandwidth = this.convert(cnx.data.result.bandwidth_down,2,1) + " - " + this.convert(cnx.data.result.bandwidth_up,2,1)
     debit = this.convert(cnx.data.result.rate_down,2) +" - " + this.convert(cnx.data.result.rate_up,2)
     type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
@@ -374,7 +432,10 @@ module.exports = NodeHelper.create({
       3: clientRate ? eth3.data.result : null,
       4: clientRate ? eth4.data.result : null,
       VPNUser: vpnUser ? vpnUsers.data.result: null,
+      playerInfo: playerInfo ? playerInfo.data : null,
+      playerVolume: playerVolume ? playerVolume.data : null
     }
+    if (!this.init) this.channelInfo= channelInfo.data
 
     await freebox.logout()
     return output
@@ -412,5 +473,16 @@ module.exports = NodeHelper.create({
   /** nbre de barre wifi selon % quality) **/
   wifiBar(percent) {
     return parseInt(((percent*5)/100).toFixed(0))
+  },
+
+  Channel(channel) {
+    if (Object.keys(channel).length > 0) {
+      for (let [item, value] of Object.entries(channel.result)) {
+        if (!value.name) console.log("[Freebox] hein!? la chaine n'as pas de nom !", item)
+        else this.FreeboxTV[value.name] = item +".png"
+      }
+    }
+    console.log("[Freebox] Nombre de chaines trouvé:",Object.keys(this.FreeboxTV).length)
+    console.log("[Freebox] Nombre de chaines activé:", Object.keys(this.FreeboxTVChannel).length)
   }
 });

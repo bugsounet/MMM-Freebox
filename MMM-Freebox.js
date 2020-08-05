@@ -47,6 +47,7 @@ Module.register("MMM-Freebox", {
       "Ping": null,
       "VPNUsers": [],
       "nbVPNUser": 0,
+      "Player": {}
     }
 
     this.maxMissedCall = 0
@@ -123,6 +124,7 @@ Module.register("MMM-Freebox", {
     this.Freebox.Calls = payload.Calls
     this.Freebox.VPNUsers = payload.VPNUsers
     this.Freebox.Ping = payload.Ping
+    this.Freebox.Player = payload.Player
     FB("Result:", this.Freebox)
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
@@ -280,6 +282,16 @@ Module.register("MMM-Freebox", {
         vpnDate.innerHTML = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm")
       }
     }
+    var TV = document.getElementById("FREE_TV")
+    var TVLogo = document.getElementById("FREE_CHANNEL")
+    if (this.Freebox.Player.logo && this.Freebox.Player.power) {
+      TV.classList.remove("hidden")
+      if (this.Freebox.Player.logo == "inconnu!") TVLogo.src = "/modules/MMM-Freebox/resources/tv1.png"
+      else TVLogo.src = this.Freebox.Player.logo
+      var TVVolume = document.getElementById("FREE_VOLUME")
+      TVVolume.textContent = "Volume: " + this.Freebox.Player.volume+ " - Mute: " + (this.Freebox.Player.mute ? true: false)
+    }
+    else TV.classList.add("hidden")
   },
 
   /** scan main loop **/
@@ -503,8 +515,7 @@ Module.register("MMM-Freebox", {
           wrapper.appendChild(who)
         }
       }
-    
-      
+
       /** Utilisateurs VPN **/
       if (this.Freebox.nbVPNUser > 0) {
         var table = document.createElement("div")
@@ -535,6 +546,19 @@ Module.register("MMM-Freebox", {
           vpnUser.appendChild(vpnDate)
         }
       }
+
+      var TV = document.createElement("div")
+      TV.id = "FREE_TV"
+      TV.classList.add("hidden")
+      var TVLogo = document.createElement("img")
+      TVLogo.id= "FREE_CHANNEL"
+      TVLogo.className = "tv"
+      TV.appendChild(TVLogo)
+      var TVVolume = document.createElement("div")
+      TVVolume.id = "FREE_VOLUME"
+      TVVolume.className = "volume"
+      TV.appendChild(TVVolume)
+      wrapper.appendChild(TV)
     }
     return wrapper
 
