@@ -284,7 +284,8 @@ module.exports = NodeHelper.create({
           var channel = this.player.result.foreground_app.cur_url.split("channel=")[1]
           res.Player.channel = channel
           res.Player.power = true
-          res.Player.logo = this.FreeboxTV[channel] ? "http://mafreebox.free.fr/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[channel] : "inconnu!"
+          //res.Player.logo = this.FreeboxTV[channel] ? "http://mafreebox.free.fr/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[channel] : "inconnu!"
+          res.Player.logo = this.FreeboxTV[channel] ? "http://212.27.38.253/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[channel] : "inconnu!"
           res.Player.channelName = this.FreeboxChannelTV[channel] ? this.FreeboxChannelTV[channel] : 0
           this.EPGSearch(this.FreeboxChannelTV[channel])
         }
