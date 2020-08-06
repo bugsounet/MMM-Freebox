@@ -3,6 +3,11 @@ const { Freebox } = require("@bugsounet/freebox")
 var _ = require("underscore")
 var ping = require('ping')
 
+const fs = require("fs")
+const parser = require("fast-xml-parser")
+const moment = require("moment")
+const wget = require('wget-improved')
+
 FB = (...args) => { /* do nothing */ }
 
 module.exports = NodeHelper.create({
@@ -12,8 +17,12 @@ module.exports = NodeHelper.create({
     this.init = false
     this.pingValue = null
     this.channelInfo = {}
-    this.bouquetID= null,
+    this.bouquetID= null
     this.FreeboxTV = {}
+    this.FreeboxChannelTV = {} // basse de données des chaines du bouquet FreeboxTV
+    this.FreeboxChannelBDD = {} // base dedonnées des 900 chaines Freebox
+    this.EPG = {}
+    this.downloadEPG()
   },
 
   Freebox: function (token) {
@@ -22,9 +31,9 @@ module.exports = NodeHelper.create({
         if (!this.init) this.makeCache(res)
         else this.makeResult(res)
       },
-      (err) => { 
+      (err) => {
         FB("[Freebox] " + err)
-        if (!this.init) this.scan() 
+        if (!this.init) this.scan()
       }
     )
   },
@@ -149,7 +158,9 @@ module.exports = NodeHelper.create({
       channel: null,
       logo: null,
       volume: 0,
-      mute: false
+      mute: false,
+      channelProgram: "Programme Inconnu",
+      channelName: 0
     }
 
     var device = {}
@@ -273,17 +284,17 @@ module.exports = NodeHelper.create({
           var channel = this.player.result.foreground_app.cur_url.split("channel=")[1]
           res.Player.channel = channel
           res.Player.power = true
-          res.Player.logo = this.FreeboxTV[channel] ? "http://mafreebox.free.fr/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[channel] : "inconnu!" 
+          res.Player.logo = this.FreeboxTV[channel] ? "http://mafreebox.free.fr/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[channel] : "inconnu!"
+          res.Player.channelName = this.FreeboxChannelTV[channel] ? this.FreeboxChannelTV[channel] : 0
+          this.EPGSearch(this.FreeboxChannelTV[channel])
         }
       }
       else res.Player.power = false
 
       if (this.volume && this.volume.success && this.volume.result) {
-        //console.log(this.volume)
         if (this.volume.result.mute) res.Player.mute = this.volume.result.mute
         if (this.volume.result.volume) res.Player.volume = this.volume.result.volume
       }
-      //console.log("PlayerInfo", this.player)
     }
 
     /** delete all Freebox result **/
@@ -513,5 +524,102 @@ module.exports = NodeHelper.create({
     this.FreeboxTV["300"] = "uuid-webtv-427.png" // mosaïque France 3
 
     console.log("[Freebox] Nombre chaines trouvé:",Object.keys(this.FreeboxTV).length)
+  },
+
+  ChannelIdName: async function (token) {
+    const freebox = new Freebox(token)
+    await freebox.login()
+    var data= {}
+    var channel = await freebox.request({
+      method: "GET",
+      url:"tv/channels/"
+    })
+    data=  channel.data
+    await freebox.logout()
+
+    if (Object.keys(data).length > 0) {
+      for (let [item, value] of Object.entries(data.result)) {
+        if (!value.name) console.log("[Freebox] hein!? la chaine n'as pas de nom !", item)
+        else this.FreeboxChannelBDD[item +".png"] = value.name
+      }
+    }
+    console.log("[Freebox] FULL DB- Nombre de chaines trouvé:",Object.keys(this.FreeboxChannelBDD).length)
+    if (Object.keys(this.FreeboxTV).length > 0) {
+      for (let [item, value] of Object.entries(this.FreeboxTV)) {
+        this.FreeboxChannelTV[item] = this.FreeboxChannelBDD[value]
+      }
+    }
+    console.log("[Freebox] BouquetDB- Nombre de chaines trouvé:",Object.keys(this.FreeboxChannelTV).length)
+  },
+
+  downloadEPG: async function() {
+    var url = "https://xmltv.ch/xmltv/xmltv-complet_1jour.xml"
+    this.jsonData = null
+
+    let download = wget.download(url, "./epg.xml", { });
+    download.on('error', (err) => {
+        console.log("[Freebox] EPG- error", err)
+    })
+    download.on('start', (fileSize) => {
+        console.log("[Freebox] EPG- Downloading :", fileSize)
+    })
+    download.on('end', (output) => {
+        console.log("[Freebox] EPG- Download Terminé !")
+        this.xmlToJSON()
+    })
+  },
+
+  xmlToJSON: function () {
+    const xmlData = fs.readFileSync(`./epg.xml`, {
+      encoding: "utf-8",
+    })
+
+    this.EPG = parser.parse(
+      xmlData,
+      {
+        attrNodeName: "",
+        textNodeName: "#text",
+        attributeNamePrefix: "",
+        arrayMode: "false",
+        ignoreAttributes: false,
+        parseAttributeValue: true,
+      },
+      true
+    )
+    console.log("[Freebox] EPG- Créé !")
+    this.ChannelIdName(this.config.token)
+  },
+
+  EPGSearch: function (name) {
+    if (!name || !this.EPG) {
+      console.log("[Freebox] EPG- " + name + " > Programme inconnu")
+      return this.sendSocketNotification("SEND_EPG", "Programme inconnu")
+    }
+    var currentDate = moment().format("YYYYMMDDHHmmss")
+    var channel = this.EPG.tv.channel
+    var programme = this.EPG.tv.programme
+    this.id = null
+    var found = 0
+    channel.forEach(element => {
+      if (element["display-name"] == name) {
+        this.id= element.id
+      }
+    })
+
+    programme.forEach(prog => {
+      if (prog.channel == this.id) {
+        start = prog.start.split(' ')[0]
+        stop = prog.stop.split(' ')[0]
+        if (currentDate >= start && currentDate <= stop) {
+          console.log("[Freebox] EPG- " + name + " > " + (prog.title ? prog.title : "Programme inconnu"))
+          this.sendSocketNotification("SEND_EPG", prog.title ? prog.title : "Programme inconnu")
+          found =1
+        }
+      }
+    })
+    if (!found) {
+      console.log("[Freebox] EPG- " + name + " > Programme inconnu")
+      this.sendSocketNotification("SEND_EPG", "Programme inconnu")
+    }
   }
 });

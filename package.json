@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-Freebox",
   "dependencies": {
+    "@bugsounet/freebox": "^1.0.0",
+    "fast-xml-parser": "^3.17.4",
     "ping": "^0.2.2",
-    "@bugsounet/freebox": "^1.0.0"
+    "wget-improved": "^3.2.0"
   }
 }

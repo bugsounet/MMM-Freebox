@@ -88,6 +88,9 @@ Module.register("MMM-Freebox", {
       case "NB_VPN_USER":
         this.Freebox.nbVPNUser = payload
         break
+      case "SEND_EPG":
+        console.log("[Freebox] " + payload)
+        break
     }
   },
 
@@ -130,7 +133,7 @@ Module.register("MMM-Freebox", {
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
   },
-  
+
   displayDom: function() {
     /** On applique les mises a jour en live ! **/
 
@@ -562,13 +565,12 @@ Module.register("MMM-Freebox", {
       wrapper.appendChild(TV)
     }
     return wrapper
-
   },
 
 /*****************************************/
 
   getScripts: function () {
-    return ["moment.js"];
+    return ["moment.js"]
   },
 
   getStyles: function() {
