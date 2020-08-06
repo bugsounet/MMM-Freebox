@@ -50,6 +50,7 @@ Module.register("MMM-Freebox", {
       "nbVPNUser": 0,
       "Player": {}
     }
+    this.EPG = "Programme inconnu"
 
     this.maxMissedCall = 0
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
@@ -89,7 +90,8 @@ Module.register("MMM-Freebox", {
         this.Freebox.nbVPNUser = payload
         break
       case "SEND_EPG":
-        console.log("[Freebox] " + payload)
+        this.EPG = payload
+        //console.log("[Freebox] " + payload)
         break
     }
   },
@@ -129,6 +131,7 @@ Module.register("MMM-Freebox", {
     this.Freebox.VPNUsers = payload.VPNUsers
     this.Freebox.Ping = payload.Ping
     this.Freebox.Player = payload.Player
+    this.Freebox.Player.channelProgram = this.EPG
     FB("Result:", this.Freebox)
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
@@ -293,7 +296,8 @@ Module.register("MMM-Freebox", {
       if (this.Freebox.Player.logo == "inconnu!") TVLogo.src = "/modules/MMM-Freebox/resources/tv1.png"
       else TVLogo.src = this.Freebox.Player.logo
       var TVVolume = document.getElementById("FREE_VOLUME")
-      TVVolume.textContent = "Volume: " + this.Freebox.Player.volume+ " - Mute: " + (this.Freebox.Player.mute ? true: false)
+      //TVVolume.textContent = "Volume: " + this.Freebox.Player.volume+ " - Mute: " + (this.Freebox.Player.mute ? true: false)
+      TVVolume.textContent = this.Freebox.Player.channelProgram
     }
     else TV.classList.add("hidden")
   },
