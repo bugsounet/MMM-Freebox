@@ -22,6 +22,7 @@ module.exports = NodeHelper.create({
     this.FreeboxChannelTV = {} // basse de données des chaines du bouquet FreeboxTV
     this.FreeboxChannelBDD = {} // base dedonnées des 900 chaines Freebox
     this.EPG = {}
+    console.log(Date.now())
     this.downloadEPG()
   },
 
@@ -159,7 +160,6 @@ module.exports = NodeHelper.create({
       logo: null,
       volume: 0,
       mute: false,
-      channelProgram: "Programme Inconnu",
       channelName: 0
     }
 
@@ -554,7 +554,8 @@ module.exports = NodeHelper.create({
   },
 
   downloadEPG: async function() {
-    var url = "https://xmltv.ch/xmltv/xmltv-complet_1jour.xml"
+    //var url = "https://xmltv.ch/xmltv/xmltv-complet_1jour.xml"
+    var url = "https://xmltv.ch/xmltv/xmltv-complet.xml"
     this.jsonData = null
 
     let download = wget.download(url, "./epg.xml", { });
@@ -592,10 +593,18 @@ module.exports = NodeHelper.create({
   },
 
   EPGSearch: function (name) {
-    if (!name || !this.EPG) {
-      console.log("[Freebox] EPG- " + name + " > Programme inconnu")
-      return this.sendSocketNotification("SEND_EPG", "Programme inconnu")
+    var output = {
+      title: "Programme incconu",
+      start: 0,
+      stop: 0,
+      current: 0,
+      photo: "unknow"
     }
+    if (!name || !this.EPG) {
+      console.log("[Freebox] EPG- " + name + " *** no DB!")
+      return this.sendSocketNotification("SEND_EPG", output)
+    }
+
     var currentDate = moment().format("YYYYMMDDHHmmss")
     var channel = this.EPG.tv.channel
     var programme = this.EPG.tv.programme
@@ -612,15 +621,21 @@ module.exports = NodeHelper.create({
         start = prog.start.split(' ')[0]
         stop = prog.stop.split(' ')[0]
         if (currentDate >= start && currentDate <= stop) {
-          console.log("[Freebox] EPG- " + name + " > " + (prog.title ? prog.title : "Programme inconnu"))
-          this.sendSocketNotification("SEND_EPG", prog.title ? prog.title : "Programme inconnu")
+          console.log("[Freebox] EPG- " + name + " *** " + (prog.title ? prog.title : "no entry title !"))
+          output.title= prog.title ? prog.title : "Programme inconnu"
+          output.start= parseInt(start)
+          output.stop= parseInt(stop)
+          output.current= parseInt(currentDate)
+          if (prog.icon && prog.icon.src) output.photo= prog.icon.src
+          this.sendSocketNotification("SEND_EPG", output)
           found =1
+          //console.log(prog)
         }
       }
     })
     if (!found) {
-      console.log("[Freebox] EPG- " + name + " > Programme inconnu")
-      this.sendSocketNotification("SEND_EPG", "Programme inconnu")
+      console.log("[Freebox] EPG- " + name + " *** no entry found !")
+      this.sendSocketNotification("SEND_EPG", output)
     }
   }
 });

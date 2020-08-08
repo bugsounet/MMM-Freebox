@@ -58,7 +58,7 @@ Module.register("MMM-Freebox", {
       /** normalise les adresses MAC en majuscule **/
       this.config.excludeMac = this.config.excludeMac.map(function(x){ return x.toUpperCase() })
     }
-    if (this.config.textWidth < 220) this.config.textWidth = 220
+    if (this.config.textWidth < 200) this.config.textWidth = 200
     if (typeof this.config.textWidth != 'number') this.config.textWidth = this.defaults.textWidth
     console.log("[Freebox] Started...")
   },
@@ -131,7 +131,7 @@ Module.register("MMM-Freebox", {
     this.Freebox.VPNUsers = payload.VPNUsers
     this.Freebox.Ping = payload.Ping
     this.Freebox.Player = payload.Player
-    this.Freebox.Player.channelProgram = this.EPG
+    this.Freebox.Player.program = this.EPG
     FB("Result:", this.Freebox)
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
@@ -289,15 +289,42 @@ Module.register("MMM-Freebox", {
         vpnDate.innerHTML = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm")
       }
     }
+
+    /** TV **/
     var TV = document.getElementById("FREE_TV")
     var TVLogo = document.getElementById("FREE_CHANNEL")
     if (this.Freebox.Player.logo && this.Freebox.Player.power) {
       TV.classList.remove("hidden")
       if (this.Freebox.Player.logo == "inconnu!") TVLogo.src = "/modules/MMM-Freebox/resources/tv1.png"
       else TVLogo.src = this.Freebox.Player.logo
-      var TVVolume = document.getElementById("FREE_VOLUME")
+      var TVPhoto= document.getElementById("FREE_PHOTO")
+      if (this.Freebox.Player.program.photo == "unknow") TVPhoto.src= "/modules/MMM-Freebox/resources/unknow.jpg"
+      else TVPhoto.src= this.Freebox.Player.program.photo
+      var TVProgram = document.getElementById("FREE_PROGRAM")
       //TVVolume.textContent = "Volume: " + this.Freebox.Player.volume+ " - Mute: " + (this.Freebox.Player.mute ? true: false)
-      TVVolume.textContent = this.Freebox.Player.channelProgram
+      TVProgram.textContent = this.Freebox.Player.program.title
+      var TVProgress = document.getElementById("FREE_PROGRESS")
+      /** putain de formule de merde ! **/
+      TVProgress.value= this.Freebox.Player.program.current ? ((((this.Freebox.Player.program.current - this.Freebox.Player.program.start) / (this.Freebox.Player.program.stop-this.Freebox.Player.program.start)) * 100)) : 100
+
+      var TVProgressStart = document.getElementById("FREE_PROGRESS_START")
+      var TVProgressEnd = document.getElementById("FREE_PROGRESS_END")
+      var startStr = this.Freebox.Player.program.start.toString().substring(8, 12)
+      var endStr = this.Freebox.Player.program.stop.toString().substring(8, 12)
+      if (startStr) {
+        var startHour= startStr.substring(0,2)
+        var startMin= startStr.substring(2)
+        var startTime= startHour+"h"+startMin
+        TVProgressStart.textContent = startTime
+      }
+      else TVProgressStart.textContent = "00h00"
+      if (endStr) {
+        var endHour= endStr.substring(0,2)
+        var endMin= endStr.substring(2)
+        var endTime= endHour+"h"+endMin
+        TVProgressEnd.textContent = endTime
+      }
+      else TVProgressEnd.textContent = "00h00"
     }
     else TV.classList.add("hidden")
   },
@@ -351,7 +378,7 @@ Module.register("MMM-Freebox", {
       /** Afficage de la bande passante **/
       var bandWidth = document.createElement("div")
       bandWidth.id = "FREE_BAND"
-      bandWidth.style.width = (this.config.textWidth + 60) + "px"
+      //bandWidth.style.width = (this.config.textWidth + 60) + "px"
       bandWidth.classList.add("hidden")
 
       var bandWidthIcon = document.createElement("div")
@@ -362,7 +389,7 @@ Module.register("MMM-Freebox", {
 
       var bandWidthDisplay= document.createElement("div")
       bandWidthDisplay.id = "FREE_VALUE"
-      bandWidthDisplay.style.width= this.config.textWidth + "px"
+      //bandWidthDisplay.style.width= this.config.textWidth + "px"
       bandWidth.appendChild(bandWidthDisplay)
 
       wrapper.appendChild(bandWidth)
@@ -555,13 +582,42 @@ Module.register("MMM-Freebox", {
         }
       }
 
+      /** TV info **/
       var TV = document.createElement("div")
       TV.id = "FREE_TV"
       TV.classList.add("hidden")
+      var Contener = document.createElement("div")
+      Contener.id = "FREE_CONTENER"
       var TVLogo = document.createElement("img")
       TVLogo.id= "FREE_CHANNEL"
       TVLogo.className = "tv"
-      TV.appendChild(TVLogo)
+      Contener.appendChild(TVLogo)
+      var TVPhoto= document.createElement("img")
+      TVPhoto.id = "FREE_PHOTO"
+      TVPhoto.className = "photo"
+      Contener.appendChild(TVPhoto)
+      TV.appendChild(Contener)
+      var TVEPG= document.createElement("div")
+      TVEPG.id = "FREE_EPG"
+      TV.appendChild(TVEPG)
+      var TVProgram = document.createElement("div")
+      TVProgram.id = "FREE_PROGRAM"
+      TVEPG.appendChild(TVProgram)
+      var TVProgressContener = document.createElement("div")
+      TVProgressContener.id = "FREE_PROGRESS_CONTENER"
+      var TVProgressStart = document.createElement("div")
+      TVProgressStart.id = "FREE_PROGRESS_START"
+      TVProgressContener.appendChild(TVProgressStart)
+      var TVProgress = document.createElement("meter")
+      TVProgress.id = "FREE_PROGRESS"
+      TVProgress.className="meter"
+      TVProgress.min= 0
+      TVProgress.max= 100
+      TVProgressContener.appendChild(TVProgress)
+      var TVProgressEnd = document.createElement("div")
+      TVProgressEnd.id = "FREE_PROGRESS_END"
+      TVProgressContener.appendChild(TVProgressEnd)
+      TV.appendChild(TVProgressContener)
       var TVVolume = document.createElement("div")
       TVVolume.id = "FREE_VOLUME"
       TVVolume.className = "volume"
