@@ -301,7 +301,6 @@ Module.register("MMM-Freebox", {
       if (this.Freebox.Player.program.photo == "unknow") TVPhoto.src= "/modules/MMM-Freebox/resources/unknow.jpg"
       else TVPhoto.src= this.Freebox.Player.program.photo
       var TVProgram = document.getElementById("FREE_PROGRAM")
-      //TVVolume.textContent = "Volume: " + this.Freebox.Player.volume+ " - Mute: " + (this.Freebox.Player.mute ? true: false)
       TVProgram.textContent = this.Freebox.Player.program.title
       var TVProgress = document.getElementById("FREE_PROGRESS")
       /** putain de formule de merde ! **/
@@ -327,6 +326,18 @@ Module.register("MMM-Freebox", {
       else TVProgressEnd.textContent = "00h00"
     }
     else TV.classList.add("hidden")
+    var TVVolume = document.getElementById("FREE_VOLUME")
+    if (this.Freebox.Player.mute) TVVolume.src = "/modules/MMM-Freebox/resources/volmute.png"
+    else {
+      if (this.Freebox.Player.volume && this.Freebox.Player.volume !=100) {
+        var volume = ((this.Freebox.Player.volume * 5) / 100).toFixed(0)
+        TVVolume.src = "/modules/MMM-Freebox/resources/vol"+volume+".png"
+      }
+      else {
+        if (this.Freebox.Player.volume ==100) TVVolume.src = "/modules/MMM-Freebox/resources/volmax.png"
+        else if (!this.Freebox.Player.mute) TVVolume.src = "/modules/MMM-Freebox/resources/vol0.png"
+      }
+    }
   },
 
   /** scan main loop **/
@@ -596,13 +607,14 @@ Module.register("MMM-Freebox", {
       TVPhoto.id = "FREE_PHOTO"
       TVPhoto.className = "photo"
       Contener.appendChild(TVPhoto)
+      var TVVolume = document.createElement("img")
+      TVVolume.id = "FREE_VOLUME"
+      TVVolume.className = "volume"
+      Contener.appendChild(TVVolume)
       TV.appendChild(Contener)
-      var TVEPG= document.createElement("div")
-      TVEPG.id = "FREE_EPG"
-      TV.appendChild(TVEPG)
       var TVProgram = document.createElement("div")
       TVProgram.id = "FREE_PROGRAM"
-      TVEPG.appendChild(TVProgram)
+      TV.appendChild(TVProgram)
       var TVProgressContener = document.createElement("div")
       TVProgressContener.id = "FREE_PROGRESS_CONTENER"
       var TVProgressStart = document.createElement("div")
@@ -618,10 +630,6 @@ Module.register("MMM-Freebox", {
       TVProgressEnd.id = "FREE_PROGRESS_END"
       TVProgressContener.appendChild(TVProgressEnd)
       TV.appendChild(TVProgressContener)
-      var TVVolume = document.createElement("div")
-      TVVolume.id = "FREE_VOLUME"
-      TVVolume.className = "volume"
-      TV.appendChild(TVVolume)
       wrapper.appendChild(TV)
     }
     return wrapper

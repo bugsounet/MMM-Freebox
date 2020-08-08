@@ -428,6 +428,7 @@ input.switch-round:checked + label:after {
 #FREE_CHANNEL {
   font-size: 15px;
   height: 80px;
+  margin-left: 25px;
 }
 
 #FREE_PHOTO {
@@ -451,7 +452,7 @@ input.switch-round:checked + label:after {
 }
 
 #FREE_VOLUME {
-
+  height: 80px;
 }
 
 #FREE_CONTENER {
