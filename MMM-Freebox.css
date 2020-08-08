@@ -444,6 +444,10 @@ input.switch-round:checked + label:after {
 #FREE_PROGRAM {
   font-size: 15px;
   text-align: center;
+  width: 395px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
 
 #FREE_PROGRESS {
