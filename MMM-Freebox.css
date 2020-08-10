@@ -504,3 +504,10 @@ meter::-webkit-meter-inner-element {
 #FREE_PROGRESS_END {
   line-height: 10px;
 }
+
+#FREE_PROGRAM.hidden,
+#FREE_PROGRESS.hidden,
+#FREE_PROGRESS_START.hidden,
+#FREE_PROGRESS_END.hidden {
+  display:none;
+}

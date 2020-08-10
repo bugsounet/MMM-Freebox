@@ -27,10 +27,14 @@ Module.register("MMM-Freebox", {
     verbose: false,
     dev: false,
     debitText: "Débit total utilisé : ",
-    player : { // Beta only for testing !
-      showPlayerInfo: true,
-      ServerIP: "212.27.38.253", // "192.168.0.254" // "mafreebox.free.fr"
-      UseEPGDayURL: false,
+    player : {
+      showPlayerInfo: false,
+      // depuis le firmware 4.2.3, problemes d'affichage des logos
+      // essayez avec les ips :  "192.168.0.254" (l'ip du freebox server)
+      //                         "mafreebox.free.fr" ou le resultat de l'ip de mafreebox.free.fr
+      //                         "212.27.38.253" l'ip de mafreebox.free.fr (a voir si cela fonctionne pour vous)
+      ServerIP: "212.27.38.253",
+      UseEPGDayURL: true,
       EPGDelay: 2* 60 *60 *1000
     }
   },
@@ -307,29 +311,40 @@ Module.register("MMM-Freebox", {
         if (this.Freebox.Player.program.photo == "unknow") TVPhoto.src= "/modules/MMM-Freebox/resources/unknow.jpg"
         else TVPhoto.src= this.Freebox.Player.program.photo
         var TVProgram = document.getElementById("FREE_PROGRAM")
-        TVProgram.textContent = this.Freebox.Player.program.title
         var TVProgress = document.getElementById("FREE_PROGRESS")
-        /** putain de formule de merde ! **/
-        TVProgress.value= this.Freebox.Player.program.current ? ((((this.Freebox.Player.program.current - this.Freebox.Player.program.start) / (this.Freebox.Player.program.stop-this.Freebox.Player.program.start)) * 100)) : 100
-
         var TVProgressStart = document.getElementById("FREE_PROGRESS_START")
         var TVProgressEnd = document.getElementById("FREE_PROGRESS_END")
-        var startStr = this.Freebox.Player.program.start.toString().substring(8, 12)
-        var endStr = this.Freebox.Player.program.stop.toString().substring(8, 12)
-        if (startStr) {
-          var startHour= startStr.substring(0,2)
-          var startMin= startStr.substring(2)
-          var startTime= startHour+"h"+startMin
-          TVProgressStart.textContent = startTime
+        if (this.Freebox.Player.program.title == "Programme inconnu") {
+          TVProgram.classList.add("hidden")
+          TVProgress.classList.add("hidden")
+          TVProgressStart.classList.add("hidden")
+          TVProgressEnd.classList.add("hidden")
         }
-        else TVProgressStart.textContent = "00h00"
-        if (endStr) {
-          var endHour= endStr.substring(0,2)
-          var endMin= endStr.substring(2)
-          var endTime= endHour+"h"+endMin
-          TVProgressEnd.textContent = endTime
+        else {
+          TVProgram.innerHTML = this.Freebox.Player.program.title
+          /** putain de formule de merde ! **/
+          TVProgress.value= this.Freebox.Player.program.current ? ((((this.Freebox.Player.program.current - this.Freebox.Player.program.start) / (this.Freebox.Player.program.stop-this.Freebox.Player.program.start)) * 100)) : 100
+          var startStr = this.Freebox.Player.program.start.toString().substring(8, 12)
+          var endStr = this.Freebox.Player.program.stop.toString().substring(8, 12)
+          if (startStr) {
+            var startHour= startStr.substring(0,2)
+            var startMin= startStr.substring(2)
+            var startTime= startHour+"h"+startMin
+            TVProgressStart.textContent = startTime
+          }
+          else TVProgressStart.textContent = "00h00"
+          if (endStr) {
+            var endHour= endStr.substring(0,2)
+            var endMin= endStr.substring(2)
+            var endTime= endHour+"h"+endMin
+            TVProgressEnd.textContent = endTime
+          }
+          else TVProgressEnd.textContent = "00h00"
+          TVProgram.classList.remove("hidden")
+          TVProgress.classList.remove("hidden")
+          TVProgressStart.classList.remove("hidden")
+          TVProgressEnd.classList.remove("hidden")
         }
-        else TVProgressEnd.textContent = "00h00"
       }
       else TV.classList.add("hidden")
       var TVVolume = document.getElementById("FREE_VOLUME")

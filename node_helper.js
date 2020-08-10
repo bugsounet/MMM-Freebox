@@ -490,7 +490,7 @@ module.exports = NodeHelper.create({
       data.result.forEach((x) => {
         if (x.name == "Freebox TV") {
           this.bouquetID = x.id
-          FB("[Freebox] Numéro du Bouquet Freebox trouvé:", this.bouquetID)
+          FB("Numéro du Bouquet Freebox trouvé:", this.bouquetID)
           this.ChannelLogo(this.config.token,this.bouquetID)
         }
       })
@@ -526,10 +526,16 @@ module.exports = NodeHelper.create({
     this.FreeboxTV["130"] = "uuid-webtv-1319.png" // Netflix
     this.FreeboxTV["300"] = "uuid-webtv-427.png" // mosaïque France 3
 
-    FB("[Freebox] Nombre chaines trouvé:",Object.keys(this.FreeboxTV).length)
+    FB("LOGO- Nombre chaines trouvé:",Object.keys(this.FreeboxTV).length)
   },
 
   ChannelIdName: async function (token) {
+    var CorrectChannelDBName = null
+    try {
+      CorrectChannelDBName = require("./correctChannelName.js").CorrectChannelDBName
+    } catch (e) {
+      console.log("[Freebox] erreur correctChannelName.js", e.message)
+    }
     const freebox = new Freebox(token)
     await freebox.login()
     var data= {}
@@ -547,7 +553,7 @@ module.exports = NodeHelper.create({
         else this.FreeboxChannelBDD[item +".png"] = value.name
       }
     }
-    FB("[Freebox] FULL DB- Nombre de chaines trouvé:",Object.keys(this.FreeboxChannelBDD).length)
+    FB("FULL DB- Nombre de chaines trouvé:",Object.keys(this.FreeboxChannelBDD).length)
     if (Object.keys(this.FreeboxTV).length > 0) {
       for (let [item, value] of Object.entries(this.FreeboxTV)) {
         this.FreeboxChannelTV[item] = this.FreeboxChannelBDD[value]
@@ -557,7 +563,21 @@ module.exports = NodeHelper.create({
       console.log("[Freebox] BouquetDB- Aucune chaine trouvé... retry")
       this.ChannelIdName(this.config.token)
     }
-    else FB("[Freebox] BouquetDB- Nombre de chaines trouvé:", Object.keys(this.FreeboxChannelTV).length)
+    else {
+      FB("BouquetDB- Nombre de chaines trouvé:", Object.keys(this.FreeboxChannelTV).length)
+      /** synchronistaion des noms des chaines EPG avec FreeboxTV **/
+      if (CorrectChannelDBName) {
+        for (let [item, value] of Object.entries(this.EPG.tv.channel)) {
+          for (let [EPG, FBTV] of Object.entries(CorrectChannelDBName)) {
+            if (value["display-name"] == EPG) {
+              FB("CorrectDB- " + EPG + " -> " + FBTV)
+              value["display-name"] = FBTV
+            }
+          }
+        }
+        FB("CorrectDB- done !")
+      }
+    }
   },
 
   downloadEPG: async function() {
@@ -568,13 +588,13 @@ module.exports = NodeHelper.create({
 
     let download = wget.download(url, "./epg.xml", { });
     download.on('error', (err) => {
-        console.log("[Freebox] EPG- error", err)
+        console.log("Download EPG- error", err)
     })
     download.on('start', (fileSize) => {
-        FB("[Freebox] EPG- Downloading :", fileSize)
+        FB("Download EPG- URL: " + url + "- Taille:", this.convert(fileSize, null, 2))
     })
     download.on('end', (output) => {
-        FB("[Freebox] EPG- Download Terminé !")
+        FB("Download EPG- Terminé !")
         this.xmlToJSON()
     })
   },
@@ -596,7 +616,7 @@ module.exports = NodeHelper.create({
       },
       true
     )
-    FB("[Freebox] EPG- Créé !")
+    FB("EPG- Créé !")
     this.ChannelIdName(this.config.token)
   },
 
@@ -609,7 +629,7 @@ module.exports = NodeHelper.create({
       photo: "unknow"
     }
     if (!name || !this.EPG) {
-      FB("[Freebox] EPG- " + name + " *** no DB!")
+      FB("EPG- " + name + " *** no DB!")
       return this.sendSocketNotification("SEND_EPG", output)
     }
 
@@ -629,7 +649,7 @@ module.exports = NodeHelper.create({
         start = prog.start.split(' ')[0]
         stop = prog.stop.split(' ')[0]
         if (currentDate >= start && currentDate <= stop) {
-          FB("[Freebox] EPG- " + name + " *** " + (prog.title ? prog.title : "no entry title !"))
+          FB("EPG- " + name + " *** " + (prog.title ? prog.title : "no entry title !"))
           output.title= prog.title ? prog.title : "Programme inconnu"
           output.start= parseInt(start)
           output.stop= parseInt(stop)
@@ -641,7 +661,7 @@ module.exports = NodeHelper.create({
       }
     })
     if (!found) {
-      FB("[Freebox] EPG- " + name + " *** no entry found !")
+      FB("EPG- " + name + " *** no entry found !")
       this.sendSocketNotification("SEND_EPG", output)
     }
   },
