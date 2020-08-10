@@ -526,7 +526,7 @@ module.exports = NodeHelper.create({
     this.FreeboxTV["130"] = "uuid-webtv-1319.png" // Netflix
     this.FreeboxTV["300"] = "uuid-webtv-427.png" // mosaïque France 3
 
-    FB("LOGO- Nombre chaines trouvé:",Object.keys(this.FreeboxTV).length)
+    FB("LOGO- Nombre chaines trouvées:",Object.keys(this.FreeboxTV).length)
   },
 
   ChannelIdName: async function (token) {
@@ -553,7 +553,7 @@ module.exports = NodeHelper.create({
         else this.FreeboxChannelBDD[item +".png"] = value.name
       }
     }
-    FB("FULL DB- Nombre de chaines trouvé:",Object.keys(this.FreeboxChannelBDD).length)
+    FB("FULL DB- Nombre de chaines trouvées:",Object.keys(this.FreeboxChannelBDD).length)
     if (Object.keys(this.FreeboxTV).length > 0) {
       for (let [item, value] of Object.entries(this.FreeboxTV)) {
         this.FreeboxChannelTV[item] = this.FreeboxChannelBDD[value]
@@ -564,7 +564,7 @@ module.exports = NodeHelper.create({
       this.ChannelIdName(this.config.token)
     }
     else {
-      FB("BouquetDB- Nombre de chaines trouvé:", Object.keys(this.FreeboxChannelTV).length)
+      FB("BouquetDB- Nombre de chaines trouvées:", Object.keys(this.FreeboxChannelTV).length)
       /** synchronistaion des noms des chaines EPG avec FreeboxTV **/
       if (CorrectChannelDBName) {
         for (let [item, value] of Object.entries(this.EPG.tv.channel)) {
@@ -575,7 +575,7 @@ module.exports = NodeHelper.create({
             }
           }
         }
-        FB("CorrectDB- done !")
+        FB("CorrectDB- Nombre d'entrées EPG corrigées:", Object.keys(CorrectChannelDBName).length)
       }
     }
   },
