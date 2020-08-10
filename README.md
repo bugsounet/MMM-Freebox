@@ -16,6 +16,8 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Type de connexion utilisé par les appareils
 
 ## Update
+ * v1.4.0 (10/08/2020)
+   * Affichage de la chaîne regardé avec son programme en cours
  * v1.3.3 (04/08/2020)
    * Affichage des clients connectés en wifi (2.4Ghz: vert, 5Ghz: bleu)
    * Affichage des clients connectés en ethernet et indique le port de connexion
@@ -165,12 +167,6 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | UseEPGDayURL | true: permet le téléchargement de l'EPG du jour. false, permet le téléchargement de l'EPG pour 15 jours | Boolean | true
 | EPGDelay | Délai de mise a jour du téléchargement automatique de l'EPG (2 heures par defaut)| Number | 2 *60 *60 *1000
 
-Notes:
- * Je ne sais pas si la Freebox mini4k retourne les informations (elle est sous AndroidTV)
- * ServerIP: depuis le dernier firmware Free a ne permet plus l'affichage des logo des chaines...<br>
- cela fonctionne en http uniquement avec l'adresse ip du FreeboxServer ou l'ip de `mafreebox.free.fr`<br>
- par default j'ai mis l'ip de `mafreebox.free.fr`
-
 ### Personalisation de l'affichage des appareils connecté
 
  * Utilisez l'interface FreeboxOS de votre Freebox Server (Periphériques Réseau)
@@ -181,3 +177,9 @@ Notes:
  - Je n'ai pas encore de retour sur la Freebox One et POP je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
  - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
  - En cas de souci, ne pas hésiter a ouvrir une ISSUE
+ - `player: {}`
+   * Je ne sais pas si les Freebox mini4k ou pop retournent les informations (elles sont sous AndroidTV)
+   * ServerIP: depuis le dernier firmware Free ne permet plus l'affichage des logo des chaines...<br>
+   cela fonctionne en http uniquement avec l'adresse ip du FreeboxServer ou l'ip de `mafreebox.free.fr`<br>
+   par default j'ai mis l'ip de `mafreebox.free.fr`
+   * Testé sous Freebox Révolution
