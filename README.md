@@ -47,6 +47,7 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen2.png)
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/VPNUsers.png)
+![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen3.png)
 
 ## Installation
  * Clonez le module dans votre dossier de module de MagicMirror et exécutez `npm install` dans le répertoire du module.
