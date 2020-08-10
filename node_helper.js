@@ -337,6 +337,9 @@ module.exports = NodeHelper.create({
   Freebox_OS: async function(token,clientRate, callLog, vpnUser) {
     var rate
     var output
+    var playerInfo = null
+    var playerVolume = null
+
     const freebox = new Freebox(token)
     await freebox.login()
 
@@ -401,15 +404,17 @@ module.exports = NodeHelper.create({
       })
     }
 
-    var playerInfo = await freebox.request({
-      method: "GET",
-      url:"player/1/api/v8/status/"
-    })
+    if (this.config.player.showPlayerInfo) {
+      playerInfo = await freebox.request({
+        method: "GET",
+        url:"player/1/api/v8/status/"
+      })
 
-    var playerVolume = await freebox.request({
-      method: "GET",
-      url:"player/1/api/v8/control/volume"
-    })
+      playerVolume = await freebox.request({
+        method: "GET",
+        url:"player/1/api/v8/control/volume"
+      })
+    }
 
     bandwidth = this.convert(cnx.data.result.bandwidth_down,2,1) + " - " + this.convert(cnx.data.result.bandwidth_up,2,1)
     debit = this.convert(cnx.data.result.rate_down,2) +" - " + this.convert(cnx.data.result.rate_up,2)

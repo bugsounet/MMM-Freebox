@@ -40,7 +40,7 @@ Module.register("MMM-Freebox", {
   },
 
   start: function () {
-    this.config = Object.assign({}, this.defaults, this.config)
+    this.config = configMerge({}, this.defaults, this.config)
     this.Init = false
     this.update = null
     this.Freebox = {
@@ -662,7 +662,10 @@ Module.register("MMM-Freebox", {
 /*****************************************/
 
   getScripts: function () {
-    return ["moment.js"]
+    return [
+      "moment.js",
+      "configMerge.min.js"
+    ]
   },
 
   getStyles: function() {
