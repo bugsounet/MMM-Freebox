@@ -419,3 +419,95 @@ input.switch-round:checked + label:after {
   margin-right: 15px;
 }
 
+#FREE_TV {
+  font-size: 15px;
+  text-align: left;
+  padding: 10px;
+}
+
+#FREE_CHANNEL {
+  font-size: 15px;
+  height: 80px;
+  margin-left: 25px;
+}
+
+#FREE_PHOTO {
+  height: 80px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+#FREE_EPG {
+  font-size: 15px;
+}
+
+#FREE_PROGRAM {
+  font-size: 15px;
+  text-align: center;
+  width: 395px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+
+#FREE_PROGRESS {
+ /* height: 3px*/
+  width: 80%;
+}
+
+#FREE_VOLUME {
+  height: 80px;
+}
+
+#FREE_CONTENER {
+ height: 80px;
+}
+
+#FREE_PROGRESS.meter {
+  -webkit-writing-mode: horizontal-tb !important;
+  -webkit-appearance: meter;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 10px;
+  /* width: 5em; */
+  vertical-align: -0.2em;
+  -webkit-user-modify: read-only !important;
+  margin-left: 10px;
+  margin-right: 10px;
+
+}
+
+meter::-webkit-meter-inner-element {
+  border-radius: 10px;
+}
+
+#FREE_PROGRESS.meter::-webkit-meter-optimum-value {
+    background: red; /* Green */
+      border-radius: 10px;
+}
+
+#FREE_PROGRESS.meter::-webkit-meter-bar  {
+  /*background: #eee;*/
+  /*box-shadow: 0 2px 3px rgba (0, 0, 0, 0.2) inset;*/
+  border-radius: 10px;
+}
+
+#FREE_PROGRESS_CONTENER {
+  display: flex;
+}
+
+#FREE_PROGRESS_START {
+  height: 10px;
+  line-height: 10px;
+}
+
+#FREE_PROGRESS_END {
+  line-height: 10px;
+}
+
+#FREE_PROGRAM.hidden,
+#FREE_PROGRESS.hidden,
+#FREE_PROGRESS_START.hidden,
+#FREE_PROGRESS_END.hidden {
+  display:none;
+}

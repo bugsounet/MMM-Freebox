@@ -3,6 +3,11 @@ const { Freebox } = require("@bugsounet/freebox")
 var _ = require("underscore")
 var ping = require('ping')
 
+const fs = require("fs")
+const parser = require("fast-xml-parser")
+const moment = require("moment")
+const wget = require('wget-improved')
+
 FB = (...args) => { /* do nothing */ }
 
 module.exports = NodeHelper.create({
@@ -11,6 +16,13 @@ module.exports = NodeHelper.create({
     this.freebox = null
     this.init = false
     this.pingValue = null
+    this.channelInfo = {}
+    this.bouquetID= null
+    this.FreeboxTV = {}
+    this.FreeboxChannelTV = {} // basse de données des chaines du bouquet FreeboxTV
+    this.FreeboxChannelBDD = {} // base de données des 900 chaines Freebox
+    this.EPG = {}
+    this.interval = null
   },
 
   Freebox: function (token) {
@@ -19,9 +31,9 @@ module.exports = NodeHelper.create({
         if (!this.init) this.makeCache(res)
         else this.makeResult(res)
       },
-      (err) => { 
+      (err) => {
         FB("[Freebox] " + err)
-        if (!this.init) this.scan() 
+        if (!this.init) this.scan()
       }
     )
   },
@@ -78,10 +90,13 @@ module.exports = NodeHelper.create({
     if (this.config.showVPNUsers) {
       var nbVPNUser = 0
       if (res.VPNUser) nbVPNUser = res.VPNUser.length
-
       this.sendInfo("NB_VPN_USER", nbVPNUser)
     }
 
+    if (this.config.player.showPlayerInfo) {
+      this.bouquetQuery(this.config.token)
+      this.delayDownloadEPG()
+    }
     this.sendInfo("INITIALIZED", this.cache)
   },
 
@@ -141,6 +156,15 @@ module.exports = NodeHelper.create({
     res.VPNUsers = {}
     res.VPNUsers.who = []
     res.VPNUsers.nb = 0
+    res.Player = {
+      power: false,
+      channel: null,
+      logo: null,
+      volume: 0,
+      mute: false,
+      channelName: 0
+    }
+
     var device = {}
 
     /** Array of client with used value in object **/
@@ -253,6 +277,28 @@ module.exports = NodeHelper.create({
       }
     }
 
+    if (this.config.player.showPlayerInfo) {
+      /** test TV **/
+      this.player = res.playerInfo
+      this.volume = res.playerVolume
+      if (this.player && this.player.success && this.player.result && (this.player.result.power_state == "running") && this.player.result.foreground_app) {
+        if (this.player.result.foreground_app.package == "fr.freebox.tv") {
+          var channel = this.player.result.foreground_app.cur_url.split("channel=")[1]
+          res.Player.channel = channel
+          res.Player.power = true
+          res.Player.logo = this.FreeboxTV[channel] ? "http://" + this.config.player.ServerIP + "/api/v8/tv/img/channels/logos68x60/" + this.FreeboxTV[channel] : "inconnu!"
+          res.Player.channelName = this.FreeboxChannelTV[channel] ? this.FreeboxChannelTV[channel] : 0
+          this.EPGSearch(this.FreeboxChannelTV[channel])
+        }
+      }
+      else res.Player.power = false
+
+      if (this.volume && this.volume.success && this.volume.result) {
+        if (this.volume.result.mute) res.Player.mute = this.volume.result.mute
+        if (this.volume.result.volume) res.Player.volume = this.volume.result.volume
+      }
+    }
+
     /** delete all Freebox result **/
     delete res.Call
     delete res.Client
@@ -264,6 +310,8 @@ module.exports = NodeHelper.create({
     delete res.Wifi5g,
     delete res.EthCnx
     delete res.VPNUser
+    delete res.playerInfo
+    delete res.playerVolume
 
     res.Ping = this.config.showPing ? this.pingValue : null
     this.sendInfo("RESULT", res)
@@ -289,6 +337,9 @@ module.exports = NodeHelper.create({
   Freebox_OS: async function(token,clientRate, callLog, vpnUser) {
     var rate
     var output
+    var playerInfo = null
+    var playerVolume = null
+
     const freebox = new Freebox(token)
     await freebox.login()
 
@@ -353,6 +404,18 @@ module.exports = NodeHelper.create({
       })
     }
 
+    if (this.config.player.showPlayerInfo) {
+      playerInfo = await freebox.request({
+        method: "GET",
+        url:"player/1/api/v8/status/"
+      })
+
+      playerVolume = await freebox.request({
+        method: "GET",
+        url:"player/1/api/v8/control/volume"
+      })
+    }
+
     bandwidth = this.convert(cnx.data.result.bandwidth_down,2,1) + " - " + this.convert(cnx.data.result.bandwidth_up,2,1)
     debit = this.convert(cnx.data.result.rate_down,2) +" - " + this.convert(cnx.data.result.rate_up,2)
     type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
@@ -374,6 +437,8 @@ module.exports = NodeHelper.create({
       3: clientRate ? eth3.data.result : null,
       4: clientRate ? eth4.data.result : null,
       VPNUser: vpnUser ? vpnUsers.data.result: null,
+      playerInfo: playerInfo ? playerInfo.data : null,
+      playerVolume: playerVolume ? playerVolume.data : null
     }
 
     await freebox.logout()
@@ -412,5 +477,206 @@ module.exports = NodeHelper.create({
   /** nbre de barre wifi selon % quality) **/
   wifiBar(percent) {
     return parseInt(((percent*5)/100).toFixed(0))
+  },
+
+  bouquetQuery: async function(token) {
+    const freebox = new Freebox(token)
+    await freebox.login()
+    var data= {}
+
+    const bouquets = await freebox.request({
+      method: "GET",
+      url: "tv/bouquets/"
+    })
+    data = bouquets.data
+    await freebox.logout()
+
+    if (data.success && data.result && data.result.length) {
+      data.result.forEach((x) => {
+        if (x.name == "Freebox TV") {
+          this.bouquetID = x.id
+          FB("Numéro du Bouquet Freebox trouvé:", this.bouquetID)
+          this.ChannelLogo(this.config.token,this.bouquetID)
+        }
+      })
+    }
+    else console.log("[Freebox] Erreur Bouquet !?")
+  },
+
+  /** TV infos **/
+  ChannelLogo: async function(token, bouquet) {
+    const freebox = new Freebox(token)
+    await freebox.login()
+    var data= {}
+    this.FreeboxTV = {}
+
+    const channels = await freebox.request({
+      method: "GET",
+      url: `tv/bouquets/${bouquet}/channels`
+    })
+    data = channels.data
+    await freebox.logout()
+    if (data.success && data.result && data.result.length) {
+      data.result.forEach((x) => {
+        this.FreeboxTV[x.number] = x.uuid + ".png"
+      })
+    }
+
+    /** Ajout de quelques logos manquant **/
+    this.FreeboxTV["0"] = "uuid-webtv-234.png" // mosaïque
+    this.FreeboxTV["46"] = "uuid-webtv-1098.png" // A la une Canal+
+    this.FreeboxTV["106"] = "uuid-webtv-659.png" // canal+ Séries
+    this.FreeboxTV["107"] = "uuid-webtv-947.png" // abctek
+    this.FreeboxTV["108"] = "uuid-webtv-946.png" // disneytek
+    this.FreeboxTV["130"] = "uuid-webtv-1319.png" // Netflix
+    this.FreeboxTV["300"] = "uuid-webtv-427.png" // mosaïque France 3
+
+    FB("LOGO- Nombre chaines trouvées:",Object.keys(this.FreeboxTV).length)
+  },
+
+  ChannelIdName: async function (token) {
+    var CorrectChannelDBName = null
+    try {
+      CorrectChannelDBName = require("./correctChannelName.js").CorrectChannelDBName
+    } catch (e) {
+      console.log("[Freebox] erreur correctChannelName.js", e.message)
+    }
+    const freebox = new Freebox(token)
+    await freebox.login()
+    var data= {}
+    var channel = await freebox.request({
+      method: "GET",
+      url:"tv/channels/"
+    })
+    data=  channel.data
+    await freebox.logout()
+    this.FreeboxChannelTV = {}
+
+    if (Object.keys(data).length > 0) {
+      for (let [item, value] of Object.entries(data.result)) {
+        if (!value.name) console.log("[Freebox] hein!? la chaine n'as pas de nom !", item)
+        else this.FreeboxChannelBDD[item +".png"] = value.name
+      }
+    }
+    FB("FULL DB- Nombre de chaines trouvées:",Object.keys(this.FreeboxChannelBDD).length)
+    if (Object.keys(this.FreeboxTV).length > 0) {
+      for (let [item, value] of Object.entries(this.FreeboxTV)) {
+        this.FreeboxChannelTV[item] = this.FreeboxChannelBDD[value]
+      }
+    }
+    if (Object.keys(this.FreeboxChannelTV).length == 0) {
+      console.log("[Freebox] BouquetDB- Aucune chaine trouvé... retry")
+      this.ChannelIdName(this.config.token)
+    }
+    else {
+      FB("BouquetDB- Nombre de chaines trouvées:", Object.keys(this.FreeboxChannelTV).length)
+      /** synchronistaion des noms des chaines EPG avec FreeboxTV **/
+      if (CorrectChannelDBName) {
+        for (let [item, value] of Object.entries(this.EPG.tv.channel)) {
+          for (let [EPG, FBTV] of Object.entries(CorrectChannelDBName)) {
+            if (value["display-name"] == EPG) {
+              FB("CorrectDB- " + EPG + " -> " + FBTV)
+              value["display-name"] = FBTV
+            }
+          }
+        }
+        FB("CorrectDB- Nombre d'entrées EPG corrigées:", Object.keys(CorrectChannelDBName).length)
+      }
+    }
+  },
+
+  downloadEPG: async function() {
+    var EPGFullURL = "https://xmltv.ch/xmltv/xmltv-complet.xml"
+    var EPGDayURL = "https://xmltv.ch/xmltv/xmltv-complet_1jour.xml"
+    var url = this.config.player.UseEPGDayURL ? EPGDayURL : EPGFullURL
+    this.jsonData = null
+
+    let download = wget.download(url, "./epg.xml", { });
+    download.on('error', (err) => {
+        console.log("Download EPG- error", err)
+    })
+    download.on('start', (fileSize) => {
+        FB("Download EPG- URL: " + url + "- Taille:", this.convert(fileSize, null, 2))
+    })
+    download.on('end', (output) => {
+        FB("Download EPG- Terminé !")
+        this.xmlToJSON()
+    })
+  },
+
+  xmlToJSON: function () {
+    const xmlData = fs.readFileSync(`./epg.xml`, {
+      encoding: "utf-8",
+    })
+
+    this.EPG = parser.parse(
+      xmlData,
+      {
+        attrNodeName: "",
+        textNodeName: "#text",
+        attributeNamePrefix: "",
+        arrayMode: "false",
+        ignoreAttributes: false,
+        parseAttributeValue: true,
+      },
+      true
+    )
+    FB("EPG- Créé !")
+    this.ChannelIdName(this.config.token)
+  },
+
+  EPGSearch: function (name) {
+    var output = {
+      title: "Programme inconnu",
+      start: 0,
+      stop: 0,
+      current: 0,
+      photo: "unknow"
+    }
+    if (!name || !this.EPG) {
+      FB("EPG- " + name + " *** no DB!")
+      return this.sendSocketNotification("SEND_EPG", output)
+    }
+
+    var currentDate = moment().format("YYYYMMDDHHmmss")
+    var channel = this.EPG.tv.channel
+    var programme = this.EPG.tv.programme
+    this.id = null
+    var found = 0
+    channel.forEach(element => {
+        if (element["display-name"] == name) {
+        this.id= element.id
+      }
+    })
+
+    programme.forEach(prog => {
+      if (prog.channel == this.id) {
+        start = prog.start.split(' ')[0]
+        stop = prog.stop.split(' ')[0]
+        if (currentDate >= start && currentDate <= stop) {
+          FB("EPG- " + name + " *** " + (prog.title ? prog.title : "no entry title !"))
+          output.title= prog.title ? prog.title : "Programme inconnu"
+          output.start= parseInt(start)
+          output.stop= parseInt(stop)
+          output.current= parseInt(currentDate)
+          if (prog.icon && prog.icon.src) output.photo= prog.icon.src
+          this.sendSocketNotification("SEND_EPG", output)
+          found =1
+        }
+      }
+    })
+    if (!found) {
+      FB("EPG- " + name + " *** no entry found !")
+      this.sendSocketNotification("SEND_EPG", output)
+    }
+  },
+
+  delayDownloadEPG: function () {
+    this.downloadEPG()
+    clearInterval(this.interval)
+    this.interval = null
+    this.interval = setTimeout(()=>{
+      this.delayDownloadEPG()
+    }, this.config.player.EPGDelay)
   }
 });

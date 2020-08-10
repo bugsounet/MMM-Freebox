@@ -26,11 +26,21 @@ Module.register("MMM-Freebox", {
     debug: false,
     verbose: false,
     dev: false,
-    debitText: "Débit total utilisé : "
+    debitText: "Débit total utilisé : ",
+    player : {
+      showPlayerInfo: false,
+      // depuis le firmware 4.2.3, problemes d'affichage des logos
+      // essayez avec les ips :  "192.168.0.254" (l'ip du freebox server)
+      //                         "mafreebox.free.fr" ou le resultat de l'ip de mafreebox.free.fr
+      //                         "212.27.38.253" l'ip de mafreebox.free.fr (a voir si cela fonctionne pour vous)
+      ServerIP: "212.27.38.253",
+      UseEPGDayURL: true,
+      EPGDelay: 2* 60 *60 *1000
+    }
   },
 
   start: function () {
-    this.config = Object.assign({}, this.defaults, this.config)
+    this.config = configMerge({}, this.defaults, this.config)
     this.Init = false
     this.update = null
     this.Freebox = {
@@ -47,7 +57,9 @@ Module.register("MMM-Freebox", {
       "Ping": null,
       "VPNUsers": [],
       "nbVPNUser": 0,
+      "Player": {}
     }
+    this.EPG = "Programme inconnu"
 
     this.maxMissedCall = 0
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
@@ -55,7 +67,7 @@ Module.register("MMM-Freebox", {
       /** normalise les adresses MAC en majuscule **/
       this.config.excludeMac = this.config.excludeMac.map(function(x){ return x.toUpperCase() })
     }
-    if (this.config.textWidth < 220) this.config.textWidth = 220
+    if (this.config.textWidth < 200) this.config.textWidth = 200
     if (typeof this.config.textWidth != 'number') this.config.textWidth = this.defaults.textWidth
     console.log("[Freebox] Started...")
   },
@@ -85,6 +97,10 @@ Module.register("MMM-Freebox", {
         break
       case "NB_VPN_USER":
         this.Freebox.nbVPNUser = payload
+        break
+      case "SEND_EPG":
+        this.EPG = payload
+        //console.log("[Freebox] " + payload)
         break
     }
   },
@@ -123,11 +139,13 @@ Module.register("MMM-Freebox", {
     this.Freebox.Calls = payload.Calls
     this.Freebox.VPNUsers = payload.VPNUsers
     this.Freebox.Ping = payload.Ping
+    this.Freebox.Player = payload.Player
+    this.Freebox.Player.program = this.EPG
     FB("Result:", this.Freebox)
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
   },
-  
+
   displayDom: function() {
     /** On applique les mises a jour en live ! **/
 
@@ -280,6 +298,68 @@ Module.register("MMM-Freebox", {
         vpnDate.innerHTML = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm")
       }
     }
+
+    /** TV **/
+    if (this.config.player.showPlayerInfo) {
+      var TV = document.getElementById("FREE_TV")
+      var TVLogo = document.getElementById("FREE_CHANNEL")
+      if (this.Freebox.Player.logo && this.Freebox.Player.power) {
+        TV.classList.remove("hidden")
+        if (this.Freebox.Player.logo == "inconnu!") TVLogo.src = "/modules/MMM-Freebox/resources/tv1.png"
+        else TVLogo.src = this.Freebox.Player.logo
+        var TVPhoto= document.getElementById("FREE_PHOTO")
+        if (this.Freebox.Player.program.photo == "unknow") TVPhoto.src= "/modules/MMM-Freebox/resources/unknow.jpg"
+        else TVPhoto.src= this.Freebox.Player.program.photo
+        var TVProgram = document.getElementById("FREE_PROGRAM")
+        var TVProgress = document.getElementById("FREE_PROGRESS")
+        var TVProgressStart = document.getElementById("FREE_PROGRESS_START")
+        var TVProgressEnd = document.getElementById("FREE_PROGRESS_END")
+        if (this.Freebox.Player.program.title == "Programme inconnu") {
+          TVProgram.classList.add("hidden")
+          TVProgress.classList.add("hidden")
+          TVProgressStart.classList.add("hidden")
+          TVProgressEnd.classList.add("hidden")
+        }
+        else {
+          TVProgram.innerHTML = this.Freebox.Player.program.title
+          /** putain de formule de merde ! **/
+          TVProgress.value= this.Freebox.Player.program.current ? ((((this.Freebox.Player.program.current - this.Freebox.Player.program.start) / (this.Freebox.Player.program.stop-this.Freebox.Player.program.start)) * 100)) : 100
+          var startStr = this.Freebox.Player.program.start.toString().substring(8, 12)
+          var endStr = this.Freebox.Player.program.stop.toString().substring(8, 12)
+          if (startStr) {
+            var startHour= startStr.substring(0,2)
+            var startMin= startStr.substring(2)
+            var startTime= startHour+"h"+startMin
+            TVProgressStart.textContent = startTime
+          }
+          else TVProgressStart.textContent = "00h00"
+          if (endStr) {
+            var endHour= endStr.substring(0,2)
+            var endMin= endStr.substring(2)
+            var endTime= endHour+"h"+endMin
+            TVProgressEnd.textContent = endTime
+          }
+          else TVProgressEnd.textContent = "00h00"
+          TVProgram.classList.remove("hidden")
+          TVProgress.classList.remove("hidden")
+          TVProgressStart.classList.remove("hidden")
+          TVProgressEnd.classList.remove("hidden")
+        }
+      }
+      else TV.classList.add("hidden")
+      var TVVolume = document.getElementById("FREE_VOLUME")
+      if (this.Freebox.Player.mute) TVVolume.src = "/modules/MMM-Freebox/resources/volmute.png"
+      else {
+        if (this.Freebox.Player.volume && this.Freebox.Player.volume !=100) {
+          var volume = ((this.Freebox.Player.volume * 5) / 100).toFixed(0)
+          TVVolume.src = "/modules/MMM-Freebox/resources/vol"+volume+".png"
+        }
+        else {
+          if (this.Freebox.Player.volume ==100) TVVolume.src = "/modules/MMM-Freebox/resources/volmax.png"
+          else if (!this.Freebox.Player.mute) TVVolume.src = "/modules/MMM-Freebox/resources/vol0.png"
+        }
+      }
+    }
   },
 
   /** scan main loop **/
@@ -331,7 +411,7 @@ Module.register("MMM-Freebox", {
       /** Afficage de la bande passante **/
       var bandWidth = document.createElement("div")
       bandWidth.id = "FREE_BAND"
-      bandWidth.style.width = (this.config.textWidth + 60) + "px"
+      //bandWidth.style.width = (this.config.textWidth + 60) + "px"
       bandWidth.classList.add("hidden")
 
       var bandWidthIcon = document.createElement("div")
@@ -342,7 +422,7 @@ Module.register("MMM-Freebox", {
 
       var bandWidthDisplay= document.createElement("div")
       bandWidthDisplay.id = "FREE_VALUE"
-      bandWidthDisplay.style.width= this.config.textWidth + "px"
+      //bandWidthDisplay.style.width= this.config.textWidth + "px"
       bandWidth.appendChild(bandWidthDisplay)
 
       wrapper.appendChild(bandWidth)
@@ -503,8 +583,7 @@ Module.register("MMM-Freebox", {
           wrapper.appendChild(who)
         }
       }
-    
-      
+
       /** Utilisateurs VPN **/
       if (this.Freebox.nbVPNUser > 0) {
         var table = document.createElement("div")
@@ -535,15 +614,58 @@ Module.register("MMM-Freebox", {
           vpnUser.appendChild(vpnDate)
         }
       }
+
+      /** TV info **/
+      if (this.config.player.showPlayerInfo) {
+        var TV = document.createElement("div")
+        TV.id = "FREE_TV"
+        TV.classList.add("hidden")
+        var Contener = document.createElement("div")
+        Contener.id = "FREE_CONTENER"
+        var TVLogo = document.createElement("img")
+        TVLogo.id= "FREE_CHANNEL"
+        TVLogo.className = "tv"
+        Contener.appendChild(TVLogo)
+        var TVPhoto= document.createElement("img")
+        TVPhoto.id = "FREE_PHOTO"
+        TVPhoto.className = "photo"
+        Contener.appendChild(TVPhoto)
+        var TVVolume = document.createElement("img")
+        TVVolume.id = "FREE_VOLUME"
+        TVVolume.className = "volume"
+        Contener.appendChild(TVVolume)
+        TV.appendChild(Contener)
+        var TVProgram = document.createElement("div")
+        TVProgram.id = "FREE_PROGRAM"
+        TV.appendChild(TVProgram)
+        var TVProgressContener = document.createElement("div")
+        TVProgressContener.id = "FREE_PROGRESS_CONTENER"
+        var TVProgressStart = document.createElement("div")
+        TVProgressStart.id = "FREE_PROGRESS_START"
+        TVProgressContener.appendChild(TVProgressStart)
+        var TVProgress = document.createElement("meter")
+        TVProgress.id = "FREE_PROGRESS"
+        TVProgress.className="meter"
+        TVProgress.min= 0
+        TVProgress.max= 100
+        TVProgressContener.appendChild(TVProgress)
+        var TVProgressEnd = document.createElement("div")
+        TVProgressEnd.id = "FREE_PROGRESS_END"
+        TVProgressContener.appendChild(TVProgressEnd)
+        TV.appendChild(TVProgressContener)
+        wrapper.appendChild(TV)
+      }
     }
     return wrapper
-
   },
 
 /*****************************************/
 
   getScripts: function () {
-    return ["moment.js"];
+    return [
+      "moment.js",
+      "configMerge.min.js"
+    ]
   },
 
   getStyles: function() {
