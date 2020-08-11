@@ -511,3 +511,8 @@ meter::-webkit-meter-inner-element {
 #FREE_PROGRESS_END.hidden {
   display:none;
 }
+
+#FREE_CLIENTIP {
+  margin-right: 10px;
+  width: 80px;
+}

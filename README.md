@@ -16,6 +16,8 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Type de connexion utilisé par les appareils
 
 ## Update
+ * v1.4.1 (12/08/2020)
+   * Ajout IP des clients connectés [Issue #16](https://github.com/bugsounet/MMM-Freebox/issues/16) pour @BlackCatDeployment
  * v1.4.0 (10/08/2020)
    * Affichage de la chaîne regardé avec son programme en cours
  * v1.3.3 (04/08/2020)
@@ -107,6 +109,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     showRate: true,
     showClient: true,
     showClientRate: true,
+    showClientIP: false,
     showClientCnxType: true,
     showVPNUsers: true,
     showFreePlayer: true,
@@ -146,6 +149,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | showRate | Affiche le débit utilisé | Boolean | true |
 | showClient | Affiche la liste des appareils | Boolean | true |
 | showClientRate | Affiche le débit de l'appareil | Boolean | true |
+| showClientIP | Affiche l'addresse IPv4 de l'appareil | Boolean | false |
 | showClientCnxType | Affiche le type de connexion des appareils | Boolean | true |
 | showVPNUsers | Affiche les utilisateurs connectés via VPN | Boolean | true |
 | showFreePlayer | Affiche les Freebox Player | Boolean | true |
