@@ -12,6 +12,7 @@ Module.register("MMM-Freebox", {
     showRate: true,
     showClient: true,
     showClientRate: true,
+    showClientIP: false,
     showClientCnxType: true,
     showFreePlayer: true,
     showMissedCall: true,
@@ -191,6 +192,12 @@ Module.register("MMM-Freebox", {
           clientName.textContent = cache.name
         }
 
+        if (this.config.showClientIP) {
+          /** Affichage IP **/
+          var clientIP = clientSelect.querySelector("#FREE_CLIENTIP")
+          clientIP.textContent = client.ip ? client.ip : ""
+        }
+
         /** Wifi ou Eth ? **/
         var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
         if (this.config.showClientCnxType) {
@@ -205,7 +212,7 @@ Module.register("MMM-Freebox", {
           else clientAccess.className = "black"
         }
 
-        /** debit client **/
+         /** debit client **/
         var clientDebit = clientSelect.querySelector("#FREE_RATE")
         if (this.config.showClientRate) clientDebit.classList.remove("hidden")
         clientDebit.textContent = client.debit ? client.debit : ""
@@ -466,9 +473,15 @@ Module.register("MMM-Freebox", {
   
           var clientName = document.createElement("div")
           clientName.id = "FREE_NAME"
-          clientName.style.width= this.config.textWidth + "px"
+          clientName.style.width= this.config.showClientIP ? this.config.textWidth-80 + "px" : this.config.textWidth + "px"
           clientName.textContent = setName
           client.appendChild(clientName)
+
+          if (this.config.showClientIP) {
+            var clientIP = document.createElement("div")
+            clientIP.id= "FREE_CLIENTIP"
+            client.appendChild(clientIP)
+          }
 
           var clientCnxType= document.createElement("div")
           clientCnxType.id = "FREE_ACCESS"

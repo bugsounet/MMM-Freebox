@@ -173,6 +173,7 @@ module.exports = NodeHelper.create({
         device = {
           mac: client.l2ident.id,
           name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
+          ip: null,
           type: client.host_type,
           vendor: client.vendor_name,
           debit: null,
@@ -232,6 +233,11 @@ module.exports = NodeHelper.create({
               }
             }
           }
+        }
+        if (client.l3connectivities && this.config.showClientIP) {
+          client.l3connectivities.forEach(ip => {
+            if (ip.af == "ipv4" && ip.active) device.ip = ip.addr
+          })
         }
         res.Clients.push(device)
       }
