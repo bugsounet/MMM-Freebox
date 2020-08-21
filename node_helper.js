@@ -614,21 +614,24 @@ module.exports = NodeHelper.create({
     const xmlData = fs.readFileSync(`./epg.xml`, {
       encoding: "utf-8",
     })
-
-    this.EPG = parser.parse(
-      xmlData,
-      {
-        attrNodeName: "",
-        textNodeName: "#text",
-        attributeNamePrefix: "",
-        arrayMode: "false",
-        ignoreAttributes: false,
-        parseAttributeValue: true,
-      },
-      true
-    )
-    FB("EPG- Créé !")
-    this.ChannelIdName(this.config.token)
+    try {
+      this.EPG = parser.parse(
+        xmlData,
+        {
+          attrNodeName: "",
+          textNodeName: "#text",
+          attributeNamePrefix: "",
+          arrayMode: "false",
+          ignoreAttributes: false,
+          parseAttributeValue: true,
+        },
+        true
+      )
+      FB("EPG- Créé !")
+      this.ChannelIdName(this.config.token)
+    } catch (error) {
+      console.log("[Freebox] XML Error: ", error.message)
+    }
   },
 
   EPGSearch: function (name) {
