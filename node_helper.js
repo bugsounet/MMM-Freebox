@@ -226,7 +226,7 @@ module.exports = NodeHelper.create({
                     else {
                       device.debit = "0"
                       device.access_type = null
-                      devbice.eth = null
+                      device.eth = null
                     }
                   }
                 })
