@@ -7,6 +7,7 @@ const fs = require("fs")
 const parser = require("fast-xml-parser")
 const moment = require("moment")
 const wget = require('wget-improved')
+const npmCheck = require('npm-check')
 
 FB = (...args) => { /* do nothing */ }
 
@@ -14,7 +15,6 @@ module.exports = NodeHelper.create({
   start: function() {
     console.log("[Freebox] Starting...")
     this.freebox = null
-    this.init = false
     this.pingValue = null
     this.channelInfo = {}
     this.bouquetID= null
@@ -23,17 +23,17 @@ module.exports = NodeHelper.create({
     this.FreeboxChannelBDD = {} // base de données des 900 chaines Freebox
     this.EPG = {}
     this.interval = null
+    this.cache = {}
   },
 
-  Freebox: function (token) {
+  Freebox: async function (token) {
     this.Freebox_OS(token,this.config.showClientRate || this.config.showClientCnxType ,this.config.showMissedCall,this.config.showVPNUsers).then(
       (res) => {
-        if (!this.init) this.makeCache(res)
+        if (Object.keys(this.cache).length == 0) this.makeCache(res)
         else this.makeResult(res)
       },
       (err) => {
         FB("[Freebox] " + err)
-        if (!this.init) this.scan()
       }
     )
   },
@@ -53,11 +53,10 @@ module.exports = NodeHelper.create({
         this.scan()
         break
       case "SCAN":
-        this.init = true
         this.scan()
         break
       case "CACHE":
-        this.init = false
+        this.cache = {}
         this.scan()
         break
     }

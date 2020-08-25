@@ -406,7 +406,6 @@ Module.register("MMM-Freebox", {
 
     if (!this.Init) {
       wrapper.id = "FREE_LOADING"
-      wrapper.style.width= this.config.textWidth+"px"
       wrapper.innerHTML = this.translate("LOADING")
       var free = document.createElement("div")
       free.id = "FREE_LOGO"
@@ -429,7 +428,6 @@ Module.register("MMM-Freebox", {
 
       var bandWidthDisplay= document.createElement("div")
       bandWidthDisplay.id = "FREE_VALUE"
-      //bandWidthDisplay.style.width= this.config.textWidth + "px"
       bandWidth.appendChild(bandWidthDisplay)
 
       wrapper.appendChild(bandWidth)

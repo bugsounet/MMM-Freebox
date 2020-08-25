@@ -16,6 +16,10 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Type de connexion utilisé par les appareils
 
 ## Update
+ * v1.4.2 (25/08/2020)
+   * correction d'un bug lors du demarrage -> reste figé sur le logo Freebox
+   * correction d'un crash si le XML de l'EPG n'est pas conforme
+   * correcttion du css (logo freebox)
  * v1.4.1 (12/08/2020)
    * Ajout IP des clients connectés [Issue #16](https://github.com/bugsounet/MMM-Freebox/issues/16) pour @BlackCatDeployment
  * v1.4.0 (10/08/2020)
