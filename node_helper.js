@@ -14,7 +14,6 @@ module.exports = NodeHelper.create({
   start: function() {
     console.log("[Freebox] Starting...")
     this.freebox = null
-    this.init = false
     this.pingValue = null
     this.channelInfo = {}
     this.bouquetID= null
@@ -23,17 +22,17 @@ module.exports = NodeHelper.create({
     this.FreeboxChannelBDD = {} // base de données des 900 chaines Freebox
     this.EPG = {}
     this.interval = null
+    this.cache = {}
   },
 
-  Freebox: function (token) {
+  Freebox: async function (token) {
     this.Freebox_OS(token,this.config.showClientRate || this.config.showClientCnxType ,this.config.showMissedCall,this.config.showVPNUsers).then(
       (res) => {
-        if (!this.init) this.makeCache(res)
+        if (Object.keys(this.cache).length == 0) this.makeCache(res)
         else this.makeResult(res)
       },
       (err) => {
         FB("[Freebox] " + err)
-        if (!this.init) this.scan()
       }
     )
   },
@@ -53,11 +52,10 @@ module.exports = NodeHelper.create({
         this.scan()
         break
       case "SCAN":
-        this.init = true
         this.scan()
         break
       case "CACHE":
-        this.init = false
+        this.cache = {}
         this.scan()
         break
     }
@@ -226,7 +224,7 @@ module.exports = NodeHelper.create({
                     else {
                       device.debit = "0"
                       device.access_type = null
-                      devbice.eth = null
+                      device.eth = null
                     }
                   }
                 })
@@ -614,21 +612,24 @@ module.exports = NodeHelper.create({
     const xmlData = fs.readFileSync(`./epg.xml`, {
       encoding: "utf-8",
     })
-
-    this.EPG = parser.parse(
-      xmlData,
-      {
-        attrNodeName: "",
-        textNodeName: "#text",
-        attributeNamePrefix: "",
-        arrayMode: "false",
-        ignoreAttributes: false,
-        parseAttributeValue: true,
-      },
-      true
-    )
-    FB("EPG- Créé !")
-    this.ChannelIdName(this.config.token)
+    try {
+      this.EPG = parser.parse(
+        xmlData,
+        {
+          attrNodeName: "",
+          textNodeName: "#text",
+          attributeNamePrefix: "",
+          arrayMode: "false",
+          ignoreAttributes: false,
+          parseAttributeValue: true,
+        },
+        true
+      )
+      FB("EPG- Créé !")
+      this.ChannelIdName(this.config.token)
+    } catch (error) {
+      console.log("[Freebox] XML Error: ", error.message)
+    }
   },
 
   EPGSearch: function (name) {
