@@ -7,7 +7,6 @@ const fs = require("fs")
 const parser = require("fast-xml-parser")
 const moment = require("moment")
 const wget = require('wget-improved')
-const npmCheck = require('npm-check')
 
 FB = (...args) => { /* do nothing */ }
 
