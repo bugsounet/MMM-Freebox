@@ -192,3 +192,6 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
    cela fonctionne en http uniquement avec l'adresse ip du FreeboxServer ou l'ip de `mafreebox.free.fr`<br>
    par default j'ai mis l'ip de `mafreebox.free.fr`
    * Testé sous Freebox Révolution
+
+## Donation
+ [Donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TTHRH94Y4KL36&source=url), si vous aimez ce module !
