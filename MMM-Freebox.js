@@ -98,7 +98,6 @@ Module.register("MMM-Freebox", {
   callbackHide: function () {
     this.updateDom()
     this.sendSocketNotification("SCAN")
-    this.ScanClient()
   },
 
   showFreebox: function() {

@@ -61,7 +61,7 @@ module.exports = NodeHelper.create({
         this.scan()
         break
       case "SCAN":
-        this.scan()
+        this.updateInterval()
         break
       case "CACHE":
         this.cache = {}
@@ -95,6 +95,7 @@ module.exports = NodeHelper.create({
     }
 
     this.sendInfo("INITIALIZED", this.cache)
+    this.makeResult(res)
   },
 
   sortBy: function (data, sort) {
@@ -302,7 +303,7 @@ module.exports = NodeHelper.create({
 
 /** Freebox OS API CALL **/
   Freebox_OS: async function(token,clientRate, callLog) {
-    FB("Quering Freebox Server...")
+    FB("Start Query Freebox Server:")
     var rate
     var output
 
@@ -400,7 +401,7 @@ module.exports = NodeHelper.create({
       })
     }
 
-    FB("Fetch all value")
+    FB("Done!")
 
     bandwidth = this.convert(cnx.data.result.bandwidth_down,2,1) + " - " + this.convert(cnx.data.result.bandwidth_up,2,1)
     debit = this.convert(cnx.data.result.rate_down,2) +" - " + this.convert(cnx.data.result.rate_up,2)
