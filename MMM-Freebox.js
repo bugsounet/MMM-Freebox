@@ -30,7 +30,6 @@ Module.register("MMM-Freebox", {
   },
 
   start: function () {
-    this.config = configMerge({}, this.defaults, this.config)
     this.Init = false
     this.update = null
     this.Freebox = {
@@ -259,36 +258,6 @@ Module.register("MMM-Freebox", {
     }
   },
 
-  /** scan main loop **/
-  ScanClient: function () {
-    clearInterval(this.update)
-    this.update = null
-    this.counterUpdate = this.config.updateDelay
-
-    this.update = setInterval( ()=> {
-      this.counterUpdate -= 1000
-      if (this.counterUpdate <= 0) {
-        clearInterval(this.update)
-        this.update = null
-        this.sendSocketNotification("SCAN")
-        this.ScanClient()
-      }
-    }, 1000);
-  },
-
-  /** ne scan pas si le module est suspendu **/
-  suspend: function() {
-    clearInterval(this.update)
-    this.update = null
-    console.log("MMM-Freebox is suspended.")
-  },
-
-  /** reprend le scan si le module est actif **/
-  resume: function() {
-    this.ScanClient()
-    console.log("MMM-Freebox is resumed.")
-  },
-
   getDom: function () {
     var client = this.Freebox.Cache
 
@@ -492,8 +461,7 @@ Module.register("MMM-Freebox", {
 
   getScripts: function () {
     return [
-      "moment.js",
-      "configMerge.min.js"
+      "moment.js"
     ]
   },
 

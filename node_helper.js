@@ -12,32 +12,52 @@ module.exports = NodeHelper.create({
     this.pingValue = null
     this.interval = null
     this.cache = {}
+    this.update = null
+    this.FreeboxVersion = null
+    this.FreeboxV7 = false
+    this.init = false
   },
 
   Freebox: async function (token) {
     this.Freebox_OS(token,this.config.showClientRate || this.config.showClientCnxType ,this.config.showMissedCall).then(
       (res) => {
         if (Object.keys(this.cache).length == 0) this.makeCache(res)
-        else this.makeResult(res)
+        else {
+          this.makeResult(res)
+          this.updateInterval()
+        }
       },
       (err) => {
         FB("[Error] " + err)
+        this.updateInterval()
       }
     )
   },
 
   scan: function() {
-   this.Freebox(this.config.token)
-   if (this.config.showPing) this.Ping()
+    if (this.config.showPing) this.Ping()
+    this.Freebox(this.config.token)
+  },
+
+  /** scan main loop **/
+  updateInterval: function () {
+    clearInterval(this.update)
+    this.counterUpdate = this.config.updateDelay
+
+    this.update = setInterval( ()=> {
+      this.counterUpdate -= 1000
+      if (this.counterUpdate <= 0) {
+        clearInterval(this.update)
+        this.scan()
+      }
+    }, 1000)
   },
 
   socketNotificationReceived: function(notification, payload) {
     switch(notification) {
       case "INIT":
         this.config = payload
-        if (this.config.debug) {
-          FB = (...args) => { console.log("[Freebox]", ...args) }
-        }
+        if (this.config.debug) FB = (...args) => { console.log("[Freebox]", ...args) }
         this.scan()
         break
       case "SCAN":
@@ -174,25 +194,27 @@ module.exports = NodeHelper.create({
               }
             }
           }
-          if (res.Wifi5g2 && Object.keys(res.Wifi5g2).length > 0) {
-            for (let [item, info] of Object.entries(res.Wifi5g2)) {
-              if (client.l2ident.id == info.mac) {
-                device.debit = this.convert(info.tx_rate,0)
-                device.access_type= "wifi5"
-                device.signal = info.signal
-                device.signal_percent = this.wifiPercent(info.signal)
-                device.signal_bar = this.wifiBar(device.signal_percent)
+          if (this.FreeboxV7) {
+            if (res.Wifi5g2 && Object.keys(res.Wifi5g2).length > 0) {
+              for (let [item, info] of Object.entries(res.Wifi5g2)) {
+                if (client.l2ident.id == info.mac) {
+                  device.debit = this.convert(info.tx_rate,0)
+                  device.access_type= "wifi5"
+                  device.signal = info.signal
+                  device.signal_percent = this.wifiPercent(info.signal)
+                  device.signal_bar = this.wifiBar(device.signal_percent)
+                }
               }
             }
-          }
-          if (res.Wifi5g3 && Object.keys(res.Wifi5g3).length > 0) {
-            for (let [item, info] of Object.entries(res.Wifi5g3)) {
-              if (client.l2ident.id == info.mac) {
-                device.debit = this.convert(info.tx_rate,0)
-                device.access_type= "wifi5"
-                device.signal = info.signal
-                device.signal_percent = this.wifiPercent(info.signal)
-                device.signal_bar = this.wifiBar(device.signal_percent)
+            if (res.Wifi5g3 && Object.keys(res.Wifi5g3).length > 0) {
+              for (let [item, info] of Object.entries(res.Wifi5g3)) {
+                if (client.l2ident.id == info.mac) {
+                  device.debit = this.convert(info.tx_rate,0)
+                  device.access_type= "wifi5"
+                  device.signal = info.signal
+                  device.signal_percent = this.wifiPercent(info.signal)
+                  device.signal_bar = this.wifiBar(device.signal_percent)
+                }
               }
             }
           }
@@ -273,33 +295,46 @@ module.exports = NodeHelper.create({
       }
     )
     .then((res)=> {
-      if (res.alive) {
-        this.pingValue = res.time + " ms"
-      } else {
-        this.pingValue = "Erreur !"
-      }
+      if (res.alive) this.pingValue = res.time + " ms"
+      else this.pingValue = "Erreur !"
     })
   },
 
 /** Freebox OS API CALL **/
   Freebox_OS: async function(token,clientRate, callLog) {
+    FB("Quering Freebox Server...")
     var rate
     var output
 
     const freebox = new Freebox(token)
     await freebox.login()
 
+    if (!this.init) {
+      FB("Quering Freebox Model...")
+      const FreeboxVersion = await freebox.request({
+        method: "GET",
+        url: "api_version/"
+      })
+      this.FreeboxVersion = FreeboxVersion.data.box_model_name
+      FB("Found:", this.FreeboxVersion)
+      this.init = true
+      this.FreeboxV7 = this.FreeboxVersion.match(/(v7)/gi) ? true : false
+    }
+
+    FB("Quering Client...")
     const clients = await freebox.request({
       method: "GET",
       url: "lan/browser/pub/"
     })
 
+    FB("Quering Connexion...")
     const cnx = await freebox.request({
       method: "GET",
       url: "connection/"
     })
 
     if (callLog) {
+      FB("Quering Call Log...")
       var calls = await freebox.request({
         method: "GET",
         url:"call/log/"
@@ -307,53 +342,65 @@ module.exports = NodeHelper.create({
     }
 
     if (clientRate) {
+      FB("Quering Wifi 2Ghz...")
       var wifi2gCnx = await freebox.request({
         method: "GET",
         url:"wifi/ap/0/stations/"
       })
 
+      FB("Quering Wifi 5Ghz...")
       var wifi5gCnx = await freebox.request({
         method: "GET",
         url:"wifi/ap/1/stations/"
       })
 
       /** Freebox Delta require ... **/
-      var wifi5gCnx2 = await freebox.request({
-        method: "GET",
-        url:"wifi/ap/2/stations/"
-      })
+      if (this.FreeboxV7) {
+        FB("Quering Wifi 5Ghz card 2...")
+        var wifi5gCnx2 = await freebox.request({
+          method: "GET",
+          url:"wifi/ap/2/stations/"
+        })
 
-      var wifi5gCnx3 = await freebox.request({
-        method: "GET",
-        url:"wifi/ap/3/stations/"
-      })
+        FB("Quering Wifi 5Ghz card 3...")
+        var wifi5gCnx3 = await freebox.request({
+          method: "GET",
+          url:"wifi/ap/3/stations/"
+        })
+      }
       /** **/
-
+      FB("Quering ALL Ethernet Cnx...")
       var ethCnx = await freebox.request({
         method: "GET",
         url:"switch/status/"
       })
 
+      FB("Quering Ethernet on port 1...")
       var eth1 = await freebox.request({
         method: "GET",
         url:"switch/port/1/stats"
       })
 
+      FB("Quering Ethernet on port 2...")
       var eth2 = await freebox.request({
         method: "GET",
         url:"switch/port/2/stats"
       })
 
+      FB("Quering Ethernet on port 3...")
       var eth3 = await freebox.request({
         method: "GET",
         url:"switch/port/3/stats"
       })
 
+      FB("Quering Ethernet on port 4...")
       var eth4 = await freebox.request({
         method: "GET",
         url:"switch/port/4/stats"
       })
     }
+
+    FB("Fetch all value")
 
     bandwidth = this.convert(cnx.data.result.bandwidth_down,2,1) + " - " + this.convert(cnx.data.result.bandwidth_up,2,1)
     debit = this.convert(cnx.data.result.rate_down,2) +" - " + this.convert(cnx.data.result.rate_up,2)
@@ -370,8 +417,8 @@ module.exports = NodeHelper.create({
       Call: callLog ? calls.data.result: null,
       Wifi2g: clientRate ? wifi2gCnx.data.result : null,
       Wifi5g: clientRate ? wifi5gCnx.data.result : null,
-      Wifi5g2: clientRate ? wifi5gCnx2.data.result : null,
-      Wifi5g3: clientRate ? wifi5gCnx3.data.result : null,
+      Wifi5g2: (clientRate && this.FreeboxV7) ? wifi5gCnx2.data.result : null,
+      Wifi5g3: (clientRate && this.FreeboxV7) ? wifi5gCnx3.data.result : null,
       EthCnx: clientRate ? ethCnx.data.result : null,
       1: clientRate ? eth1.data.result : null,
       2: clientRate ? eth2.data.result : null,
