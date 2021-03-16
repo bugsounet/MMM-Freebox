@@ -1,3 +1,6 @@
+// @todo ... check freeplug and sfp cnx
+// npmcheck powa !
+
 var NodeHelper = require('node_helper')
 const { Freebox } = require("@bugsounet/freebox")
 var _ = require("underscore")
@@ -66,6 +69,7 @@ module.exports = NodeHelper.create({
       case "CACHE":
         this.cache = {}
         this.scan()
+        this.updateInterval()
         break
     }
   },
@@ -154,119 +158,102 @@ module.exports = NodeHelper.create({
 
     var device = {}
 
+    res.Client.forEach(client=> {
     /** Array of client with used value in object **/
-    if (Object.keys(res.Client).length > 0) {
-      for (let [item, client] of Object.entries(res.Client)) {
-        device = {
-          mac: client.l2ident.id,
-          name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
-          ip: null,
-          type: client.host_type,
-          vendor: client.vendor_name,
-          debit: null,
-          active: client.active,
-          access_type: null,
-          signal: null,
-          signal_percent: null,
-          signal_bar: null,
-          eth: null
-        }
-        if (this.config.showClientRate || this.config.showClientCnxType) {
-          /** rate of wifi devices **/
-          if (res.Wifi2g && Object.keys(res.Wifi2g).length > 0) {
-            for (let [item, info] of Object.entries(res.Wifi2g)) {
-              if (client.l2ident.id == info.mac) {
-                device.debit = this.convert(info.tx_rate,0)
-                device.access_type= "wifi2"
-                device.signal = info.signal
-                device.signal_percent = this.wifiPercent(info.signal)
-                device.signal_bar = this.wifiBar(device.signal_percent)
-              }
-            }
-          }
-          if (res.Wifi5g && Object.keys(res.Wifi5g).length > 0) {
-            for (let [item, info] of Object.entries(res.Wifi5g)) {
-              if (client.l2ident.id == info.mac) {
-                device.debit = this.convert(info.tx_rate,0)
-                device.access_type= "wifi5"
-                device.signal = info.signal
-                device.signal_percent = this.wifiPercent(info.signal)
-                device.signal_bar = this.wifiBar(device.signal_percent)
-              }
-            }
-          }
-          if (this.FreeboxV7) {
-            if (res.Wifi5g2 && Object.keys(res.Wifi5g2).length > 0) {
-              for (let [item, info] of Object.entries(res.Wifi5g2)) {
-                if (client.l2ident.id == info.mac) {
-                  device.debit = this.convert(info.tx_rate,0)
-                  device.access_type= "wifi5"
-                  device.signal = info.signal
-                  device.signal_percent = this.wifiPercent(info.signal)
-                  device.signal_bar = this.wifiBar(device.signal_percent)
-                }
-              }
-            }
-            if (res.Wifi5g3 && Object.keys(res.Wifi5g3).length > 0) {
-              for (let [item, info] of Object.entries(res.Wifi5g3)) {
-                if (client.l2ident.id == info.mac) {
-                  device.debit = this.convert(info.tx_rate,0)
-                  device.access_type= "wifi5"
-                  device.signal = info.signal
-                  device.signal_percent = this.wifiPercent(info.signal)
-                  device.signal_bar = this.wifiBar(device.signal_percent)
-                }
-              }
-            }
-          }
-          /** rate of eth devices **/
-          if (res.EthCnx && Object.keys(res.EthCnx).length > 0) {
-            for (let [item, info] of Object.entries(res.EthCnx)) {
-              if (info.mac_list) {
-                var macList = info.mac_list.map((mac_list)=>{return mac_list.mac})
-                macList.forEach(mac => {
-                  if (client.l2ident.id == mac) {
-                    // devialet patch ou ... hub / cpl ?
-                    // bizarre ce crash... il est pas systématique
-                    // dans tous les cas, si erreur, je sors la valeur à 0
-                    if (res[info.id] && res[info.id].tx_bytes_rate) {
-                      device.debit = this.convert(res[info.id].tx_bytes_rate,0)
-                      device.access_type = "ethernet"
-                      device.eth = info.id
-                    }
-                    else {
-                      device.debit = "0"
-                      device.access_type = null
-                      device.eth = null
-                    }
-                  }
-                })
-              }
-            }
-          }
-        }
-        if (client.l3connectivities && this.config.showClientIP) {
-          client.l3connectivities.forEach(ip => {
-            if (ip.af == "ipv4" && ip.active) device.ip = ip.addr
-          })
-        }
-        res.Clients.push(device)
+      device = {
+        mac: client.l2ident.id,
+        name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
+        ip: null,
+        type: client.host_type,
+        vendor: client.vendor_name,
+        debit: null,
+        active: client.active,
+        access_type: null,
+        signal: null,
+        signal_percent: null,
+        signal_bar: null,
+        eth: null
       }
-    }
+      if (this.config.showClientRate || this.config.showClientCnxType) {
+        /** rate of wifi devices **/
+        res.Wifi2g.forEach(info=> {
+          if (client.l2ident.id == info.mac) {
+            device.debit = this.convert(info.tx_rate,0)
+            device.access_type= "wifi2"
+            device.signal = info.signal
+            device.signal_percent = this.wifiPercent(info.signal)
+            device.signal_bar = this.wifiBar(device.signal_percent)
+          }
+        })
+        res.Wifi5g.forEach(info=> {
+          if (client.l2ident.id == info.mac) {
+            device.debit = this.convert(info.tx_rate,0)
+            device.access_type= "wifi5"
+            device.signal = info.signal
+            device.signal_percent = this.wifiPercent(info.signal)
+            device.signal_bar = this.wifiBar(device.signal_percent)
+          }
+        })
+        if (this.FreeboxV7) {
+          res.Wifi5g2.forEach(info=> {
+            if (client.l2ident.id == info.mac) {
+              device.debit = this.convert(info.tx_rate,0)
+              device.access_type= "wifi5"
+              device.signal = info.signal
+              device.signal_percent = this.wifiPercent(info.signal)
+              device.signal_bar = this.wifiBar(device.signal_percent)
+            }
+          })
+          res.Wifi5g3.forEach(info=> {
+            if (client.l2ident.id == info.mac) {
+              device.debit = this.convert(info.tx_rate,0)
+              device.access_type= "wifi5"
+              device.signal = info.signal
+              device.signal_percent = this.wifiPercent(info.signal)
+              device.signal_bar = this.wifiBar(device.signal_percent)
+            }
+          }) || null
+        }
+        /** rate of eth devices **/
+        res.EthCnx.forEach(info=> {
+          if (info.mac_list) {
+            var macList = info.mac_list.map((mac_list)=>{return mac_list.mac})
+            macList.forEach(mac => {
+              if (client.l2ident.id == mac) {
+                if (res[info.id] && res[info.id].tx_bytes_rate) {
+                  device.debit = this.convert(res[info.id].tx_bytes_rate,0)
+                  device.access_type = "ethernet"
+                  device.eth = info.id
+                }
+                else { /* attend le prochain le tour */ }
+              }
+            })
+          }
+        })
+      }
+
+      if (client.l3connectivities && this.config.showClientIP) {
+        client.l3connectivities.forEach(ip => {
+          if (ip.af == "ipv4" && ip.active) device.ip = ip.addr
+        })
+      }
+
+      res.Clients.push(device)
+    })
 
     if (this.config.showMissedCall) {
       var filtered = _.where(res.Call, {type: "missed"})
       var missed = filtered.length
       var call = {}
       if (missed > 0) {
-        for (let [item, value] of Object.entries(filtered)) {
+        filtered.forEach(caller => {
           call = {
-            name: value.name,
-            date: value.datetime,
-            new: value.new
+            name: caller.name,
+            date: caller.datetime,
+            new: caller.new
           }
           res.Calls.who.push(call)
-        }
+        })
       }
       res.Calls.missed = missed
     }
@@ -414,19 +401,18 @@ module.exports = NodeHelper.create({
       Bandwidth: bandwidth,
       Debit: debit,
       IP: cnx.data.result.ipv4,
-      Client: clients.data.result,
-      Call: callLog ? calls.data.result: null,
-      Wifi2g: clientRate ? wifi2gCnx.data.result : null,
-      Wifi5g: clientRate ? wifi5gCnx.data.result : null,
-      Wifi5g2: (clientRate && this.FreeboxV7) ? wifi5gCnx2.data.result : null,
-      Wifi5g3: (clientRate && this.FreeboxV7) ? wifi5gCnx3.data.result : null,
-      EthCnx: clientRate ? ethCnx.data.result : null,
-      1: clientRate ? eth1.data.result : null,
-      2: clientRate ? eth2.data.result : null,
-      3: clientRate ? eth3.data.result : null,
-      4: clientRate ? eth4.data.result : null
+      Client: clients.data.result ? clients.data.result : [],
+      Call: callLog && calls.data.result ? calls.data.result : [],
+      Wifi2g: clientRate && wifi2gCnx.data.result ? wifi2gCnx.data.result : [],
+      Wifi5g: clientRate && wifi5gCnx.data.result ? wifi5gCnx.data.result : [],
+      Wifi5g2: clientRate && this.FreeboxV7 && wifi5gCnx2.data.result ? wifi5gCnx2.data.result : [],
+      Wifi5g3: clientRate && this.FreeboxV7 && wifi5gCnx3.data.result ? wifi5gCnx3.data.result : [],
+      EthCnx: clientRate && ethCnx.data.result ? ethCnx.data.result : [],
+      1: clientRate && eth1.data.result ? eth1.data.result : [],
+      2: clientRate && eth2.data.result ? eth2.data.result : [],
+      3: clientRate && eth3.data.result ? eth3.data.result : [],
+      4: clientRate && eth4.data.result ? eth4.data.result : [],
     }
-
     await freebox.logout()
     return output
   },

@@ -31,7 +31,6 @@ Module.register("MMM-Freebox", {
 
   start: function () {
     this.Init = false
-    this.update = null
     this.Freebox = {
       "Hidden": true,
       "Bandwidth": null,
@@ -141,40 +140,41 @@ Module.register("MMM-Freebox", {
     if (this.config.showIP) IP.classList.remove("hidden")
     IPDisplay.textContent = this.Freebox.IP
 
-    /** Appareils connecté **/
-    if (Object.keys(this.Freebox.Clients).length > 0) {
-      for (let [item, client] of Object.entries(this.Freebox.Clients)) {
-        var mac = client.mac
-        var cache = this.Freebox.Cache[mac]
-        var excludeMac = this.config.excludeMac
+    /** Appareils connecté je suppose qu'il y a en plus d'un en memoire! donc pas de check... **/
+    this.Freebox.Clients.forEach(client => {
+      var mac = client.mac
+      var cache = this.Freebox.Cache[mac]
+      var excludeMac = this.config.excludeMac
 
-        var clientSelect = document.getElementsByClassName(mac)[0]
-        /** Nouveau Client connecté -> rebuild du cache **/
-        if (!clientSelect) {
-          clearInterval(this.update)
-          this.update = null
-          FB("Appareil inconnu [" + mac + "] - Rechargement du cache.")
-          return this.sendSocketNotification("CACHE")
+      var clientSelect = document.getElementsByClassName(mac)[0]
+      /** Nouveau Client connecté -> rebuild du cache **/
+      if (!clientSelect || (this.Freebox.Clients.length != Object.keys(this.Freebox.Cache).length)) {
+        FB("Appareil inconnu [" + mac + "] - Rechargement du cache.")
+        return this.sendSocketNotification("CACHE")
+      }
+
+      /** Le nom d'affichage a été changé **/
+      var clientName = clientSelect.querySelector("#FREE_NAME")
+      client.name = client.name ? client.name : "(Appareil sans nom)"
+      if (cache.name != client.name) {
+        this.Freebox.Cache[mac].name = client.name
+        clientName.textContent = cache.name
+      }
+
+      if (this.config.showClientIP) {
+        /** Affichage IP **/
+        var clientIP = clientSelect.querySelector("#FREE_CLIENTIP")
+        clientIP.textContent = client.ip ? client.ip : ""
+      }
+
+      /** Wifi ou Eth ? **/
+      var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
+      if (this.config.showClientCnxType) {
+        clientAccess.classList.remove("hidden")
+        if (!client.access_type && client.active && clientAccess.classList.value.includes("ethernet")) {
+          /* do nothing */
         }
-
-        /** Le nom d'affichage a été changé **/
-        var clientName = clientSelect.querySelector("#FREE_NAME")
-        client.name = client.name ? client.name : "(Appareil sans nom)"
-        if (cache.name != client.name) {
-          this.Freebox.Cache[mac].name = client.name
-          clientName.textContent = cache.name
-        }
-
-        if (this.config.showClientIP) {
-          /** Affichage IP **/
-          var clientIP = clientSelect.querySelector("#FREE_CLIENTIP")
-          clientIP.textContent = client.ip ? client.ip : ""
-        }
-
-        /** Wifi ou Eth ? **/
-        var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
-        if (this.config.showClientCnxType) {
-          clientAccess.classList.remove("hidden")
+        else {
           if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
           else if (client.access_type == "wifi2") {
             clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
@@ -184,32 +184,33 @@ Module.register("MMM-Freebox", {
           }
           else clientAccess.className = "black"
         }
-
-         /** debit client **/
-        var clientDebit = clientSelect.querySelector("#FREE_RATE")
-        if (this.config.showClientRate) clientDebit.classList.remove("hidden")
-        clientDebit.textContent = client.debit ? client.debit : ""
-
-        /** bouton **/
-        var clientStatus = clientSelect.querySelector("INPUT")
-        var clientIcon = clientSelect.querySelector("#FREE_ICON")
-        var clientBouton = clientSelect.querySelector(".switch")
-        if (this.config.showButton) clientBouton.classList.remove("hidden")
-        clientStatus.checked = client.active
-        clientIcon.className= client.type + (client.active ? "1" : "0")
-        if (this.config.showIcon) clientIcon.classList.remove("hidden")
-        else clientIcon.classList.add("hidden")
-
-        /** Eclude @mac **/
-        if (cache.show && excludeMac.indexOf(mac) == "-1") {
-          if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
-          else if (!this.config.activeOnly) clientSelect.classList.remove("hidden")
-        }
-
-        /** activeOnly **/
-        if (this.config.activeOnly && !client.active) clientSelect.classList.add("hidden")
       }
-    }
+
+       /** debit client **/
+      var clientDebit = clientSelect.querySelector("#FREE_RATE")
+      if (this.config.showClientRate) clientDebit.classList.remove("hidden")
+      if (client.active && client.debit === null) clientDebit.textContent = "-- Ko/s"
+      else clientDebit.textContent = client.debit
+
+      /** bouton **/
+      var clientStatus = clientSelect.querySelector("INPUT")
+      var clientIcon = clientSelect.querySelector("#FREE_ICON")
+      var clientBouton = clientSelect.querySelector(".switch")
+      if (this.config.showButton) clientBouton.classList.remove("hidden")
+      clientStatus.checked = client.active
+      clientIcon.className= client.type + (client.active ? "1" : "0")
+      if (this.config.showIcon) clientIcon.classList.remove("hidden")
+      else clientIcon.classList.add("hidden")
+
+      /** Eclude @mac **/
+      if (cache.show && excludeMac.indexOf(mac) == "-1") {
+        if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
+        else if (!this.config.activeOnly) clientSelect.classList.remove("hidden")
+      }
+
+      /** activeOnly **/
+      if (this.config.activeOnly && !client.active) clientSelect.classList.add("hidden")
+    })
 
     /** Affichage Débit utilisé en temps réél **/
     var debit = document.getElementById("FREE_DEBIT")
@@ -229,8 +230,6 @@ Module.register("MMM-Freebox", {
 
     /** Appels manqués **/
     if (this.Freebox.Calls.missed != this.Freebox.MissedCall) {
-      clearInterval(this.update)
-      this.update = null
       FB("Nouvel appel manqué - Rechargement du cache.")
       return this.sendSocketNotification("CACHE")
     }
@@ -275,7 +274,6 @@ Module.register("MMM-Freebox", {
       /** Afficage de la bande passante **/
       var bandWidth = document.createElement("div")
       bandWidth.id = "FREE_BAND"
-      //bandWidth.style.width = (this.config.textWidth + 60) + "px"
       bandWidth.classList.add("hidden")
 
       var bandWidthIcon = document.createElement("div")
