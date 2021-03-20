@@ -3,8 +3,10 @@ FB = (...arg) => { /* do nothing */ }
 Module.register("MMM-Freebox", {
 
   defaults: {
-    updateDelay:  5 * 1000,
+    debug: false,
+    verbose: false,
     token: "",
+    updateDelay:  5 * 1000,
     activeOnly: false,
     showIcon: true,
     showButton: true,
@@ -23,10 +25,13 @@ Module.register("MMM-Freebox", {
     textWidth: 250,
     excludeMac: [],
     sortBy: null,
-    debug: false,
-    verbose: false,
-    dev: false,
-    debitText: "Débit total utilisé : "
+    checkFreePlug: false,
+    checkSFP: false,
+    NPMCheck: {
+      useChecker: true,
+      delay: 10 * 60 * 1000,
+      useAlert: true
+    }
   },
 
   start: function () {
@@ -79,6 +84,24 @@ Module.register("MMM-Freebox", {
       case "RESULT":
         this.result(payload)
         break
+      case "debug":
+        console.log(payload)
+        break
+      case "NPM_UPDATE":
+        if (payload && payload.length > 0) {
+          if (this.config.NPMCheck.useAlert) {
+            payload.forEach(npm => {
+              this.sendNotification("SHOW_ALERT", {
+                type: "notification" ,
+                message: "[NPM] " + npm.library + " v" + npm.installed +" -> v" + npm.latest,
+                title: this.translate("UPDATE_NOTIFICATION_MODULE", { MODULE_NAME: npm.module }),
+                timer: this.config.NPMCheck.delay - 2000
+              })
+            })
+          }
+          this.sendNotification("NPM_UPDATE", payload)
+        }
+        break
     }
   },
 
@@ -106,6 +129,7 @@ Module.register("MMM-Freebox", {
   },
   
   result: function(payload) {
+    this.Freebox.Model = payload.Model
     this.Freebox.Type = payload.Type
     this.Freebox.Degroup = payload.Degroup
     this.Freebox.Bandwidth = payload.Bandwidth
@@ -171,26 +195,18 @@ Module.register("MMM-Freebox", {
       var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
       if (this.config.showClientCnxType) {
         clientAccess.classList.remove("hidden")
-        if (!client.access_type && client.active && clientAccess.classList.value.includes("ethernet")) {
-          /* do nothing */
-        }
-        else {
-          if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
-          else if (client.access_type == "wifi2") {
-            clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
-          }
-          else if (client.access_type == "wifi5") {
-            clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
-          }
-          else clientAccess.className = "black"
-        }
+        if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
+        else if (client.access_type == "wifi2") clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
+        else if (client.access_type == "wifi5") clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
+        else if (client.access_type == "freeplug") clientAccess.className= "freeplug"
+        else if (client.access_type == "sfp") clientAccess.className= "sfp"
+        else clientAccess.className = "black"
       }
 
        /** debit client **/
       var clientDebit = clientSelect.querySelector("#FREE_RATE")
       if (this.config.showClientRate) clientDebit.classList.remove("hidden")
-      if (client.active && client.debit === null) clientDebit.textContent = "-- Ko/s"
-      else clientDebit.textContent = client.debit
+      clientDebit.textContent = client.debit
 
       /** bouton **/
       var clientStatus = clientSelect.querySelector("INPUT")
@@ -383,7 +399,7 @@ Module.register("MMM-Freebox", {
       debit.appendChild(debitIcon)
       var debitText = document.createElement("div")
       debitText.id = "FREE_TEXT"
-      debitText.textContent = this.config.debitText 
+      debitText.textContent = "Débit total utilisé:"
       debit.appendChild(debitText)
       var debitDisplay= document.createElement("div")
       debitDisplay.id = "FREE_VALUE"

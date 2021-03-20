@@ -24,6 +24,7 @@
   "homepage": "https://github.com/bugsounet/MMM-Freebox",
   "dependencies": {
     "@bugsounet/freebox": "^1.0.0",
+    "@bugsounet/npmcheck": "^0.9.92",
     "ping": "^0.2.2"
   }
 }

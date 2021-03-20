@@ -1,8 +1,6 @@
-// @todo ... check freeplug and sfp cnx
-// npmcheck powa !
-
 var NodeHelper = require('node_helper')
 const { Freebox } = require("@bugsounet/freebox")
+const npmCheck = require("@bugsounet/npmcheck")
 var _ = require("underscore")
 var ping = require('ping')
 
@@ -61,6 +59,15 @@ module.exports = NodeHelper.create({
       case "INIT":
         this.config = payload
         if (this.config.debug) FB = (...args) => { console.log("[Freebox]", ...args) }
+        if (this.config.NPMCheck.useChecker) {
+          var cfg = {
+            dirName: __dirname,
+            moduleName: this.name,
+            timer: this.config.NPMCheck.delay,
+            debug: this.config.debug
+          }
+          this.Checker= new npmCheck(cfg, update => { this.sendSocketNotification("NPM_UPDATE", update)} )
+        }
         this.scan()
         break
       case "SCAN":
@@ -81,6 +88,7 @@ module.exports = NodeHelper.create({
 
   makeCache: function (res) {
     this.cache = {}
+    this.sendSocketNotification("debug", res)
     if (Object.keys(res.Client).length > 0) {
       for (let [item, client] of Object.entries(res.Client)) {
         this.cache[client.l2ident.id] = {
@@ -212,7 +220,7 @@ module.exports = NodeHelper.create({
               device.signal_percent = this.wifiPercent(info.signal)
               device.signal_bar = this.wifiBar(device.signal_percent)
             }
-          }) || null
+          })
         }
         /** rate of eth devices **/
         res.EthCnx.forEach(info=> {
@@ -265,10 +273,12 @@ module.exports = NodeHelper.create({
     delete res[2]
     delete res[3]
     delete res[4]
+    delete res[5]
+    delete res[6]
     delete res.Wifi2g
-    delete res.Wifi5g,
-    delete res.Wifi5g2,
-    delete res.wifi5g3,
+    delete res.Wifi5g
+    delete res.Wifi5g2
+    delete res.Wifi5g3
     delete res.EthCnx
 
     res.Ping = this.config.showPing ? this.pingValue : null
@@ -330,7 +340,7 @@ module.exports = NodeHelper.create({
     }
 
     if (clientRate) {
-      FB("Quering Wifi 2Ghz...")
+      FB("Quering Wifi 2.4Ghz...")
       var wifi2gCnx = await freebox.request({
         method: "GET",
         url:"wifi/ap/0/stations/"
@@ -386,6 +396,21 @@ module.exports = NodeHelper.create({
         method: "GET",
         url:"switch/port/4/stats"
       })
+
+      if (this.FreeboxV7 && this.config.checkFreePlug) {
+        FB("Quering Freeplug...")
+        var eth5 = await freebox.request({
+          method: "GET",
+          url:"switch/port/5/stats"
+        })
+      }
+      if (this.FreeboxV7 && this.config.checkSFP) {
+        FB("Quering SFP...")
+        var eth6 = await freebox.request({
+          method: "GET",
+          url:"switch/port/9999/stats"
+        })
+      }
     }
 
     FB("Done!")
@@ -396,6 +421,7 @@ module.exports = NodeHelper.create({
     degroup = (cnx.data.result.type == "rfc2684") ? true : false
 
     output = {
+      Model: this.FreeboxVersion,
       Type: type,
       Degroup: degroup,
       Bandwidth: bandwidth,
@@ -412,7 +438,10 @@ module.exports = NodeHelper.create({
       2: clientRate && eth2.data.result ? eth2.data.result : [],
       3: clientRate && eth3.data.result ? eth3.data.result : [],
       4: clientRate && eth4.data.result ? eth4.data.result : [],
+      5: clientRate && this.FreeboxV7 && this.config.checkFreePlug && eth5.data.result ? eth5.data.result : [],
+      6: clientRate && this.FreeboxV7 && this.config.checkSFP && eth6.data.result ? eth6.data.result : [],
     }
+
     await freebox.logout()
     return output
   },

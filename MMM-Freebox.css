@@ -321,6 +321,17 @@
     background-image: url(resources/eth4.png);
     background-position: inherit;
 }
+
+#FREE_ACCESS.ethernet5 {
+    background-image: url(resources/cpl.png);
+    background-position: inherit;
+}
+
+#FREE_ACCESS.ethernet6 {
+    background-image: url(resources/sfp.png);
+    background-position: inherit;
+}
+
 /* ------------ */
 
 input.switch-round + label {
