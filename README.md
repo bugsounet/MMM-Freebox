@@ -101,7 +101,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 {
   module: 'MMM-Freebox',
   position: 'top_center',
-  configDeepMerge: true
+  configDeepMerge: true,
   config: {
     /** remplacer le token par votre valeur **/
     token:  "<token>",
