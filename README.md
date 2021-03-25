@@ -12,7 +12,6 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Débit utilisé (total et/ou par appareil)
  * Ping de votre mirroir vers google.fr (ou autre)
  * Appels manqués.
- * Utilisateurs connectés en VPN
  * Type de connexion utilisé par les appareils
 
 ## Update
@@ -52,8 +51,6 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
 ## Screenshot
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen2.png)
-![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/VPNUsers.png)
-![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen3.png)
 
 ## Installation
  * Clonez le module dans votre dossier de module de MagicMirror et exécutez `npm install` dans le répertoire du module.
@@ -65,8 +62,9 @@ npm install
   * Associer votre MMM-Freebox à votre Freebox Server.
 
 ```sh
-Register MMM-Freebox to Freebox Server [Y/n] 
-Your choice: y
+cd ~/MagicMirror/modules/MMM-Freebox
+npm run register
+
 Merci de vérifier votre écran LCD de votre Freebox Server et autoriser l'enregistrement de l'application.
 ```
   * Validez l'association par la flèche de droite de l'écran LCD de votre Freebox Server.
@@ -90,6 +88,7 @@ Remplacer le tokden la valeurs de connexion fourni par votre Freebox Server.
 {
   module: "MMM-Freebox",
   position: "top_center",
+  configDeepMerge: true,
   config: {
     token: "<token>",
   }
@@ -102,6 +101,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 {
   module: 'MMM-Freebox',
   position: 'top_center',
+  configDeepMerge: true
   config: {
     /** remplacer le token par votre valeur **/
     token:  "<token>",
@@ -115,7 +115,6 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     showClientRate: true,
     showClientIP: false,
     showClientCnxType: true,
-    showVPNUsers: true,
     showFreePlayer: true,
     showMissedCall: true,
     maxMissed: 3,
@@ -125,20 +124,10 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     textWidth: 250,
     excludeMac: [],
     sortBy: null,
+    checkFreePlug: false,
+    checkSFP: false,
     debug: false,
-    verbose: false,
-    player : {
-      showPlayerInfo: false,
-      // depuis le firmware 4.2.3, problemes d'affichage des logos
-      // essayez avec les ips :  "192.168.0.254" (l'ip du freebox server)
-      //                         "mafreebox.free.fr" ou le resultat de l'ip de mafreebox.free.fr
-      //                         "212.27.38.253" qui est l'ip de mafreebox.free.fr (a voir si cela fonctionne pour vous)
-      //                         Je ne peux déterminer pas cela pour vous pour le moment !
-      ServerIP: "212.27.38.253",
-      UseEPGDayURL: true,
-      EPGDelay: 2* 60 *60 *1000
-    }
-  },
+    verbose: false
   }
 },
 ```
@@ -155,7 +144,6 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | showClientRate | Affiche le débit de l'appareil | Boolean | true |
 | showClientIP | Affiche l'addresse IPv4 de l'appareil | Boolean | false |
 | showClientCnxType | Affiche le type de connexion des appareils | Boolean | true |
-| showVPNUsers | Affiche les utilisateurs connectés via VPN | Boolean | true |
 | showFreePlayer | Affiche les Freebox Player | Boolean | true |
 | showMissedCall | Affiche les appels manqués | Boolean | true |
 | maxMissed | Nombre d'appel maximum à afficher | Number | 3 |
@@ -165,16 +153,10 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | textWidth | Largeur du texte à afficher (mini: 220) | Number | 250 |
 | excludeMac | Ne pas afficher les appareils connectés avec certaines adresses MAC | Array | [] |
 | sortBy | Classement des appareils connectés par : type, name, mac ou null pour classement par defaut| String | null |
+| checkFreePlug| Permet de verifier et d'afficher les connexions via FreePlug sur le reseau (Freebox Delta uniquement)| Boolean | false |
+| checkSFP| Permet de verifier et d'afficher les connexions via la carte SFP sur le reseau (Freebox Delta uniquement)| Boolean | false |
 | debug | Active le mode de debuguage | Boolean | false |
 | verbose | Active le mode verbose en console | Boolean| false |
-
-## Player et affichage EPG `player: {}`
-| Option  | Description | Type | Defaut |
-| ------- | --- | --- | --- |
-| showPlayerInfo | Active les informations de la chaine actuelle du FreePlayer. désactivé par defaut | Boolean | false
-| ServerIP | Adresse / nom de domaine pour récuperer les logos des chaînes | String | 212.27.38.253
-| UseEPGDayURL | true: permet le téléchargement de l'EPG du jour. false, permet le téléchargement de l'EPG pour 15 jours | Boolean | true
-| EPGDelay | Délai de mise a jour du téléchargement automatique de l'EPG (2 heures par defaut)| Number | 2 *60 *60 *1000
 
 ### Personalisation de l'affichage des appareils connecté
 
@@ -186,12 +168,6 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
  - Je n'ai pas encore de retour sur la Freebox One et POP je pense que cela devrait fonctionner également car toutes les box Free utilisent la même API
  - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
  - En cas de souci, ne pas hésiter a ouvrir une ISSUE
- - `player: {}`
-   * Je ne sais pas si les Freebox mini4k ou pop retournent les informations (elles sont sous AndroidTV)
-   * ServerIP: depuis le dernier firmware Free ne permet plus l'affichage des logo des chaines...<br>
-   cela fonctionne en http uniquement avec l'adresse ip du FreeboxServer ou l'ip de `mafreebox.free.fr`<br>
-   par default j'ai mis l'ip de `mafreebox.free.fr`
-   * Testé sous Freebox Révolution
 
 ## Donation
  [Donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TTHRH94Y4KL36&source=url), si vous aimez ce module !
