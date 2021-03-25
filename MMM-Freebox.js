@@ -127,7 +127,7 @@ Module.register("MMM-Freebox", {
     FB("Show module")
     this.show(1000, {lockString: "FREEBOX_LOCKED"})
   },
-  
+
   result: function(payload) {
     this.Freebox.Model = payload.Model
     this.Freebox.Type = payload.Type
@@ -154,7 +154,6 @@ Module.register("MMM-Freebox", {
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
     bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ': ') + this.Freebox.Bandwidth
-    
 
     /** Adresse IP **/
     var IP = document.getElementById("FREE_IP")
@@ -340,7 +339,7 @@ Module.register("MMM-Freebox", {
           clientIcon.className= type + "0"
           clientIcon.classList.add("hidden")
           client.appendChild(clientIcon)
-  
+
           var clientName = document.createElement("div")
           clientName.id = "FREE_NAME"
           clientName.style.width= this.config.showClientIP ? this.config.textWidth-80 + "px" : this.config.textWidth + "px"
@@ -378,12 +377,12 @@ Module.register("MMM-Freebox", {
 
           var clientLabel = document.createElement('label')
           clientLabel.htmlFor = "swithed"
-  
+
           clientStatus.appendChild(clientButton)
           clientStatus.appendChild(clientLabel)
 
           client.appendChild(clientStatus)
-  
+
           wrapper.appendChild(client)
         }
       }

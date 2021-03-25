@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "postinstall": "installer/postinstall.sh",
-    "register": "node installer/Freebox_Login.js"
+    "register": "node installer/Freebox_Login.js",
+    "update": "installer/update.sh"
   },
   "author": "bugs",
   "license": "MIT",
