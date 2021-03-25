@@ -15,6 +15,10 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
  * Type de connexion utilisé par les appareils
 
 ## Update
+ * v2.0.0
+   * delete EPG
+   * delete VPN
+   * add freebox Delte support
  * v1.4.2 (25/08/2020)
    * correction d'un bug lors du demarrage -> reste figé sur le logo Freebox
    * correction d'un crash si le XML de l'EPG n'est pas conforme
