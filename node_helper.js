@@ -225,6 +225,7 @@ module.exports = NodeHelper.create({
         /** rate of eth devices **/
         res.EthCnx.forEach(info=> {
           if (info.mac_list) {
+            if(!info.mac_list.length) return // return an object ???
             var macList = info.mac_list.map((mac_list)=>{return mac_list.mac})
             macList.forEach(mac => {
               if (client.l2ident.id == mac) {
@@ -233,7 +234,9 @@ module.exports = NodeHelper.create({
                   device.access_type = "ethernet"
                   device.eth = info.id
                 }
-                else { /* attend le prochain le tour */ }
+                else {
+                  /* attend le prochain le tour */
+                }
               }
             })
           }
