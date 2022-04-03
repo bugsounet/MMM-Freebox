@@ -34,9 +34,6 @@ Installer_info "postinstall script v$Installer_vinstaller"
 
 echo
 
-# use beep request questions ?
-Installer_beep=false
-
 # Check not run as root
 if [ "$EUID" -eq 0 ]; then
   Installer_error "npm install must not be used as root"
@@ -45,9 +42,8 @@ fi
 
 echo
 
-Installer_yesno "Register MMM-Freebox to Freebox Server" && (
-  node Freebox_Login.js
-)
+Installer_error "To Register MMM-Freebox to Freebox Server, use: npm run register"
+echo
 
 # the end...
-Installer_exit "$Installer_module is now installed !"
+Installer_success "$Installer_module is now installed !"

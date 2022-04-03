@@ -3,8 +3,10 @@ FB = (...arg) => { /* do nothing */ }
 Module.register("MMM-Freebox", {
 
   defaults: {
-    updateDelay:  5 * 1000,
+    debug: false,
+    verbose: false,
     token: "",
+    updateDelay:  5 * 1000,
     activeOnly: false,
     showIcon: true,
     showButton: true,
@@ -16,7 +18,6 @@ Module.register("MMM-Freebox", {
     showClientCnxType: true,
     showFreePlayer: true,
     showMissedCall: true,
-    showVPNUsers: true,
     maxMissed: 3,
     showIP: true,
     showPing: true,
@@ -24,26 +25,12 @@ Module.register("MMM-Freebox", {
     textWidth: 250,
     excludeMac: [],
     sortBy: null,
-    debug: false,
-    verbose: false,
-    dev: false,
-    debitText: "Débit total utilisé : ",
-    player : {
-      showPlayerInfo: false,
-      // depuis le firmware 4.2.3, problemes d'affichage des logos
-      // essayez avec les ips :  "192.168.0.254" (l'ip du freebox server)
-      //                         "mafreebox.free.fr" ou le resultat de l'ip de mafreebox.free.fr
-      //                         "212.27.38.253" l'ip de mafreebox.free.fr (a voir si cela fonctionne pour vous)
-      ServerIP: "212.27.38.253",
-      UseEPGDayURL: true,
-      EPGDelay: 2* 60 *60 *1000
-    }
+    checkFreePlug: false,
+    checkSFP: false
   },
 
   start: function () {
-    this.config = configMerge({}, this.defaults, this.config)
     this.Init = false
-    this.update = null
     this.Freebox = {
       "Hidden": true,
       "Bandwidth": null,
@@ -55,12 +42,8 @@ Module.register("MMM-Freebox", {
       "Cache": {},
       "Calls" : [],
       "MissedCall": 0,
-      "Ping": null,
-      "VPNUsers": [],
-      "nbVPNUser": 0,
-      "Player": {}
+      "Ping": null
     }
-    this.EPG = "Programme inconnu"
 
     this.maxMissedCall = 0
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
@@ -96,12 +79,8 @@ Module.register("MMM-Freebox", {
       case "RESULT":
         this.result(payload)
         break
-      case "NB_VPN_USER":
-        this.Freebox.nbVPNUser = payload
-        break
-      case "SEND_EPG":
-        this.EPG = payload
-        //console.log("[Freebox] " + payload)
+      case "debug":
+        console.log(payload)
         break
     }
   },
@@ -121,7 +100,6 @@ Module.register("MMM-Freebox", {
   callbackHide: function () {
     this.updateDom()
     this.sendSocketNotification("SCAN")
-    this.ScanClient()
   },
 
   showFreebox: function() {
@@ -129,8 +107,9 @@ Module.register("MMM-Freebox", {
     FB("Show module")
     this.show(1000, {lockString: "FREEBOX_LOCKED"})
   },
-  
+
   result: function(payload) {
+    this.Freebox.Model = payload.Model
     this.Freebox.Type = payload.Type
     this.Freebox.Degroup = payload.Degroup
     this.Freebox.Bandwidth = payload.Bandwidth
@@ -138,10 +117,7 @@ Module.register("MMM-Freebox", {
     this.Freebox.IP = payload.IP
     this.Freebox.Clients = payload.Clients
     this.Freebox.Calls = payload.Calls
-    this.Freebox.VPNUsers = payload.VPNUsers
     this.Freebox.Ping = payload.Ping
-    this.Freebox.Player = payload.Player
-    this.Freebox.Player.program = this.EPG
     FB("Result:", this.Freebox)
     this.displayDom()
     if (this.Freebox.Hidden) this.showFreebox()
@@ -157,8 +133,7 @@ Module.register("MMM-Freebox", {
     var bandWidthValue = bandWidth.querySelector("#FREE_VALUE")
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
-    bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ':') + this.Freebox.Bandwidth
-    
+    bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ': ') + this.Freebox.Bandwidth
 
     /** Adresse IP **/
     var IP = document.getElementById("FREE_IP")
@@ -168,75 +143,69 @@ Module.register("MMM-Freebox", {
     if (this.config.showIP) IP.classList.remove("hidden")
     IPDisplay.textContent = this.Freebox.IP
 
-    /** Appareils connecté **/
-    if (Object.keys(this.Freebox.Clients).length > 0) {
-      for (let [item, client] of Object.entries(this.Freebox.Clients)) {
-        var mac = client.mac
-        var cache = this.Freebox.Cache[mac]
-        var excludeMac = this.config.excludeMac
+    /** Appareils connecté je suppose qu'il y a en plus d'un en memoire! donc pas de check... **/
+    this.Freebox.Clients.forEach(client => {
+      var mac = client.mac
+      var cache = this.Freebox.Cache[mac]
+      var excludeMac = this.config.excludeMac
 
-        var clientSelect = document.getElementsByClassName(mac)[0]
-        /** Nouveau Client connecté -> rebuild du cache **/
-        if (!clientSelect) {
-          clearInterval(this.update)
-          this.update = null
-          FB("Appareil inconnu [" + mac + "] - Rechargement du cache.")
-          return this.sendSocketNotification("CACHE")
-        }
-
-        /** Le nom d'affichage a été changé **/
-        var clientName = clientSelect.querySelector("#FREE_NAME")
-        client.name = client.name ? client.name : "(Appareil sans nom)"
-        if (cache.name != client.name) {
-          this.Freebox.Cache[mac].name = client.name
-          clientName.textContent = cache.name
-        }
-
-        if (this.config.showClientIP) {
-          /** Affichage IP **/
-          var clientIP = clientSelect.querySelector("#FREE_CLIENTIP")
-          clientIP.textContent = client.ip ? client.ip : ""
-        }
-
-        /** Wifi ou Eth ? **/
-        var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
-        if (this.config.showClientCnxType) {
-          clientAccess.classList.remove("hidden")
-          if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
-          else if (client.access_type == "wifi2") {
-            clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
-          }
-          else if (client.access_type == "wifi5") {
-            clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
-          }
-          else clientAccess.className = "black"
-        }
-
-         /** debit client **/
-        var clientDebit = clientSelect.querySelector("#FREE_RATE")
-        if (this.config.showClientRate) clientDebit.classList.remove("hidden")
-        clientDebit.textContent = client.debit ? client.debit : ""
-
-        /** bouton **/
-        var clientStatus = clientSelect.querySelector("INPUT")
-        var clientIcon = clientSelect.querySelector("#FREE_ICON")
-        var clientBouton = clientSelect.querySelector(".switch")
-        if (this.config.showButton) clientBouton.classList.remove("hidden")
-        clientStatus.checked = client.active
-        clientIcon.className= client.type + (client.active ? "1" : "0")
-        if (this.config.showIcon) clientIcon.classList.remove("hidden")
-        else clientIcon.classList.add("hidden")
-
-        /** Eclude @mac **/
-        if (cache.show && excludeMac.indexOf(mac) == "-1") {
-          if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
-          else if (!this.config.activeOnly) clientSelect.classList.remove("hidden")
-        }
-
-        /** activeOnly **/
-        if (this.config.activeOnly && !client.active) clientSelect.classList.add("hidden")
+      var clientSelect = document.getElementsByClassName(mac)[0]
+      /** Nouveau Client connecté -> rebuild du cache **/
+      if (!clientSelect || (this.Freebox.Clients.length != Object.keys(this.Freebox.Cache).length)) {
+        FB("Appareil inconnu [" + mac + "] - Rechargement du cache.")
+        return this.sendSocketNotification("CACHE")
       }
-    }
+
+      /** Le nom d'affichage a été changé **/
+      var clientName = clientSelect.querySelector("#FREE_NAME")
+      client.name = client.name ? client.name : "(Appareil sans nom)"
+      if (cache.name != client.name) {
+        this.Freebox.Cache[mac].name = client.name
+        clientName.textContent = cache.name
+      }
+
+      if (this.config.showClientIP) {
+        /** Affichage IP **/
+        var clientIP = clientSelect.querySelector("#FREE_CLIENTIP")
+        clientIP.textContent = client.ip ? client.ip : ""
+      }
+
+      /** Wifi ou Eth ? **/
+      var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
+      if (this.config.showClientCnxType) {
+        clientAccess.classList.remove("hidden")
+        if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
+        else if (client.access_type == "wifi2") clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
+        else if (client.access_type == "wifi5") clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
+        else if (client.access_type == "freeplug") clientAccess.className= "freeplug"
+        else if (client.access_type == "sfp") clientAccess.className= "sfp"
+        else clientAccess.className = "black"
+      }
+
+       /** debit client **/
+      var clientDebit = clientSelect.querySelector("#FREE_RATE")
+      if (this.config.showClientRate) clientDebit.classList.remove("hidden")
+      clientDebit.textContent = client.debit
+
+      /** bouton **/
+      var clientStatus = clientSelect.querySelector("INPUT")
+      var clientIcon = clientSelect.querySelector("#FREE_ICON")
+      var clientBouton = clientSelect.querySelector(".switch")
+      if (this.config.showButton) clientBouton.classList.remove("hidden")
+      clientStatus.checked = client.active
+      clientIcon.className= client.type + (client.active ? "1" : "0")
+      if (this.config.showIcon) clientIcon.classList.remove("hidden")
+      else clientIcon.classList.add("hidden")
+
+      /** Eclude @mac **/
+      if (cache.show && excludeMac.indexOf(mac) == "-1") {
+        if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
+        else if (!this.config.activeOnly) clientSelect.classList.remove("hidden")
+      }
+
+      /** activeOnly **/
+      if (this.config.activeOnly && !client.active) clientSelect.classList.add("hidden")
+    })
 
     /** Affichage Débit utilisé en temps réél **/
     var debit = document.getElementById("FREE_DEBIT")
@@ -256,8 +225,6 @@ Module.register("MMM-Freebox", {
 
     /** Appels manqués **/
     if (this.Freebox.Calls.missed != this.Freebox.MissedCall) {
-      clearInterval(this.update)
-      this.update = null
       FB("Nouvel appel manqué - Rechargement du cache.")
       return this.sendSocketNotification("CACHE")
     }
@@ -282,121 +249,6 @@ Module.register("MMM-Freebox", {
         whoDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") + " :"
       }
     }
-
-    /** Utilisateurs VPN **/
-    if (this.Freebox.VPNUsers.nb != this.Freebox.nbVPNUser) {
-      clearInterval(this.update)
-      this.update = null
-      FB("Connection/Deco VPN - Rechargement du cache.")
-      return this.sendSocketNotification("CACHE")
-    }
-
-    if  (this.Freebox.VPNUsers.nb > 0) {
-      for (let [nb, value] of Object.entries(this.Freebox.VPNUsers.who)) {
-        var vpnUser = document.getElementsByClassName("VPNUSER_" + nb)
-        if (this.config.showVPNUsers) vpnUser[0].classList.remove("hidden")
-        var vpnLogin = vpnUser[0].querySelector("#FREE_VPNLOGIN")
-        var vpnType  = vpnUser[0].querySelector("#FREE_VPNTYPE")
-        var vpnRXTX  = vpnUser[0].querySelector("#FREE_VPNRXTX")
-        var vpnDate  = vpnUser[0].querySelector("#FREE_VPNDATE")
-        vpnLogin.innerHTML = value.user 
-        vpnType.innerHTML = value.vpn +"<br/>(" + value.src_ip +")"
-        vpnRXTX.innerHTML = value.rx_bytes+ " &#8659<br/>" + value.tx_bytes + " &#8657"
-        vpnDate.innerHTML = moment(value.date, "X").format("ddd DD MMM<br/>HH:mm")
-      }
-    }
-
-    /** TV **/
-    if (this.config.player.showPlayerInfo) {
-      var TV = document.getElementById("FREE_TV")
-      var TVLogo = document.getElementById("FREE_CHANNEL")
-      if (this.Freebox.Player.logo && this.Freebox.Player.power) {
-        TV.classList.remove("hidden")
-        if (this.Freebox.Player.logo == "inconnu!") TVLogo.src = "/modules/MMM-Freebox/resources/tv1.png"
-        else TVLogo.src = this.Freebox.Player.logo
-        var TVPhoto= document.getElementById("FREE_PHOTO")
-        if (this.Freebox.Player.program.photo == "unknow") TVPhoto.src= "/modules/MMM-Freebox/resources/unknow.jpg"
-        else TVPhoto.src= this.Freebox.Player.program.photo
-        var TVProgram = document.getElementById("FREE_PROGRAM")
-        var TVProgress = document.getElementById("FREE_PROGRESS")
-        var TVProgressStart = document.getElementById("FREE_PROGRESS_START")
-        var TVProgressEnd = document.getElementById("FREE_PROGRESS_END")
-        if (this.Freebox.Player.program.title == "Programme inconnu") {
-          TVProgram.classList.add("hidden")
-          TVProgress.classList.add("hidden")
-          TVProgressStart.classList.add("hidden")
-          TVProgressEnd.classList.add("hidden")
-        }
-        else {
-          TVProgram.innerHTML = this.Freebox.Player.program.title
-          /** putain de formule de merde ! **/
-          TVProgress.value= this.Freebox.Player.program.current ? ((((this.Freebox.Player.program.current - this.Freebox.Player.program.start) / (this.Freebox.Player.program.stop-this.Freebox.Player.program.start)) * 100)) : 100
-          var startStr = this.Freebox.Player.program.start.toString().substring(8, 12)
-          var endStr = this.Freebox.Player.program.stop.toString().substring(8, 12)
-          if (startStr) {
-            var startHour= startStr.substring(0,2)
-            var startMin= startStr.substring(2)
-            var startTime= startHour+"h"+startMin
-            TVProgressStart.textContent = startTime
-          }
-          else TVProgressStart.textContent = "00h00"
-          if (endStr) {
-            var endHour= endStr.substring(0,2)
-            var endMin= endStr.substring(2)
-            var endTime= endHour+"h"+endMin
-            TVProgressEnd.textContent = endTime
-          }
-          else TVProgressEnd.textContent = "00h00"
-          TVProgram.classList.remove("hidden")
-          TVProgress.classList.remove("hidden")
-          TVProgressStart.classList.remove("hidden")
-          TVProgressEnd.classList.remove("hidden")
-        }
-      }
-      else TV.classList.add("hidden")
-      var TVVolume = document.getElementById("FREE_VOLUME")
-      if (this.Freebox.Player.mute) TVVolume.src = "/modules/MMM-Freebox/resources/volmute.png"
-      else {
-        if (this.Freebox.Player.volume && this.Freebox.Player.volume !=100) {
-          var volume = ((this.Freebox.Player.volume * 5) / 100).toFixed(0)
-          TVVolume.src = "/modules/MMM-Freebox/resources/vol"+volume+".png"
-        }
-        else {
-          if (this.Freebox.Player.volume ==100) TVVolume.src = "/modules/MMM-Freebox/resources/volmax.png"
-          else if (!this.Freebox.Player.mute) TVVolume.src = "/modules/MMM-Freebox/resources/vol0.png"
-        }
-      }
-    }
-  },
-
-  /** scan main loop **/
-  ScanClient: function () {
-    clearInterval(this.update)
-    this.update = null
-    this.counterUpdate = this.config.updateDelay
-
-    this.update = setInterval( ()=> {
-      this.counterUpdate -= 1000
-      if (this.counterUpdate <= 0) {
-        clearInterval(this.update)
-        this.update = null
-        this.sendSocketNotification("SCAN")
-        this.ScanClient()
-      }
-    }, 1000);
-  },
-
-  /** ne scan pas si le module est suspendu **/
-  suspend: function() {
-    clearInterval(this.update)
-    this.update = null
-    console.log("MMM-Freebox is suspended.")
-  },
-
-  /** reprend le scan si le module est actif **/
-  resume: function() {
-    this.ScanClient()
-    console.log("MMM-Freebox is resumed.")
   },
 
   getDom: function () {
@@ -417,7 +269,6 @@ Module.register("MMM-Freebox", {
       /** Afficage de la bande passante **/
       var bandWidth = document.createElement("div")
       bandWidth.id = "FREE_BAND"
-      //bandWidth.style.width = (this.config.textWidth + 60) + "px"
       bandWidth.classList.add("hidden")
 
       var bandWidthIcon = document.createElement("div")
@@ -468,7 +319,7 @@ Module.register("MMM-Freebox", {
           clientIcon.className= type + "0"
           clientIcon.classList.add("hidden")
           client.appendChild(clientIcon)
-  
+
           var clientName = document.createElement("div")
           clientName.id = "FREE_NAME"
           clientName.style.width= this.config.showClientIP ? this.config.textWidth-80 + "px" : this.config.textWidth + "px"
@@ -506,12 +357,12 @@ Module.register("MMM-Freebox", {
 
           var clientLabel = document.createElement('label')
           clientLabel.htmlFor = "swithed"
-  
+
           clientStatus.appendChild(clientButton)
           clientStatus.appendChild(clientLabel)
 
           client.appendChild(clientStatus)
-  
+
           wrapper.appendChild(client)
         }
       }
@@ -527,7 +378,7 @@ Module.register("MMM-Freebox", {
       debit.appendChild(debitIcon)
       var debitText = document.createElement("div")
       debitText.id = "FREE_TEXT"
-      debitText.textContent = this.config.debitText 
+      debitText.textContent = "Débit total utilisé:"
       debit.appendChild(debitText)
       var debitDisplay= document.createElement("div")
       debitDisplay.id = "FREE_VALUE"
@@ -594,78 +445,6 @@ Module.register("MMM-Freebox", {
           wrapper.appendChild(who)
         }
       }
-
-      /** Utilisateurs VPN **/
-      if (this.Freebox.nbVPNUser > 0) {
-        var table = document.createElement("div")
-        table.id = "FREE_VPN"
-        wrapper.appendChild(table)
-
-        for (var x = 0 ; x < this.Freebox.nbVPNUser; x++) {
-         var vpnUser = document.createElement("div")
-          vpnUser.id = "FREE_VPNUSER"
-          vpnUser.className= "VPNUSER_"+ x
-          vpnUser.classList.add("hidden")
-          table.appendChild(vpnUser)
-
-          var vpnLogin = document.createElement("div")
-          vpnLogin.id = "FREE_VPNLOGIN"
-          vpnUser.appendChild(vpnLogin)
-
-          var vpnType = document.createElement("div")
-          vpnType.id = "FREE_VPNTYPE"
-          vpnUser.appendChild(vpnType)
-
-          var vpnRxTx = document.createElement("div")
-          vpnRxTx.id = "FREE_VPNRXTX"
-          vpnUser.appendChild(vpnRxTx)
-
-          var vpnDate = document.createElement("div")
-          vpnDate.id = "FREE_VPNDATE"
-          vpnUser.appendChild(vpnDate)
-        }
-      }
-
-      /** TV info **/
-      if (this.config.player.showPlayerInfo) {
-        var TV = document.createElement("div")
-        TV.id = "FREE_TV"
-        TV.classList.add("hidden")
-        var Contener = document.createElement("div")
-        Contener.id = "FREE_CONTENER"
-        var TVLogo = document.createElement("img")
-        TVLogo.id= "FREE_CHANNEL"
-        TVLogo.className = "tv"
-        Contener.appendChild(TVLogo)
-        var TVPhoto= document.createElement("img")
-        TVPhoto.id = "FREE_PHOTO"
-        TVPhoto.className = "photo"
-        Contener.appendChild(TVPhoto)
-        var TVVolume = document.createElement("img")
-        TVVolume.id = "FREE_VOLUME"
-        TVVolume.className = "volume"
-        Contener.appendChild(TVVolume)
-        TV.appendChild(Contener)
-        var TVProgram = document.createElement("div")
-        TVProgram.id = "FREE_PROGRAM"
-        TV.appendChild(TVProgram)
-        var TVProgressContener = document.createElement("div")
-        TVProgressContener.id = "FREE_PROGRESS_CONTENER"
-        var TVProgressStart = document.createElement("div")
-        TVProgressStart.id = "FREE_PROGRESS_START"
-        TVProgressContener.appendChild(TVProgressStart)
-        var TVProgress = document.createElement("meter")
-        TVProgress.id = "FREE_PROGRESS"
-        TVProgress.className="meter"
-        TVProgress.min= 0
-        TVProgress.max= 100
-        TVProgressContener.appendChild(TVProgress)
-        var TVProgressEnd = document.createElement("div")
-        TVProgressEnd.id = "FREE_PROGRESS_END"
-        TVProgressContener.appendChild(TVProgressEnd)
-        TV.appendChild(TVProgressContener)
-        wrapper.appendChild(TV)
-      }
     }
     return wrapper
   },
@@ -674,8 +453,7 @@ Module.register("MMM-Freebox", {
 
   getScripts: function () {
     return [
-      "moment.js",
-      "configMerge.min.js"
+      "moment.js"
     ]
   },
 

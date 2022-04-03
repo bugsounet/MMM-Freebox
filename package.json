@@ -1,6 +1,6 @@
 {
   "name": "MMM-Freebox",
-  "version": "1.4.2",
+  "version": "2.0.0",
   "description": "Display Freebox informations",
   "main": "MMM-Freebox.js",
   "keywords": [
@@ -9,22 +9,22 @@
     "freebox"
   ],
   "scripts": {
-    "postinstall": "installer/postinstall.sh"
+    "postinstall": "installer/postinstall.sh",
+    "register": "node installer/Freebox_Login.js",
+    "update": "installer/update.sh"
   },
   "author": "bugs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bugsounet/MMM-Freebox/issues"
+    "url": "https://forum.bugsounet.fr"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/bugsounet/MMM-Freebox"
   },
-  "homepage": "https://github.com/bugsounet/MMM-Freebox",
+  "homepage": "https://forum.bugsounet.fr",
   "dependencies": {
     "@bugsounet/freebox": "^1.0.0",
-    "fast-xml-parser": "^3.17.4",
-    "ping": "^0.2.2",
-    "wget-improved": "^3.2.0"
+    "ping": "^0.2.2"
   }
 }

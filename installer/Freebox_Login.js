@@ -14,4 +14,4 @@ function retry() {
   })
 }
 
-main().catch(err => retry() ) 
+main().catch(err => retry() )
