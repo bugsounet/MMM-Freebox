@@ -1,6 +1,5 @@
 var NodeHelper = require('node_helper')
 const { Freebox } = require("@bugsounet/freebox")
-const npmCheck = require("@bugsounet/npmcheck")
 var _ = require("underscore")
 var ping = require('ping')
 
@@ -59,15 +58,6 @@ module.exports = NodeHelper.create({
       case "INIT":
         this.config = payload
         if (this.config.debug) FB = (...args) => { console.log("[Freebox]", ...args) }
-        if (this.config.NPMCheck.useChecker) {
-          var cfg = {
-            dirName: __dirname,
-            moduleName: this.name,
-            timer: this.config.NPMCheck.delay,
-            debug: this.config.debug
-          }
-          this.Checker= new npmCheck(cfg, update => { this.sendSocketNotification("NPM_UPDATE", update)} )
-        }
         this.scan()
         break
       case "SCAN":

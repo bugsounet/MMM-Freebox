@@ -1,6 +1,6 @@
 {
   "name": "MMM-Freebox",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "Display Freebox informations",
   "main": "MMM-Freebox.js",
   "keywords": [
@@ -16,16 +16,15 @@
   "author": "bugs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bugsounet/MMM-Freebox/issues"
+    "url": "https://forum.bugsounet.fr"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/bugsounet/MMM-Freebox"
   },
-  "homepage": "https://github.com/bugsounet/MMM-Freebox",
+  "homepage": "https://forum.bugsounet.fr",
   "dependencies": {
     "@bugsounet/freebox": "^1.0.0",
-    "@bugsounet/npmcheck": "^0.9.92",
     "ping": "^0.2.2"
   }
 }
