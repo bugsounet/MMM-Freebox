@@ -18,11 +18,4 @@ Plusieurs modules sont disponibles et permet l'affichage suivant:
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen.png)
 ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/screen2.png)
 
-## Installation
-Le guide d'installation est disponible sur le [Wiki](https://wiki.bugsounet.fr/fr/MMM-Freebox)
-
-## Support et aide
-Toute aide peut-être demandée sur [le forum 4th Party Modules](http://forum.bugsounet.fr)
-
-## Donation
- [Donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TTHRH94Y4KL36&source=url), si vous aimez ce module !
+## This module is now in End Of Life.
