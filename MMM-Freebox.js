@@ -131,16 +131,16 @@ Module.register("MMM-Freebox", {
     var bandWidthIcon = bandWidth.querySelector("#FREE_ICON")
 
     var bandWidthValue = bandWidth.querySelector("#FREE_VALUE")
-    if (this.config.showIcon) bandWidthIcon.classList.remove("FBhidden")
-    if (this.config.showBandWidth) bandWidth.classList.remove("FBhidden")
+    if (this.config.showIcon) bandWidthIcon.classList.remove("hidden")
+    if (this.config.showBandWidth) bandWidth.classList.remove("hidden")
     bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? ' (Dégroupé): ' : ': ') + this.Freebox.Bandwidth
 
     /** Adresse IP **/
     var IP = document.getElementById("FREE_IP")
     var IPIcon = IP.querySelector("#FREE_ICON")
     var IPDisplay = IP.querySelector("#FREE_VALUE")
-    if (this.config.showIcon) IPIcon.classList.remove("FBhidden")
-    if (this.config.showIP) IP.classList.remove("FBhidden")
+    if (this.config.showIcon) IPIcon.classList.remove("hidden")
+    if (this.config.showIP) IP.classList.remove("hidden")
     IPDisplay.textContent = this.Freebox.IP
 
     /** Appareils connecté je suppose qu'il y a en plus d'un en memoire! donc pas de check... **/
@@ -173,7 +173,7 @@ Module.register("MMM-Freebox", {
       /** Wifi ou Eth ? **/
       var clientAccess = clientSelect.querySelector("#FREE_ACCESS")
       if (this.config.showClientCnxType) {
-        clientAccess.classList.remove("FBhidden")
+        clientAccess.classList.remove("hidden")
         if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
         else if (client.access_type == "wifi2") clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
         else if (client.access_type == "wifi5") clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
@@ -184,7 +184,7 @@ Module.register("MMM-Freebox", {
 
        /** debit client **/
       var clientDebit = clientSelect.querySelector("#FREE_RATE")
-      if (this.config.showClientRate) clientDebit.classList.remove("FBhidden")
+      if (this.config.showClientRate) clientDebit.classList.remove("hidden")
       clientDebit.textContent = client.debit
 
       /** bouton **/
@@ -194,33 +194,33 @@ Module.register("MMM-Freebox", {
       if (this.config.showButton) clientBouton.classList.remove("FBhidden")
       clientStatus.checked = client.active
       clientIcon.className= client.type + (client.active ? "1" : "0")
-      if (this.config.showIcon) clientIcon.classList.remove("FBhidden")
-      else clientIcon.classList.add("FBhidden")
+      if (this.config.showIcon) clientIcon.classList.remove("hidden")
+      else clientIcon.classList.add("hidden")
 
       /** Eclude @mac **/
       if (cache.show && excludeMac.indexOf(mac) == "-1") {
-        if (this.config.activeOnly && client.active) clientSelect.classList.remove("FBhidden")
-        else if (!this.config.activeOnly) clientSelect.classList.remove("FBhidden")
+        if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
+        else if (!this.config.activeOnly) clientSelect.classList.remove("hidden")
       }
 
       /** activeOnly **/
-      if (this.config.activeOnly && !client.active) clientSelect.classList.add("FBhidden")
+      if (this.config.activeOnly && !client.active) clientSelect.classList.add("hidden")
     })
 
     /** Affichage Débit utilisé en temps réél **/
     var debit = document.getElementById("FREE_DEBIT")
     var debitIcon = debit.querySelector("#FREE_ICON")
     var debitValue = debit.querySelector("#FREE_VALUE")
-    if (this.config.showIcon) debitIcon.classList.remove("FBhidden")
-    if (this.config.showRate) debit.classList.remove("FBhidden")
+    if (this.config.showIcon) debitIcon.classList.remove("hidden")
+    if (this.config.showRate) debit.classList.remove("hidden")
     debitValue.textContent = this.Freebox.Debit
 
     /** Affichage Ping en temps réél **/
     var ping = document.getElementById("FREE_PING")
     var pingIcon = ping.querySelector("#FREE_ICON")
     var pingValue = ping.querySelector("#FREE_VALUE")
-    if (this.config.showIcon) pingIcon.classList.remove("FBhidden")
-    if (this.config.showPing) ping.classList.remove("FBhidden")
+    if (this.config.showIcon) pingIcon.classList.remove("hidden")
+    if (this.config.showPing) ping.classList.remove("hidden")
     pingValue.textContent = this.Freebox.Ping
 
     /** Appels manqués **/
@@ -231,20 +231,20 @@ Module.register("MMM-Freebox", {
 
     if (this.Freebox.Calls.missed > 0) {
       var call = document.getElementById("FREE_CALL")
-      if (this.config.showMissedCall) call.classList.remove("FBhidden")
+      if (this.config.showMissedCall) call.classList.remove("hidden")
       var callIco = call.querySelector("#FREE_ICON")
-      if (this.config.showIcon) callIco.classList.remove("FBhidden")
+      if (this.config.showIcon) callIco.classList.remove("hidden")
       var callMissed = call.querySelector("#FREE_MISSED")
       callMissed.textContent = this.Freebox.Calls.missed + ((this.Freebox.Calls.missed > 1) ? " appels manqués" : " appel manqué")
 
       for (let [nb, value] of Object.entries(this.Freebox.Calls.who)) {
         if (nb >= this.maxMissedCall) break
         var whoMissed = document.getElementsByClassName("Missed_" + nb)
-        if (this.config.showMissedCall) whoMissed[0].classList.remove("FBhidden")
+        if (this.config.showMissedCall) whoMissed[0].classList.remove("hidden")
         var whoIcon = whoMissed[0].querySelector("#FREE_ICON")
         var whoName = whoMissed[0].querySelector("#FREE_CALLER")
         var whoDate = whoMissed[0].querySelector("#FREE_TEXT")
-        if (this.config.showIcon) whoIcon.classList.remove("FBhidden")
+        if (this.config.showIcon) whoIcon.classList.remove("hidden")
         whoName.textContent = value.name
         whoDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") + " :"
       }
@@ -269,11 +269,11 @@ Module.register("MMM-Freebox", {
       /** Afficage de la bande passante **/
       var bandWidth = document.createElement("div")
       bandWidth.id = "FREE_BAND"
-      bandWidth.classList.add("FBhidden")
+      bandWidth.classList.add("hidden")
 
       var bandWidthIcon = document.createElement("div")
       bandWidthIcon.className = "bandwidth"
-      bandWidthIcon.classList.add("FBhidden")
+      bandWidthIcon.classList.add("hidden")
       bandWidthIcon.id= "FREE_ICON"
       bandWidth.appendChild(bandWidthIcon)
 
@@ -286,11 +286,11 @@ Module.register("MMM-Freebox", {
       /** Adresse IP **/
       var IP = document.createElement("div")
       IP.id = "FREE_IP"
-      IP.classList.add("FBhidden")
+      IP.classList.add("hidden")
       var IPIcon = document.createElement("div")
       IPIcon.id= "FREE_ICON"
       IPIcon.className = "ip"
-      IPIcon.classList.add("FBhidden")
+      IPIcon.classList.add("hidden")
       IP.appendChild(IPIcon)
       var IPText = document.createElement("div")
       IPText.id = "FREE_TEXT"
@@ -312,12 +312,12 @@ Module.register("MMM-Freebox", {
           var client = document.createElement("div")
           client.id= "FREE_CLIENT"
           client.className= id
-          client.classList.add("FBhidden")
+          client.classList.add("hidden")
 
           var clientIcon = document.createElement("div")
           clientIcon.id= "FREE_ICON"
           clientIcon.className= type + "0"
-          clientIcon.classList.add("FBhidden")
+          clientIcon.classList.add("hidden")
           client.appendChild(clientIcon)
 
           var clientName = document.createElement("div")
@@ -335,13 +335,13 @@ Module.register("MMM-Freebox", {
           var clientCnxType= document.createElement("div")
           clientCnxType.id = "FREE_ACCESS"
           clientCnxType.className= "black"
-          clientCnxType.classList.add("FBhidden")
+          clientCnxType.classList.add("hidden")
           client.appendChild(clientCnxType)
 
           var clientDebit = document.createElement("div")
           clientDebit.id ="FREE_RATE"
           clientDebit.textContent = "-"
-          clientDebit.classList.add("FBhidden")
+          clientDebit.classList.add("hidden")
           client.appendChild(clientDebit)
 
           var clientStatus = document.createElement("div")
@@ -370,11 +370,11 @@ Module.register("MMM-Freebox", {
       /** debit utilisé **/
       var debit = document.createElement("div")
       debit.id = "FREE_DEBIT"
-      debit.classList.add("FBhidden")
+      debit.classList.add("hidden")
       var debitIcon = document.createElement("div")
       debitIcon.id= "FREE_ICON"
       debitIcon.className = "bandwidth"
-      debitIcon.classList.add("FBhidden")
+      debitIcon.classList.add("hidden")
       debit.appendChild(debitIcon)
       var debitText = document.createElement("div")
       debitText.id = "FREE_TEXT"
@@ -389,11 +389,11 @@ Module.register("MMM-Freebox", {
       /** ping **/
       var ping = document.createElement("div")
       ping.id = "FREE_PING"
-      ping.classList.add("FBhidden")
+      ping.classList.add("hidden")
       var pingIcon = document.createElement("div")
       pingIcon.id= "FREE_ICON"
       pingIcon.className = "ping"
-      pingIcon.classList.add("FBhidden")
+      pingIcon.classList.add("hidden")
       ping.appendChild(pingIcon)
       var pingText = document.createElement("div")
       pingText.id = "FREE_TEXT"
@@ -408,11 +408,11 @@ Module.register("MMM-Freebox", {
       /** Appels Manqués **/
       var call = document.createElement("div")
       call.id = "FREE_CALL"
-      call.classList.add("FBhidden")
+      call.classList.add("hidden")
       var callIcon = document.createElement("div")
       callIcon.id = "FREE_ICON"
       callIcon.className = "missing"
-      callIcon.classList.add("FBhidden")
+      callIcon.classList.add("hidden")
       call.appendChild(callIcon)
       var callMissed = document.createElement("div")
       callMissed.id = "FREE_MISSED"
@@ -430,11 +430,11 @@ Module.register("MMM-Freebox", {
           var who = document.createElement("div")
           who.id = "FREE_WHO"
           who.className= "Missed_"+ x
-          who.classList.add("FBhidden")
+          who.classList.add("hidden")
           var whoIcon = document.createElement("div")
           whoIcon.id = "FREE_ICON"
           whoIcon.className = "missed"
-          whoIcon.classList.add("FBhidden")
+          whoIcon.classList.add("hidden")
           who.appendChild(whoIcon)
           var whoDate = document.createElement("div")
           whoDate.id = "FREE_TEXT"

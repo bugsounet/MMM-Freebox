@@ -333,6 +333,9 @@
 }
 
 /* ------------ */
+.FBhidden {
+  display: none;
+}
 
 input.switch-round + label {
   padding: 1px;
@@ -404,11 +407,6 @@ input.switch-round:checked + label:after {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-
-.FBhidden {
-    display:none;
 }
 
 #FREE_VPN {
@@ -516,6 +514,7 @@ meter::-webkit-meter-inner-element {
 #FREE_PROGRESS_END {
   line-height: 10px;
 }
+
 
 #FREE_PROGRAM.hidden,
 #FREE_PROGRESS.hidden,
