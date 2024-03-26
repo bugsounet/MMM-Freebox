@@ -5,7 +5,6 @@ Module.register("MMM-Freebox", {
   defaults: {
     debug: false,
     verbose: false,
-    token: "",
     updateDelay:  5 * 1000,
     activeOnly: false,
     showIcon: true,
@@ -14,11 +13,9 @@ Module.register("MMM-Freebox", {
     showRate: true,
     showClient: true,
     showClientRate: true,
-    showClientIP: false,
+    showClientIP: true,
     showClientCnxType: true,
     showFreePlayer: true,
-    showMissedCall: true,
-    maxMissed: 3,
     showIP: true,
     showPing: true,
     pingAdress: "google.fr",
@@ -40,12 +37,9 @@ Module.register("MMM-Freebox", {
       "Type": null,
       "Clients": [],
       "Cache": {},
-      "Calls" : [],
-      "MissedCall": 0,
       "Ping": null
     }
 
-    this.maxMissedCall = 0
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg) }
     if (this.config.excludeMac.length > 0) {
       /** normalise les adresses MAC en majuscule **/
@@ -69,9 +63,6 @@ Module.register("MMM-Freebox", {
       case "INITIALIZED":
         this.Init = true
         this.cache(payload)
-        break
-      case "MISSED_CALL":
-        this.Freebox.MissedCall = payload
         break
       case "CACHE":
         this.cache(payload)
@@ -116,7 +107,6 @@ Module.register("MMM-Freebox", {
     this.Freebox.Debit = payload.Debit
     this.Freebox.IP = payload.IP
     this.Freebox.Clients = payload.Clients
-    this.Freebox.Calls = payload.Calls
     this.Freebox.Ping = payload.Ping
     FB("Result:", this.Freebox)
     this.displayDom()
@@ -177,6 +167,8 @@ Module.register("MMM-Freebox", {
         if (client.access_type == "ethernet") clientAccess.className= "ethernet"+ client.eth
         else if (client.access_type == "wifi2") clientAccess.className ="wifi2_"+ (client.signal_bar ? client.signal_bar : 0)
         else if (client.access_type == "wifi5") clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
+        else if (client.access_type == "wifi6") clientAccess.className ="wifi6_"+ (client.signal_bar ? client.signal_bar : 0)
+        else if (client.access_type == "wifi7") clientAccess.className ="wifi7_"+ (client.signal_bar ? client.signal_bar : 0)
         else if (client.access_type == "freeplug") clientAccess.className= "freeplug"
         else if (client.access_type == "sfp") clientAccess.className= "sfp"
         else clientAccess.className = "black"
@@ -223,32 +215,6 @@ Module.register("MMM-Freebox", {
     if (this.config.showPing) ping.classList.remove("hidden")
     pingValue.textContent = this.Freebox.Ping
 
-    /** Appels manqués **/
-    if (this.Freebox.Calls.missed != this.Freebox.MissedCall) {
-      FB("Nouvel appel manqué - Rechargement du cache.")
-      return this.sendSocketNotification("CACHE")
-    }
-
-    if (this.Freebox.Calls.missed > 0) {
-      var call = document.getElementById("FREE_CALL")
-      if (this.config.showMissedCall) call.classList.remove("hidden")
-      var callIco = call.querySelector("#FREE_ICON")
-      if (this.config.showIcon) callIco.classList.remove("hidden")
-      var callMissed = call.querySelector("#FREE_MISSED")
-      callMissed.textContent = this.Freebox.Calls.missed + ((this.Freebox.Calls.missed > 1) ? " appels manqués" : " appel manqué")
-
-      for (let [nb, value] of Object.entries(this.Freebox.Calls.who)) {
-        if (nb >= this.maxMissedCall) break
-        var whoMissed = document.getElementsByClassName("Missed_" + nb)
-        if (this.config.showMissedCall) whoMissed[0].classList.remove("hidden")
-        var whoIcon = whoMissed[0].querySelector("#FREE_ICON")
-        var whoName = whoMissed[0].querySelector("#FREE_CALLER")
-        var whoDate = whoMissed[0].querySelector("#FREE_TEXT")
-        if (this.config.showIcon) whoIcon.classList.remove("hidden")
-        whoName.textContent = value.name
-        whoDate.textContent = moment(value.date, "X").format("ddd DD MMM à HH:mm") + " :"
-      }
-    }
   },
 
   getDom: function () {
@@ -404,47 +370,6 @@ Module.register("MMM-Freebox", {
 
       ping.appendChild(pingDisplay)
       wrapper.appendChild(ping)
-
-      /** Appels Manqués **/
-      var call = document.createElement("div")
-      call.id = "FREE_CALL"
-      call.classList.add("hidden")
-      var callIcon = document.createElement("div")
-      callIcon.id = "FREE_ICON"
-      callIcon.className = "missing"
-      callIcon.classList.add("hidden")
-      call.appendChild(callIcon)
-      var callMissed = document.createElement("div")
-      callMissed.id = "FREE_MISSED"
-      call.appendChild(callMissed)
-
-      wrapper.appendChild(call)
-
-      if (this.Freebox.MissedCall > 0) {
-        if (this.Freebox.MissedCall > this.config.maxMissed) {
-          this.maxMissedCall = this.config.maxMissed
-        }
-        else this.maxMissedCall = this.Freebox.MissedCall
-
-        for (var x =0;x < this.maxMissedCall; x++) {
-          var who = document.createElement("div")
-          who.id = "FREE_WHO"
-          who.className= "Missed_"+ x
-          who.classList.add("hidden")
-          var whoIcon = document.createElement("div")
-          whoIcon.id = "FREE_ICON"
-          whoIcon.className = "missed"
-          whoIcon.classList.add("hidden")
-          who.appendChild(whoIcon)
-          var whoDate = document.createElement("div")
-          whoDate.id = "FREE_TEXT"
-          who.appendChild(whoDate)
-          var whoName = document.createElement("div")
-          whoName.id = "FREE_CALLER"
-          who.appendChild(whoName)
-          wrapper.appendChild(who)
-        }
-      }
     }
     return wrapper
   },
