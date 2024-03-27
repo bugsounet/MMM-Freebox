@@ -176,8 +176,8 @@ module.exports = NodeHelper.create({
           device.signal_percent = this.wifiPercent(device.signal)
           device.signal_bar = this.wifiBar(device.signal_percent)
         }
-        if (client.access_point?.tx_rate) device.debit = this.convert(client.access_point.tx_rate*10,1)
-        else device.debit = "0 Kb/s"
+        if (client.access_point?.tx_rate) device.debit = this.convert(client.access_point.tx_rate*8,0,1) // Warn debit en bytes! (base 8)
+        else device.debit = "0 Ko/s"
       }
       
       if (this.config.showClientRate || this.config.showClientCnxType) {
@@ -189,7 +189,7 @@ module.exports = NodeHelper.create({
             macList.forEach(mac => {
               if (client.l2ident.id == mac) {
                 if (res[info.id] && res[info.id].tx_bytes_rate) {
-                  device.debit = this.convert(res[info.id].tx_bytes_rate,1)
+                  device.debit = this.convert(res[info.id].tx_bytes_rate,0,1)
                   device.access_type = "ethernet"
                   device.eth = info.id
                 }
@@ -252,12 +252,6 @@ module.exports = NodeHelper.create({
       this.init = true
     }
 
-    FB("Quering Connexion...")
-    const cnx = await freebox.request({
-      method: "GET",
-      url: "connection/"
-    })
-
     FB("Quering Client...")
     const clients = await freebox.request({
       method: "GET",
@@ -310,10 +304,15 @@ module.exports = NodeHelper.create({
         })
       }
     }
+    FB("Quering Connexion...")
+    const cnx = await freebox.request({
+      method: "GET",
+      url: "connection/"
+    })
     FB("Done!")
 
-    bandwidth = this.convert(cnx.data.result.bandwidth_down,2) + " - " + this.convert(cnx.data.result.bandwidth_up,2)
-    debit = this.convert(cnx.data.result.rate_down,2) +" - " + this.convert(cnx.data.result.rate_up,2)
+    bandwidth = this.convert(cnx.data.result.bandwidth_down,1,2) + " - " + this.convert(cnx.data.result.bandwidth_up,1,2)
+    debit = this.convert(cnx.data.result.rate_down,0,2) +" - " + this.convert(cnx.data.result.rate_up,0,2)
     type = (cnx.data.result.media == "xdsl") ? "xDSL" : ((cnx.data.result.media == "ftth") ? "FTTH" : "Inconnu")
     degroup = (cnx.data.result.type == "rfc2684") ? true : false
 
@@ -338,12 +337,26 @@ module.exports = NodeHelper.create({
     return output
   },
   
-  /** converti les octets en G/M/K **/
-  convert: function(bytes,FixTo) {
-    if (bytes>1000000000) bytes=(bytes/1000000000).toFixed(FixTo) + " Gb/s"
-    else if (bytes>1000000) bytes=(bytes/1000000).toFixed(FixTo) + " Mb/s"
-    else bytes=(bytes/1000).toFixed(FixTo) + " Kb/s"
-    return bytes
+  convert: function(data,type=0,FixTo=0) {
+    // type 0: octet / type:1 bytes
+    var value = Number(data);
+
+    if (value>1000000000) {
+      value=Number((value/1000000000).toFixed(FixTo))
+      if (type === 0) value = value + " Go/s"
+      if (type === 1) value = value + " Gb/s"
+      return value
+    }
+    if (value>1000000) {
+      value=Number((value/1000000).toFixed(FixTo))
+      if (type === 0) value = value + " Mo/s"
+      if (type === 1) value = value + " Mb/s"
+      return value
+    }
+    value=Number((value/1000).toFixed(FixTo))
+    if (type === 0) value = value + " Ko/s"
+    if (type === 1) value = value + " Kb/s"
+    return value
   },
 
   /** Signal wifi en % **/
