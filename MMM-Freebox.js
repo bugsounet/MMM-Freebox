@@ -6,6 +6,7 @@ Module.register("MMM-Freebox", {
     debug: false,
     verbose: false,
     updateDelay:  5 * 1000,
+    zoom: 100,
     activeOnly: false,
     showIcon: true,
     showButton: true,
@@ -14,7 +15,7 @@ Module.register("MMM-Freebox", {
     showClient: true,
     showClientRate: true,
     showEthClientRate: false,
-    showClientIP: true,
+    showClientIP: false,
     showClientCnxType: true,
     showFree: true,
     showIP: true,
@@ -227,7 +228,7 @@ Module.register("MMM-Freebox", {
     var client = this.Freebox.Cache
 
     var wrapper = document.createElement("div")
-
+    wrapper.id = "FREE"
     if (!this.Init) {
       wrapper.id = "FREE_LOADING"
       wrapper.innerHTML = this.translate("LOADING")
@@ -236,6 +237,7 @@ Module.register("MMM-Freebox", {
       wrapper.appendChild(free)
     } else {
       wrapper.innerHTML = ""
+      wrapper.style.zoom = `${this.config.zoom}%`;
       /** on prepare le DOM en cachant tout **/
 
       /** Afficage de la bande passante **/

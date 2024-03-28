@@ -5,6 +5,7 @@
 
 #FREE_LOGO {
     background-image: url(resources/Freebox.png);
+    max-width: 200px;
     height: 62px;
     background-size: 100%;
     background-position: center;
