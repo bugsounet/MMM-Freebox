@@ -71,19 +71,19 @@ module.exports = NodeHelper.create({
   },
 
   sendInfo: function (noti, payload) {
-    FB("Send notification: " + noti, this.config.verbose ? payload : "")
+    if (this.config.verbose) FB(`Send notification: ${noti}`, payload)
     this.sendSocketNotification(noti, payload)
   },
 
   makeCache: function (res) {
     this.cache = {}
-    this.sendSocketNotification("debug", res)
+    if (this.config.debug )this.sendSocketNotification("debug", res)
     if (Object.keys(res.Client).length > 0) {
       for (let [item, client] of Object.entries(res.Client)) {
         this.cache[client.l2ident.id] = {
           name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
           type: client.host_type,
-          show: (!this.config.showFreePlayer && client.vendor_name == "Freebox SAS") ? false : this.config.showClient
+          show: (!this.config.showFree && client.vendor_name.toLowerCase() == "freebox sas") ? false : this.config.showClient
         }
       }
     }
@@ -146,7 +146,11 @@ module.exports = NodeHelper.create({
     res.Clients = []
 
     var device = {}
-
+    /*
+console.log(res.Client[7])
+console.log(res.Client[0])
+return
+*/
     res.Client.forEach(client=> {
     /** Array of client with used value in object **/
       device = {
@@ -157,6 +161,7 @@ module.exports = NodeHelper.create({
         vendor: client.vendor_name,
         debit: null,
         active: client.active,
+        repeater: false,
         access_type: null,
         signal: null,
         signal_percent: null,
@@ -179,17 +184,17 @@ module.exports = NodeHelper.create({
         if (client.access_point?.tx_rate) device.debit = this.convert(client.access_point.tx_rate*8,0,1) // Warn debit en bytes! (base 8)
         else device.debit = "0 Ko/s"
       }
-      
+
       if (this.config.showClientRate || this.config.showClientCnxType) {
-  
         res.EthCnx.forEach(info=> {
           if (info.mac_list) {
-            if(!info.mac_list.length) return // return an object ???
+            if (!info.mac_list.length) return // return an object ???
             var macList = info.mac_list.map((mac_list)=>{return mac_list.mac})
             macList.forEach(mac => {
               if (client.l2ident.id == mac) {
-                if (res[info.id] && res[info.id].tx_bytes_rate) {
-                  device.debit = this.convert(res[info.id].tx_bytes_rate,0,1)
+                if (client.access_point?.connectivity_type === "wifi" && client.access_point?.type === "repeater") device.repeater = true
+                else if (res[info.id] && res[info.id].tx_bytes_rate) {
+                  if (this.config.showEthClientRate) device.debit = this.convert(res[info.id].tx_bytes_rate,0,1)
                   device.access_type = "ethernet"
                   device.eth = info.id
                 }
@@ -201,6 +206,9 @@ module.exports = NodeHelper.create({
           }
         })
       }
+
+      // consider virtual machine
+      if (!client.access_point && client.active) device.access_type = "VM"
       res.Clients.push(device)
     })
 

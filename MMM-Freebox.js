@@ -13,9 +13,10 @@ Module.register("MMM-Freebox", {
     showRate: true,
     showClient: true,
     showClientRate: true,
+    showEthClientRate: false,
     showClientIP: true,
     showClientCnxType: true,
-    showFreePlayer: true,
+    showFree: true,
     showIP: true,
     showPing: true,
     pingAdress: "google.fr",
@@ -169,9 +170,14 @@ Module.register("MMM-Freebox", {
         else if (client.access_type == "wifi5") clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
         else if (client.access_type == "wifi6") clientAccess.className ="wifi6_"+ (client.signal_bar ? client.signal_bar : 0)
         else if (client.access_type == "wifi7") clientAccess.className ="wifi7_"+ (client.signal_bar ? client.signal_bar : 0)
+        /* can't really code it ... but can be handled with et5/eth6
         else if (client.access_type == "freeplug") clientAccess.className= "freeplug"
         else if (client.access_type == "sfp") clientAccess.className= "sfp"
+        */
+        else if (client.access_type == "VM") clientAccess.className= "VM"
         else clientAccess.className = "black"
+        if (client.repeater) clientAccess.classList.add("repeater");
+        else clientAccess.classList.remove("repeater");
       }
 
        /** debit client **/
@@ -189,7 +195,7 @@ Module.register("MMM-Freebox", {
       if (this.config.showIcon) clientIcon.classList.remove("hidden")
       else clientIcon.classList.add("hidden")
 
-      /** Eclude @mac **/
+      /** Exclude @mac **/
       if (cache.show && excludeMac.indexOf(mac) == "-1") {
         if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden")
         else if (!this.config.activeOnly) clientSelect.classList.remove("hidden")
