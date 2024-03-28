@@ -6,7 +6,7 @@ Module.register("MMM-Freebox", {
     debug: false,
     verbose: false,
     updateDelay:  5 * 1000,
-    zoom: 100,
+    zoom: 110,
     activeOnly: false,
     showIcon: true,
     showButton: true,
