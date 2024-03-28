@@ -146,11 +146,11 @@ module.exports = NodeHelper.create({
     res.Clients = []
 
     var device = {}
-    /*
-console.log(res.Client[7])
-console.log(res.Client[0])
-return
-*/
+    
+console.log(res.Client[3])
+console.log(res.Client[10])
+
+
     res.Client.forEach(client=> {
     /** Array of client with used value in object **/
       device = {
@@ -207,8 +207,9 @@ return
         })
       }
 
-      // consider virtual machine
-      if (!client.access_point && client.active) device.access_type = "VM"
+      // consider virtual machine is connected without access point and with only 1 names length !
+      // -> with only 1 names length -> prevent fake VM detect on disconnect (don't find other solution...)
+      if (!client.access_point && client.active && client.names.length === 1) device.access_type = "VM"
       res.Clients.push(device)
     })
 

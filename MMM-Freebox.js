@@ -244,7 +244,7 @@ Module.register("MMM-Freebox", {
       bandWidth.classList.add("hidden")
 
       var bandWidthIcon = document.createElement("div")
-      bandWidthIcon.className = "bandwidth"
+      bandWidthIcon.className = "internet"
       bandWidthIcon.classList.add("hidden")
       bandWidthIcon.id= "FREE_ICON"
       bandWidth.appendChild(bandWidthIcon)
@@ -345,7 +345,7 @@ Module.register("MMM-Freebox", {
       debit.classList.add("hidden")
       var debitIcon = document.createElement("div")
       debitIcon.id= "FREE_ICON"
-      debitIcon.className = "bandwidth"
+      debitIcon.className = "rate"
       debitIcon.classList.add("hidden")
       debit.appendChild(debitIcon)
       var debitText = document.createElement("div")
