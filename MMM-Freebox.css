@@ -76,7 +76,7 @@
 
 #FREE_ICON.car0 {
     background-image: url(resources/car.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.car1 {
@@ -85,7 +85,7 @@
 
 #FREE_ICON.workstation0 {
     background-image: url(resources/desktop.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.workstation1 {
@@ -94,7 +94,7 @@
 
 #FREE_ICON.other0 {
     background-image: url(resources/other.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.other1 {
@@ -103,7 +103,7 @@
 
 #FREE_ICON.laptop0 {
     background-image: url(resources/laptop.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.laptop1 {
@@ -113,7 +113,7 @@
 
 #FREE_ICON.smartphone0 {
     background-image: url(resources/phone.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.smartphone1 {
@@ -122,7 +122,7 @@
 
 #FREE_ICON.tablet0 {
     background-image: url(resources/tablet.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.tablet1 {
@@ -131,7 +131,7 @@
 
 #FREE_ICON.printer0 {
     background-image: url(resources/printer.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.printer1 {
@@ -140,7 +140,7 @@
 
 #FREE_ICON.vg_console0 {
     background-image: url(resources/game.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.vg_console1 {
@@ -149,7 +149,7 @@
 
 #FREE_ICON.television0 {
     background-image: url(resources/television.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.television1 {
@@ -158,7 +158,7 @@
 
 #FREE_ICON.nas0 {
     background-image: url(resources/nas.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.nas1 {
@@ -167,7 +167,7 @@
 
 #FREE_ICON.ip_camera0 {
     background-image: url(resources/camera.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.ip_camera1 {
@@ -176,7 +176,7 @@
 
 #FREE_ICON.ip_phone0 {
     background-image: url(resources/ip_phone.png);
-
+    opacity: 0.3;
 }
 
 #FREE_ICON.ip_phone1 {
@@ -185,7 +185,7 @@
 
 #FREE_ICON.networking_device0 {
     background-image: url(resources/networking.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 #FREE_ICON.networking_device1 {
@@ -194,9 +194,8 @@
 
 #FREE_ICON.multimedia_device0 {
     background-image: url(resources/speaker.png);
-    opacity: 0.4;
+    opacity: 0.3;
 }
-
 
 #FREE_ICON.multimedia_device1 {
     background-image: url(resources/speaker.png);
@@ -271,49 +270,91 @@
     content: 'R';
 }
 
+#FREE_ACCESS.wifi7_0,
+#FREE_ACCESS.wifi6_0,
 #FREE_ACCESS.wifi5_0,
 #FREE_ACCESS.wifi2_0 {
-    background-image: url(resources/signal0.png);
+    background-image: url(resources/wifi/signal0.png);
 }
 
 #FREE_ACCESS.wifi2_1 {
-    background-image: url(resources/signal2_1.png);
+    background-image: url(resources/wifi/signal2_1.png);
 }
 
 #FREE_ACCESS.wifi2_2 {
-    background-image: url(resources/signal2_2.png);
+    background-image: url(resources/wifi/signal2_2.png);
 }
 
 #FREE_ACCESS.wifi2_3 {
-    background-image: url(resources/signal2_3.png);
+    background-image: url(resources/wifi/signal2_3.png);
 }
 
 #FREE_ACCESS.wifi2_4 {
-    background-image: url(resources/signal2_4.png);
+    background-image: url(resources/wifi/signal2_4.png);
 }
 
 #FREE_ACCESS.wifi2_5 {
-    background-image: url(resources/signal2_5.png);
+    background-image: url(resources/wifi/signal2_5.png);
 }
 
 #FREE_ACCESS.wifi5_1 {
-    background-image: url(resources/signal5_1.png);
+    background-image: url(resources/wifi/signal5_1.png);
 }
 
 #FREE_ACCESS.wifi5_2 {
-    background-image: url(resources/signal5_2.png);
+    background-image: url(resources/wifi/signal5_2.png);
 }
 
 #FREE_ACCESS.wifi5_3 {
-    background-image: url(resources/signal5_3.png);
+    background-image: url(resources/wifi/signal5_3.png);
 }
 
 #FREE_ACCESS.wifi5_4 {
-    background-image: url(resources/signal5_4.png);
+    background-image: url(resources/wifi/signal5_4.png);
 }
 
 #FREE_ACCESS.wifi5_5 {
-    background-image: url(resources/signal5_5.png);
+    background-image: url(resources/wifi/signal5_5.png);
+}
+
+#FREE_ACCESS.wifi6_1 {
+    background-image: url(resources/wifi/signal6_1.png);
+}
+
+#FREE_ACCESS.wifi6_2 {
+    background-image: url(resources/wifi/signal6_2.png);
+}
+
+#FREE_ACCESS.wifi6_3 {
+    background-image: url(resources/wifi/signal6_3.png);
+}
+
+#FREE_ACCESS.wifi6_4 {
+    background-image: url(resources/wifi/signal6_4.png);
+}
+
+#FREE_ACCESS.wifi6_5 {
+    background-image: url(resources/wifi/signal6_5.png);
+}
+
+#FREE_ACCESS.wifi7_1 {
+    background-image: url(resources/wifi/signal7_1.png);
+}
+
+#FREE_ACCESS.wifi7_2 {
+    background-image: url(resources/wifi/signal7_2.png);
+}
+
+#FREE_ACCESS.wifi7_3 {
+    background-image: url(resources/wifi/signal7_3.png);
+}
+
+#FREE_ACCESS.wifi7_4 {
+    background-image: url(resources/wifi/signal7_4.png);
+}
+
+#FREE_ACCESS.wifi7_5 {
+    background-image: url(resources/wifi/signal7_5.png);
 }
 
 #FREE_ACCESS.ethernet1 {

@@ -169,7 +169,7 @@ console.log(res.Client[10])
         eth: null
       }
       
-      let ip = client.l3connectivities.find(cnx => cnx.af === "ipv4" && cnx.active)
+      let ip = client?.l3connectivities.find(cnx => cnx.af === "ipv4" && cnx.active)
       device.ip = ip ? ip.addr : null
       if (client.access_point?.connectivity_type === "wifi") {
         if (client.access_point?.wifi_information.band === "2d4g") device.access_type= "wifi2"
