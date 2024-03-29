@@ -217,38 +217,93 @@
    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWFjY2Vzcy1wb2ludC1uZXR3b3JrIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTQuOTMsMy45M0MzLjEyLDUuNzQgMiw4LjI0IDIsMTFDMiwxMy43NiAzLjEyLDE2LjI2IDQuOTMsMTguMDdMNi4zNCwxNi42NkM0Ljg5LDE1LjIyIDQsMTMuMjIgNCwxMUM0LDguNzkgNC44OSw2Ljc4IDYuMzQsNS4zNEw0LjkzLDMuOTNNMTkuMDcsMy45M0wxNy42Niw1LjM0QzE5LjExLDYuNzggMjAsOC43OSAyMCwxMUMyMCwxMy4yMiAxOS4xMSwxNS4yMiAxNy42NiwxNi42NkwxOS4wNywxOC4wN0MyMC44OCwxNi4yNiAyMiwxMy43NiAyMiwxMUMyMiw4LjI0IDIwLjg4LDUuNzQgMTkuMDcsMy45M003Ljc2LDYuNzZDNi42Nyw3Ljg1IDYsOS4zNSA2LDExQzYsMTIuNjUgNi42NywxNC4xNSA3Ljc2LDE1LjI0TDkuMTcsMTMuODNDOC40NSwxMy4xMSA4LDEyLjExIDgsMTFDOCw5Ljg5IDguNDUsOC44OSA5LjE3LDguMTdMNy43Niw2Ljc2TTE2LjI0LDYuNzZMMTQuODMsOC4xN0MxNS41NSw4Ljg5IDE2LDkuODkgMTYsMTFDMTYsMTIuMTEgMTUuNTUsMTMuMTEgMTQuODMsMTMuODNMMTYuMjQsMTUuMjRDMTcuMzMsMTQuMTUgMTgsMTIuNjUgMTgsMTFDMTgsOS4zNSAxNy4zMyw3Ljg1IDE2LjI0LDYuNzZNMTIsOUEyLDIgMCAwLDAgMTAsMTFBMiwyIDAgMCwwIDEyLDEzQTIsMiAwIDAsMCAxNCwxMUEyLDIgMCAwLDAgMTIsOU0xMSwxNVYxOUgxMEExLDEgMCAwLDAgOSwyMEgyVjIySDlBMSwxIDAgMCwwIDEwLDIzSDE0QTEsMSAwIDAsMCAxNSwyMkgyMlYyMEgxNUExLDEgMCAwLDAgMTQsMTlIMTNWMTVIMTFaIiAvPjwvc3ZnPg==);
 }
 
-/* freebox */
+
+#FREE_ICON.freebox_crystal0 {
+  background-image: url(resources/players.png);
+  background-position: 0 0%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_crystal1 {
+  background-image: url(resources/players.png);
+  background-position: 0 6%;
+}
 
 #FREE_ICON.freebox_delta0 {
-    background-image: url(resources/delta0.png);
-}
-
-#FREE_ICON.freebox_mini0 {
-    background-image: url(resources/mini0.png);
-}
-
-#FREE_ICON.freebox_player0 {
-    background-image: url(resources/player0.png);
-}
-
-#FREE_ICON.freebox_hd0 {
-    background-image: url(resources/V50.png);
+  background-image: url(resources/players.png);
+  background-position: 0 13%;
+  opacity: 0.3;
 }
 
 #FREE_ICON.freebox_delta1 {
-    background-image: url(resources/delta1.png);
+  background-image: url(resources/players.png);
+  background-position: 0 20%;
 }
 
-#FREE_ICON.freebox_mini1 {
-    background-image: url(resources/mini1.png);
-}
-
-#FREE_ICON.freebox_player1 {
-    background-image: url(resources/player1.png);
+#FREE_ICON.freebox_hd0 {
+  background-image: url(resources/players.png);
+  background-position: 0 27%;
+  opacity: 0.3;
 }
 
 #FREE_ICON.freebox_hd1 {
-    background-image: url(resources/V51.png);
+  background-image: url(resources/players.png);
+  background-position: 0 34%;
+}
+
+#FREE_ICON.freebox_mini0 {
+  background-image: url(resources/players.png);
+  background-position: 0 40%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_mini1 {
+  background-image: url(resources/players.png);
+  background-position: 0 46%;
+}
+
+#FREE_ICON.freebox_one0 {
+  background-image: url(resources/players.png);
+  background-position: 0 53%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_one1 {
+  background-image: url(resources/players.png);
+  background-position: 0 59%;
+}
+
+#FREE_ICON.freebox_player0 {
+  background-image: url(resources/players.png);
+  background-position: 0 66%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_player1 {
+  background-image: url(resources/players.png);
+  background-position: 0 73%;
+}
+
+#FREE_ICON.freebox_pop0 {
+  background-image: url(resources/players.png);
+  background-position: 0 80%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_pop1 {
+  background-image: url(resources/players.png);
+  background-position: 0 86%;
+}
+
+#FREE_ICON.freebox_wifi0 {
+  background-image: url(resources/players.png);
+  background-position: 0 93%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_wifi1 {
+  background-image: url(resources/players.png);
+  background-position: 0 100%;
 }
 
 #FREE_ACCESS {
