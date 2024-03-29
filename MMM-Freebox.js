@@ -171,7 +171,7 @@ Module.register("MMM-Freebox", {
         else if (client.access_type == "wifi5") clientAccess.className ="wifi5_"+ (client.signal_bar ? client.signal_bar : 0)
         else if (client.access_type == "wifi6") clientAccess.className ="wifi6_"+ (client.signal_bar ? client.signal_bar : 0)
         else if (client.access_type == "wifi7") clientAccess.className ="wifi7_"+ (client.signal_bar ? client.signal_bar : 0)
-        /* can't really code it ... but can be handled with et5/eth6
+        /* can't really code it ... but can be handled with eth5/eth6
         else if (client.access_type == "freeplug") clientAccess.className= "freeplug"
         else if (client.access_type == "sfp") clientAccess.className= "sfp"
         */
@@ -268,7 +268,7 @@ Module.register("MMM-Freebox", {
       IP.appendChild(IPIcon)
       var IPText = document.createElement("div")
       IPText.id = "FREE_TEXT"
-      IPText.textContent = "Adresse IP :"
+      IPText.textContent = "Adresse IP:"
       IP.appendChild(IPText)
       var IPDisplay= document.createElement("div")
       IPDisplay.id = "FREE_VALUE"
@@ -371,7 +371,7 @@ Module.register("MMM-Freebox", {
       ping.appendChild(pingIcon)
       var pingText = document.createElement("div")
       pingText.id = "FREE_TEXT"
-      pingText.textContent = "Ping :"
+      pingText.textContent = "Ping:"
       ping.appendChild(pingText)
       var pingDisplay= document.createElement("div")
       pingDisplay.id = "FREE_VALUE"
