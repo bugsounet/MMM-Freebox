@@ -17,11 +17,14 @@ import {createHmac} from 'node:crypto';
 import axios from 'axios';
 */
 
-const https = require('node:https');
-const {createHmac} = require('node:crypto');
-const axios = require('axios');
+/* eslint-disable no-param-reassign */
+/* make as original content */
 
-const FREEBOX_LOCAL_URL = 'https://mafreebox.freebox.fr';
+const https = require("node:https");
+const { createHmac } = require("node:crypto");
+const axios = require("axios");
+
+const FREEBOX_LOCAL_URL = "https://mafreebox.freebox.fr";
 
 // HTTPS Access: https://dev.freebox.fr/sdk/os/#https-access
 const FREEBOX_ROOT_CA = `
@@ -59,345 +62,345 @@ S27oDfFq04XSox7JM9HdTt2hLK96x1T7FpFrBTnALzb7vHv9MhXqAT90fPR/8A==
 -----END CERTIFICATE-----
 `;
 
-const httpsAgentConfig = {ca: FREEBOX_ROOT_CA, rejectUnauthorized: false};
+const httpsAgentConfig = { ca: FREEBOX_ROOT_CA, rejectUnauthorized: false };
 
 class FreeboxRegister {
-	constructor({
-		app_id,
-		app_name,
-		app_version = '1.0.0',
-		device_name = 'NodeJS',
-	} = {}) {
-		// Generate defaults required
-		const suffixId = `_${Math.random().toString(36).slice(2, 9)}`;
+  constructor ({
+    app_id,
+    app_name,
+    app_version = "1.0.0",
+    device_name = "NodeJS"
+  } = {}) {
+    // Generate defaults required
+    const suffixId = `_${Math.random().toString(36).slice(2, 9)}`;
 
-		if (!app_name && !app_id) {
-			app_name = `nodejs_app${suffixId}`;
-			app_id = `fbx.${app_name}`;
-		}
+    if (!app_name && !app_id) {
+      app_name = `nodejs_app${suffixId}`;
+      app_id = `fbx.${app_name}`;
+    }
 
-		if (app_name && !app_id) {
-			app_id = `fbx.${app_name}${suffixId}`;
-		}
+    if (app_name && !app_id) {
+      app_id = `fbx.${app_name}${suffixId}`;
+    }
 
-		if (!app_name && app_id) {
-			app_name = `${app_id}${suffixId}`;
-		}
-		this.appIdentity = {app_id, app_name, app_version, device_name};
-		this.baseURL = FREEBOX_LOCAL_URL;
-		this.baseAPIURL = null;
-		this.axiosInstance = axios.create({
-			httpsAgent: new https.Agent(httpsAgentConfig),
-		});
-	}
+    if (!app_name && app_id) {
+      app_name = `${app_id}${suffixId}`;
+    }
+    this.appIdentity = { app_id, app_name, app_version, device_name };
+    this.baseURL = FREEBOX_LOCAL_URL;
+    this.baseAPIURL = null;
+    this.axiosInstance = axios.create({
+      httpsAgent: new https.Agent(httpsAgentConfig)
+    });
+  }
 
-	async register({silent = false} = {}) {
-		let discoveryResponse;
-		try {
-			discoveryResponse = await this.discovery();
-		} catch (error) {
-			console.error(
-				'\u001B[31m%s\u001B[0m',
-				`Erreur: Vous n'êtes pas connecté à votre reseau Freebox (check "${FREEBOX_LOCAL_URL}").`
-			);
-			throw error;
-		}
+  async register ({ silent = false } = {}) {
+    let discoveryResponse;
+    try {
+      discoveryResponse = await this.discovery();
+    } catch (error) {
+      console.error(
+        "\u001B[31m%s\u001B[0m",
+        `Erreur: Vous n'êtes pas connecté à votre reseau Freebox (check "${FREEBOX_LOCAL_URL}").`
+      );
+      throw error;
+    }
 
-		const {api_domain, https_port, api_base_url, api_version} =
-			discoveryResponse.data;
+    const { api_domain, https_port, api_base_url, api_version }
+			= discoveryResponse.data;
 
-		this.baseAPIURL = `${this.baseURL}${api_base_url}v${api_version
-			.split('.')
-			.shift()
-			.trim()}`;
+    this.baseAPIURL = `${this.baseURL}${api_base_url}v${api_version
+      .split(".")
+      .shift()
+      .trim()}`;
 
-		const {data} = await this.requestAuthorization(this.appIdentity);
-		const {app_token, track_id} = data.result;
+    const { data } = await this.requestAuthorization(this.appIdentity);
+    const { app_token, track_id } = data.result;
 
-		if (!silent) {
-			console.info(
-				'\u001B[36m%s\u001B[0m',
-				`Merci de vérifier l'écran LCD de votre Freebox Server et autoriser l'enregistrement de l'application.`
-			);
-		}
+    if (!silent) {
+      console.info(
+        "\u001B[36m%s\u001B[0m",
+        "Merci de vérifier l'écran LCD de votre Freebox Server et autoriser l'enregistrement de l'application."
+      );
+    }
 
-		await this.getAuthorizationStatus(track_id);
-		const access = {
-			app_token,
-			app_id: this.appIdentity.app_id,
-			api_domain,
-			https_port,
-			api_base_url,
-			api_version,
-		};
+    await this.getAuthorizationStatus(track_id);
+    const access = {
+      app_token,
+      app_id: this.appIdentity.app_id,
+      api_domain,
+      https_port,
+      api_base_url,
+      api_version
+    };
 
-		if (!silent) {
-			console.info(
-				'\u001B[32m%s\u001B[0m',
-				`Votre application a maintenant accès à votre Freebox!\nConservez secrètement les informations suivantes pour vous connecter à votre API Freebox avec MMM-Freebox\n`,
+    if (!silent) {
+      console.info(
+        "\u001B[32m%s\u001B[0m",
+        "Votre application a maintenant accès à votre Freebox!\nConservez secrètement les informations suivantes pour vous connecter à votre API Freebox avec MMM-Freebox\n"
 
-			);
-			console.info(
-				'\u001B[32m%s\u001B[0m',
-				`\nVoici le champ de configuration 'freebox' à reporter dans votre configuration:\n`
-			);
-			console.info("freebox:", access, ",");
-		}
-		return access;
-	}
+      );
+      console.info(
+        "\u001B[32m%s\u001B[0m",
+        "\nVoici le champ de configuration 'freebox' à reporter dans votre configuration:\n"
+      );
+      console.info("freebox:", access, ",");
+    }
+    return access;
+  }
 
-	async request(requestConfig) {
-		return this.axiosInstance.request(requestConfig);
-	}
+  async request (requestConfig) {
+    return this.axiosInstance.request(requestConfig);
+  }
 
-	async discovery() {
-		return this.request({
-			method: 'GET',
-			baseURL: this.baseURL,
-			url: 'api_version',
-		});
-	}
+  async discovery () {
+    return this.request({
+      method: "GET",
+      baseURL: this.baseURL,
+      url: "api_version"
+    });
+  }
 
-	// Require to be connected to local freebox URL
-	async requestAuthorization() {
-		return this.request({
-			method: 'POST',
-			baseURL: this.baseAPIURL,
-			url: 'login/authorize',
-			data: this.appIdentity,
-		});
-	}
+  // Require to be connected to local freebox URL
+  async requestAuthorization () {
+    return this.request({
+      method: "POST",
+      baseURL: this.baseAPIURL,
+      url: "login/authorize",
+      data: this.appIdentity
+    });
+  }
 
-	async getAuthorizationStatus(track_id) {
-		const authorizationStatus = {
-			unknown: 'The app_token is invalid or has been revoked',
-			pending: 'The user has not confirmed the authorization request yet',
-			timeout:
-				'The user did not confirmed the authorization within the given time',
-			granted: 'The app_token is valid and can be used to open a session',
-			denied: 'The user denied the authorization request',
-		};
+  async getAuthorizationStatus (track_id) {
+    const authorizationStatus = {
+      unknown: "The app_token is invalid or has been revoked",
+      pending: "The user has not confirmed the authorization request yet",
+      timeout:
+				"The user did not confirmed the authorization within the given time",
+      granted: "The app_token is valid and can be used to open a session",
+      denied: "The user denied the authorization request"
+    };
 
-		return new Promise((resolve, reject) => {
-			const checkTrackAuthorizationProgress = async () => {
-				try {
-					const response = await this.trackAuthorizationProgress(track_id);
-					const {status} = response.data.result;
+    return new Promise((resolve, reject) => {
+      const checkTrackAuthorizationProgress = async () => {
+        try {
+          const response = await this.trackAuthorizationProgress(track_id);
+          const { status } = response.data.result;
 
-					if (status === 'pending') {
-						return true;
-					}
+          if (status === "pending") {
+            return true;
+          }
 
-					if (status === 'granted') {
-						clearInterval(intervalTrackAuthorizationProgress);
-						resolve(true);
-					} else {
-						clearInterval(intervalTrackAuthorizationProgress);
-						const endStatus = response.data.result.status;
-						const errorData = response.data;
-						// @TODO
-						reject(
-							new Error(
-								`${authorizationStatus[endStatus]}: \n ${JSON.stringify(
-									errorData,
-									null,
-									2,
-								)}`,
-							),
-						);
-					}
-				} catch (error) {
-					clearInterval(intervalTrackAuthorizationProgress);
-					reject(error);
-				}
-			};
+          if (status === "granted") {
+            clearInterval(intervalTrackAuthorizationProgress);
+            resolve(true);
+          } else {
+            clearInterval(intervalTrackAuthorizationProgress);
+            const endStatus = response.data.result.status;
+            const errorData = response.data;
+            // @TODO
+            reject(
+              new Error(
+                `${authorizationStatus[endStatus]}: \n ${JSON.stringify(
+                  errorData,
+                  null,
+                  2
+                )}`
+              )
+            );
+          }
+        } catch (error) {
+          clearInterval(intervalTrackAuthorizationProgress);
+          reject(error);
+        }
+      };
 
-			const intervalTrackAuthorizationProgress = setInterval(
-				checkTrackAuthorizationProgress,
-				2 * 1000,
-			);
-		});
-	}
+      const intervalTrackAuthorizationProgress = setInterval(
+        checkTrackAuthorizationProgress,
+        2 * 1000
+      );
+    });
+  }
 
-	async trackAuthorizationProgress(track_id) {
-		if (
-			!track_id ||
-			(typeof track_id !== 'string' && typeof track_id !== 'number')
-		) {
-			throw new Error('track_id must be a string or a number not null');
-		}
+  async trackAuthorizationProgress (track_id) {
+    if (
+      !track_id
+			|| (typeof track_id !== "string" && typeof track_id !== "number")
+    ) {
+      throw new Error("track_id must be a string or a number not null");
+    }
 
-		return this.request({
-			method: 'GET',
-			baseURL: this.baseAPIURL,
-			url: `login/authorize/${track_id}`,
-		});
-	}
+    return this.request({
+      method: "GET",
+      baseURL: this.baseAPIURL,
+      url: `login/authorize/${track_id}`
+    });
+  }
 }
 
 class Freebox {
-	constructor({
-		app_token,
-		api_domain = FREEBOX_LOCAL_URL,
-		https_port,
-		api_base_url = '/api/',
-		api_version,
-		app_id,
-		app_version, // Optional to open session
-	}) {
-		const validationErrors = [];
+  constructor ({
+    app_token,
+    api_domain = FREEBOX_LOCAL_URL,
+    https_port,
+    api_base_url = "/api/",
+    api_version,
+    app_id,
+    app_version // Optional to open session
+  }) {
+    const validationErrors = [];
 
-		if (typeof api_domain !== 'string' || api_domain.length === 0) {
-			validationErrors.push(`api_domain must be a string not empty.`);
-		}
+    if (typeof api_domain !== "string" || api_domain.length === 0) {
+      validationErrors.push("api_domain must be a string not empty.");
+    }
 
-		if (typeof app_token !== 'string' || app_token.length === 0) {
-			validationErrors.push(
-				`app_token is required and must be a string not empty.`,
-			);
-		}
+    if (typeof app_token !== "string" || app_token.length === 0) {
+      validationErrors.push(
+        "app_token is required and must be a string not empty."
+      );
+    }
 
-		if (typeof api_base_url !== 'string' || api_base_url.length === 0) {
-			validationErrors.push(
-				`api_base_url is required and must be a string not empty`,
-			);
-		}
+    if (typeof api_base_url !== "string" || api_base_url.length === 0) {
+      validationErrors.push(
+        "api_base_url is required and must be a string not empty"
+      );
+    }
 
-		if (typeof api_version !== 'string' || api_version.length === 0) {
-			validationErrors.push(
-				`api_version is required and must be a string not empty`,
-			);
-		}
+    if (typeof api_version !== "string" || api_version.length === 0) {
+      validationErrors.push(
+        "api_version is required and must be a string not empty"
+      );
+    }
 
-		if (typeof app_id !== 'string' || app_id.length === 0) {
-			validationErrors.push(
-				`app_id is required and must be a string not empty`,
-			);
-		}
+    if (typeof app_id !== "string" || app_id.length === 0) {
+      validationErrors.push(
+        "app_id is required and must be a string not empty"
+      );
+    }
 
-		if (validationErrors.length > 0) {
-			throw new Error(
-				`Validation errors in Freebox constructor args: \n ${JSON.stringify(
-					validationErrors,
-					null,
-					2,
-				)}`,
-			);
-		}
+    if (validationErrors.length > 0) {
+      throw new Error(
+        `Validation errors in Freebox constructor args: \n ${JSON.stringify(
+          validationErrors,
+          null,
+          2
+        )}`
+      );
+    }
 
     // fix api > v10
-		this.baseAPIURL = `https://${api_domain}${
-			https_port ? ':' + https_port : ''
-		}${api_base_url}v${api_version.split('.').shift().trim()}`;
+    this.baseAPIURL = `https://${api_domain}${
+      https_port ? `:${  https_port}` : ""
+    }${api_base_url}v${api_version.split(".").shift().trim()}`;
 
-		this.appToken = app_token;
-		this.appVersion = app_version;
-		this.appId = app_id;
-		this.headers = {};
+    this.appToken = app_token;
+    this.appVersion = app_version;
+    this.appId = app_id;
+    this.headers = {};
 
-		this.axiosInstanceCache = null;
-	}
+    this.axiosInstanceCache = null;
+  }
 
-	_getAxiosInstance(updateCache = false) {
-		if (this.axiosInstanceCache && !updateCache) {
-			return this.axiosInstanceCache;
-		}
+  _getAxiosInstance (updateCache = false) {
+    if (this.axiosInstanceCache && !updateCache) {
+      return this.axiosInstanceCache;
+    }
 
-		// Secure HTTPS configuration
-		// https://engineering.circle.com/https-authorized-certs-with-node-js-315e548354a2
-		const axiosConfig = {
-			baseURL: this.baseAPIURL,
-			headers: this.headers,
-		};
+    // Secure HTTPS configuration
+    // https://engineering.circle.com/https-authorized-certs-with-node-js-315e548354a2
+    const axiosConfig = {
+      baseURL: this.baseAPIURL,
+      headers: this.headers
+    };
 
-		if (axiosConfig.baseURL.includes('https://')) {
-			axiosConfig.httpsAgent = new https.Agent(httpsAgentConfig);
-		}
+    if (axiosConfig.baseURL.includes("https://")) {
+      axiosConfig.httpsAgent = new https.Agent(httpsAgentConfig);
+    }
 
-		const axiosInstance = axios.create(axiosConfig);
-		this.axiosInstanceCache = axiosInstance;
-		return axiosInstance;
-	}
+    const axiosInstance = axios.create(axiosConfig);
+    this.axiosInstanceCache = axiosInstance;
+    return axiosInstance;
+  }
 
-	async request(requestConfig) {
-		let response;
-		try {
-			response = await this._getAxiosInstance().request(requestConfig);
-		} catch (error) {
-			if (!error.response) {
-				throw error;
-			}
+  async request (requestConfig) {
+    let response;
+    try {
+      response = await this._getAxiosInstance().request(requestConfig);
+    } catch (error) {
+      if (!error.response) {
+        throw error;
+      }
 
-			const {status, data} = error.response;
-			const {
-				error_code,
-				result: {challenge},
-			} = data;
-			const isTokenExpired =
-				status === 403 &&
-				error_code === 'auth_required' &&
-				this.headers['X-Fbx-App-Auth'];
+      const { status, data } = error.response;
+      const {
+        error_code,
+        result: { challenge }
+      } = data;
+      const isTokenExpired
+				= status === 403
+				&& error_code === "auth_required"
+				&& this.headers["X-Fbx-App-Auth"];
 
-			if (!isTokenExpired) {
-				throw error;
-			}
+      if (!isTokenExpired) {
+        throw error;
+      }
 
-			// Token has expired, we need to login
-			await this.login(challenge);
+      // Token has expired, we need to login
+      await this.login(challenge);
 
-			// Execute once again the initial request
-			response = await this._getAxiosInstance().request(requestConfig);
-		}
+      // Execute once again the initial request
+      response = await this._getAxiosInstance().request(requestConfig);
+    }
 
-		return response;
-	}
+    return response;
+  }
 
-	async login(challenge) {
-		if (!challenge) {
-			const challengeResponse = await this.getChallenge();
-			challenge = challengeResponse.data.result.challenge;
-		}
+  async login (challenge) {
+    if (!challenge) {
+      const challengeResponse = await this.getChallenge();
+      challenge = challengeResponse.data.result.challenge;
+    }
 
-		const sessionStart = {
-			app_id: this.appId,
-			app_version: typeof this.appVersion === 'string' ? this.appVersion : null, // Optional
-			password: createHmac('sha1', this.appToken)
-				.update(challenge)
-				.digest('hex'),
-		};
-		const openSessionResponse = await this.openSession(sessionStart);
-		const {session_token, permissions} = openSessionResponse.data.result;
-		this.headers['X-Fbx-App-Auth'] = session_token;
-		this._getAxiosInstance(true); // Must update axios instance cache
-		return {session_token, permissions};
-	}
+    const sessionStart = {
+      app_id: this.appId,
+      app_version: typeof this.appVersion === "string" ? this.appVersion : null, // Optional
+      password: createHmac("sha1", this.appToken)
+        .update(challenge)
+        .digest("hex")
+    };
+    const openSessionResponse = await this.openSession(sessionStart);
+    const { session_token, permissions } = openSessionResponse.data.result;
+    this.headers["X-Fbx-App-Auth"] = session_token;
+    this._getAxiosInstance(true); // Must update axios instance cache
+    return { session_token, permissions };
+  }
 
-	async openSession(sessionStart) {
-		return this.request({
-			method: 'POST',
-			url: 'login/session',
-			data: sessionStart,
-		});
-	}
+  async openSession (sessionStart) {
+    return this.request({
+      method: "POST",
+      url: "login/session",
+      data: sessionStart
+    });
+  }
 
-	async getChallenge() {
-		return this.request({
-			method: 'GET',
-			url: 'login',
-		});
-	}
+  async getChallenge () {
+    return this.request({
+      method: "GET",
+      url: "login"
+    });
+  }
 
-	async logout() {
-		return this.request({
-			method: 'POST',
-			url: 'login/logout',
-		});
-	}
+  async logout () {
+    return this.request({
+      method: "POST",
+      url: "login/logout"
+    });
+  }
 }
 
 module.exports = {
-	FreeboxRegister,
-	Freebox
+  FreeboxRegister,
+  Freebox
 };
 
 module.exports.default = Freebox;
