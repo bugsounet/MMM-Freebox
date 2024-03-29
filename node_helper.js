@@ -1,6 +1,5 @@
 var NodeHelper = require('node_helper')
 const { Freebox } = require("./components/freebox.js")
-var _ = require("underscore")
 var ping = require('ping')
 
 FB = (...args) => { /* do nothing */ }
@@ -57,7 +56,9 @@ module.exports = NodeHelper.create({
       case "INIT":
         this.config = payload
         if (this.config.debug) FB = (...args) => { console.log("[Freebox]", ...args) }
+        console.log("[Freebox] Version:", require("./package.json").version, "rev:", require("./package.json").rev);
         this.scan()
+        console.log("[Freebox] Started!");
         break
       case "SCAN":
         this.updateInterval()
