@@ -155,7 +155,7 @@ Module.register("MMM-Freebox", {
       var clientSelect = document.getElementsByClassName(mac)[0];
       /** Nouveau Client connecté -> rebuild du cache **/
       if (!clientSelect || (this.Freebox.Clients.length !== Object.keys(this.Freebox.Cache).length)) {
-        FB(`Appareil inconnu [${  mac  }] - Rechargement du cache.`);
+        FB(`Appareil inconnu [${mac}] - Rechargement du cache.`);
         return this.sendSocketNotification("CACHE");
       }
 
@@ -208,7 +208,7 @@ Module.register("MMM-Freebox", {
       else clientIcon.classList.add("hidden");
 
       /** Exclude @mac **/
-      if (cache.show && excludeMac.indexOf(mac) === "-1") {
+      if (cache.show && excludeMac.indexOf(mac) === -1) {
         if (this.config.activeOnly && client.active) clientSelect.classList.remove("hidden");
         else if (!this.config.activeOnly) clientSelect.classList.remove("hidden");
       }
@@ -318,7 +318,7 @@ Module.register("MMM-Freebox", {
 
           var clientIcon = document.createElement("div");
           clientIcon.id= "FREE_ICON";
-          clientIcon.className= `${type  }0`;
+          clientIcon.className= `${type}0`;
           clientIcon.classList.add("hidden");
           client.appendChild(clientIcon);
 

@@ -26,7 +26,7 @@ module.exports = NodeHelper.create({
         }
       },
       (err) => {
-        console.error(`[Freebox] ${  err}`);
+        console.error(`[Freebox] ${err}`);
         this.updateInterval();
       }
     );
@@ -348,19 +348,19 @@ module.exports = NodeHelper.create({
 
     if (value>1000000000) {
       value=Number((value/1000000000).toFixed(FixTo));
-      if (type === 0) value = `${value  } Go/s`;
-      if (type === 1) value = `${value  } Gb/s`;
+      if (type === 0) value = `${value} Go/s`;
+      if (type === 1) value = `${value} Gb/s`;
       return value;
     }
     if (value>1000000) {
       value=Number((value/1000000).toFixed(FixTo));
-      if (type === 0) value = `${value  } Mo/s`;
-      if (type === 1) value = `${value  } Mb/s`;
+      if (type === 0) value = `${value} Mo/s`;
+      if (type === 1) value = `${value} Mb/s`;
       return value;
     }
     value=Number((value/1000).toFixed(FixTo));
-    if (type === 0) value = `${value  } Ko/s`;
-    if (type === 1) value = `${value  } Kb/s`;
+    if (type === 0) value = `${value} Ko/s`;
+    if (type === 1) value = `${value} Kb/s`;
     return value;
   },
 
