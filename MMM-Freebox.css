@@ -14,6 +14,7 @@
     margin-right: auto;
 }
 
+#FREE_MODEL,
 #FREE_PING,
 #FREE_IP,
 #FREE_DEBIT,
@@ -54,6 +55,7 @@
     white-space: nowrap;
 }
 
+#FREE_MODEL.hidden,
 #FREE_ACCESS.hidden,
 #FREE_IP.hidden,
 #FREE_DEBIT.hidden,

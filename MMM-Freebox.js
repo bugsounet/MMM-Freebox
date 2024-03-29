@@ -9,6 +9,7 @@ Module.register("MMM-Freebox", {
     updateDelay:  5 * 1000,
     zoom: 110,
     activeOnly: false,
+    showModel: true,
     showIcon: true,
     showButton: true,
     showBandWidth: true,
@@ -118,6 +119,15 @@ Module.register("MMM-Freebox", {
 
   displayDom: function() {
     /** On applique les mises a jour en live ! **/
+
+    /** affichage du model de la freebox **/
+    var model = document.getElementById("FREE_MODEL")
+    var modelIcon = model.querySelector("#FREE_ICON")
+
+    var modelValue = model.querySelector("#FREE_VALUE")
+    if (this.config.showIcon) modelIcon.classList.remove("hidden")
+    if (this.config.showModel) model.classList.remove("hidden")
+    modelValue.textContent = this.Freebox.Model
 
     /** Bande Passante **/
     var bandWidth = document.getElementById("FREE_BAND")
@@ -240,6 +250,23 @@ Module.register("MMM-Freebox", {
       wrapper.innerHTML = ""
       wrapper.style.zoom = `${this.config.zoom}%`;
       /** on prepare le DOM en cachant tout **/
+
+      /** Affichage du model de la Freebox **/
+      var model = document.createElement("div")
+      model.id = "FREE_MODEL"
+      model.classList.add("hidden")
+
+      var modelIcon = document.createElement("div")
+      modelIcon.className = "free" /// <-- to see
+      modelIcon.classList.add("hidden")
+      modelIcon.id= "FREE_ICON"
+      model.appendChild(modelIcon)
+
+      var modelDisplay= document.createElement("div")
+      modelDisplay.id = "FREE_VALUE"
+      model.appendChild(modelDisplay)
+
+      wrapper.appendChild(model)
 
       /** Afficage de la bande passante **/
       var bandWidth = document.createElement("div")
