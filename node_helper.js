@@ -253,7 +253,7 @@ module.exports = NodeHelper.create({
         url: "api_version/"
       })
 
-      this.FreeboxVersion = FreeboxVersion.data.box_model_name
+      this.FreeboxVersion = this.ModelSearh(FreeboxVersion.data.box_model_name)
       FB("Found:", this.FreeboxVersion)
       this.init = true
     }
@@ -379,5 +379,37 @@ module.exports = NodeHelper.create({
   /** nbre de barre wifi selon % quality) **/
   wifiBar(percent) {
     return parseInt(((percent*5)/100).toFixed(0))
+  },
+
+  ModelSearh(model) {
+    try {
+      const freebox = model.split(" ")
+      var version = freebox[1]
+      const rev = freebox[2]
+      switch (version) {
+        case "v9":
+          version = "Ultra";
+          break;
+        case "v8":
+          version = "Pop";
+          break;
+        case "v7":
+          version = "Delta";
+          break;
+        case "v6":
+          version = "Révolution";
+          break;
+        default:
+          console.warn("[Freebox] Freebox Version not found !")
+          console.warn("[Freebox] Please contact developer with this freebox model:", model)
+          break
+      }
+      let FreeboxName = `Freebox ${version} ${rev}`
+      return FreeboxName
+    } catch (e) {
+      console.warn("[Freebox] Error Freebox model formating!")
+      console.warn("[Freebox] Please contact developer with this freebox model:", model)
+      return model
+    }
   }
 });
