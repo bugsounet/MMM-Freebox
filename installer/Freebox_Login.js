@@ -1,7 +1,8 @@
 const { FreeboxRegister } = require("../components/freebox.js");
-var count = 1
 
-async function main() {
+var count = 1;
+
+async function main () {
   const register = await new FreeboxRegister(
     {
       app_id: "fbx.MMM-Freebox",
@@ -12,13 +13,13 @@ async function main() {
   ).register();
 }
 
-function retry() {
-  console.log("Retry... "+ count + "/10")
-  count++
-  main().catch(err => {
-    console.log("[Freebox][Error] " + err)
-    if (count < 11) retry()
-  })
+function retry () {
+  console.log(`Retry... ${ count  }/10`);
+  count++;
+  main().catch((err) => {
+    console.log(`[Freebox][Error] ${  err}`);
+    if (count < 11) retry();
+  });
 }
 
-main().catch(err => retry() )
+main().catch((err) => retry() );
