@@ -48,8 +48,8 @@ Merci de vérifier votre écran LCD de votre Freebox Server et autoriser l'enreg
       api_version: 'xxx.x'
     },
 ```
-### **Attention:** Les informations fournies par la Freebox sont à considérer comme des identifiants !
-### Ne JAMAIS les divulguer car cela permet d'avoir un accès à votre freebox à distance !
+### **Attention:** Les informations fournies par la Freebox sont à considérer comme des identifiants!
+### Ne JAMAIS les divulguer car cela permet d'avoir un accès à votre freebox à distance!
 
 ## Configuration
 Pour afficher le module, inserez ceci dans votre ficher `config.js`
