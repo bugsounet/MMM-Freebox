@@ -157,7 +157,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 ## Update
 Utilisez cette commande:
 ```
-cd ~/MagicMirror/modules/MMM-Pir
+cd ~/MagicMirror/modules/MMM-Freebox
 npm run update
 ```
 
