@@ -140,6 +140,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | showClientIP | Affiche l'addresse IPv4 des appareils | Boolean | false |
 | showClientCnxType | Affiche le type de connexion des appareils | Boolean | true |
 | showFree | Affiche les Freebox Player | Boolean | true |
+| showIP | Affiche l'adresse ip de votre connexion | Boolean | true |
 | showPing | Affiche le ping entre le mirroir et google.fr | Boolean | true |
 | pingAdress| personalisation de l'adresse a ping | String | google.fr |
 | textWidth | Largeur du texte à afficher (mini: 220) | Number | 250 |
