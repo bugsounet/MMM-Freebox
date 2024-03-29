@@ -14,10 +14,10 @@ async function main () {
 }
 
 function retry () {
-  console.log(`Retry... ${ count  }/10`);
+  console.log(`Retry... ${count}/10`);
   count++;
   main().catch((err) => {
-    console.log(`[Freebox][Error] ${  err}`);
+    console.log(`[Freebox][Error] ${err}`);
     if (count < 11) retry();
   });
 }
