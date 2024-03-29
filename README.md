@@ -150,9 +150,16 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | checkSFP| Permet de verifier et d'afficher les connexions via la carte SFP sur le reseau (Freebox Delta/Ultra uniquement)| Boolean | false |
 
 
-### Personalisation de l'affichage des appareils connecté
+### Personalisation de l'affichage des appareils connectés
  * Utilisez l'interface `FreeboxOS` de votre Freebox Server (Periphériques Réseau)
  * Utilisez l'application `Freebox Connect` sur votre téléphone (Appareils Connectés)
+
+## Update
+Utilisez cette commande:
+```
+cd ~/MagicMirror/modules/MMM-Pir
+npm run update
+```
 
 ## Notes:
  - Les essais ont été effectué avec une Freebox Ultra.
