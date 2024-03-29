@@ -3,6 +3,7 @@ FB = (...arg) => { /* do nothing */ }
 Module.register("MMM-Freebox", {
 
   defaults: {
+    freebox: {},
     debug: false,
     verbose: false,
     updateDelay:  5 * 1000,

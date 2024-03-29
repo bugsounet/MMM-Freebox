@@ -26,7 +26,7 @@ module.exports = NodeHelper.create({
         }
       },
       (err) => {
-        FB("[Error] " + err)
+        console.error("[Freebox] " + err)
         this.updateInterval()
       }
     )
