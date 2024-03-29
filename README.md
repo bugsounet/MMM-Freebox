@@ -60,7 +60,7 @@ Remplacer le contenu de `freebox` par les valeurs de connexion fourni par votre 
 ```js
 {
   module: "MMM-Freebox",
-  position: "top_center",
+  position: "top_left",
   animateIn: "fadeInLeft",
   animateOut: "fadeOutLeft",
   config: {
@@ -82,7 +82,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 ```js
 {
   module: 'MMM-Freebox',
-  position: 'top_center',
+  position: 'top_left',
   animateIn: "fadeInLeft",
   animateOut: "fadeOutLeft",
   config: {
