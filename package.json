@@ -1,30 +1,44 @@
 {
   "name": "MMM-Freebox",
-  "version": "2.0.0",
+  "version": "2.1.0",
+  "rev": "240329",
   "description": "Display Freebox informations",
   "main": "MMM-Freebox.js",
   "keywords": [
-    "magic mirror",
-    "module",
     "freebox"
   ],
   "scripts": {
-    "postinstall": "installer/postinstall.sh",
     "register": "node installer/Freebox_Login.js",
-    "update": "installer/update.sh"
+    "preinstall": "installer/preinstall.sh",
+    "postinstall": "installer/postinstall.sh -m",
+    "update": "installer/update.sh",
+    "reset": "git reset --hard",
+    "clean": "rm -rf node_modules package-lock.json",
+    "lint": "eslint *.js installer/*.js components/*.js --config eslint.config.js",
+    "lint:fix": "eslint *.js installer/*.js components/*.js --config eslint.config.js --fix",
+    "test": "npm run lint",
+    "test:minify": "cd installer && node minify.js"
   },
   "author": "bugs",
   "license": "MIT",
   "bugs": {
-    "url": "https://forum.bugsounet.fr"
+    "url": "https://github.com/bugsounet/MMM-Freebox"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/bugsounet/MMM-Freebox"
   },
-  "homepage": "https://forum.bugsounet.fr",
+  "homepage": "https://github.com/bugsounet/MMM-Freebox",
   "dependencies": {
-    "@bugsounet/freebox": "^1.0.0",
+    "axios": "^1.6.8",
+    "esbuild": "^0.20.2",
+    "glob": "^10.3.12",
     "ping": "^0.2.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^8.57.0",
+    "@stylistic/eslint-plugin": "^1.7.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1"
   }
 }

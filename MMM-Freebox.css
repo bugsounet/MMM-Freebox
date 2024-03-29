@@ -5,6 +5,7 @@
 
 #FREE_LOGO {
     background-image: url(resources/Freebox.png);
+    max-width: 200px;
     height: 62px;
     background-size: 100%;
     background-position: center;
@@ -13,21 +14,21 @@
     margin-right: auto;
 }
 
-#FREE_WHO,
-#FREE_CALL,
+#FREE_MODEL,
 #FREE_PING,
 #FREE_IP,
 #FREE_DEBIT,
 #FREE_BAND,
 #FREE_CLIENT {
     display: flex;
-    font-size: 14px;
-    line-height: 110%;
+    font-size: small;
+    align-items: center;
     padding: 1px;
+    line-height: 1;
 }
 
 #FREE_VALUE {
-    margin-left: 15px;
+    margin-left: 10px;
     text-align: left;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -35,17 +36,16 @@
 }
 
 #FREE_RATE {
-    margin-left: 15px;
+    margin-left: 10px;
     text-align: left;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
-    /* margin-right: 15px; */
-    width: 60px;
+    width: 65px;
 }
 
 #FREE_TEXT {
-    margin-left: 15px;
+    margin-left: 10px;
 }
 
 #FREE_NAME {
@@ -55,21 +55,7 @@
     white-space: nowrap;
 }
 
-#FREE_MISSED {
-    margin-left: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #eee;
-}
-
-#FREE_CALLER {
-    margin-left: 10px;
-    font-weight: bold;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space: nowrap;
-}
-
+#FREE_MODEL.hidden,
 #FREE_ACCESS.hidden,
 #FREE_IP.hidden,
 #FREE_DEBIT.hidden,
@@ -77,9 +63,7 @@
 #FREE_CLIENT.hidden,
 #FREE_RATE.hidden,
 #FREE_BAND.hidden,
-#FREE_ICON.hidden,
-#FREE_CALL.hidden,
-#FREE_WHO.hidden {
+#FREE_ICON.hidden {
     display:none;
 }
 
@@ -90,158 +74,242 @@
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: 0;
+    opacity: 1;
 }
 
-#FREE_ICON.freebox_delta0 {
-    background-image: url(resources/delta0.png);
+#FREE_ICON.car0 {
+    background-image: url(resources/new/car.png);
+    opacity: 0.3;
 }
 
-#FREE_ICON.freebox_mini0 {
-    background-image: url(resources/mini0.png);
+#FREE_ICON.car1 {
+    background-image: url(resources/new/car.png);
 }
 
 #FREE_ICON.workstation0 {
-    background-image: url(resources/desktop0.png);
-}
-
-#FREE_ICON.laptop0 {
-    background-image: url(resources/laptop0.png);
-}
-
-#FREE_ICON.smartphone0 {
-    background-image: url(resources/mobile0.png);
-}
-
-#FREE_ICON.tablet0 {
-    background-image: url(resources/tab0.png);
-}
-
-#FREE_ICON.printer0 {
-    background-image: url(resources/printer0.png);
-}
-
-#FREE_ICON.vg_console0 {
-    background-image: url(resources/game0.png);
-}
-
-#FREE_ICON.television0 {
-    background-image: url(resources/tv0.png);
-}
-
-#FREE_ICON.nas0 {
-    background-image: url(resources/nas0.png);
-}
-
-#FREE_ICON.ip_camera0 {
-    background-image: url(resources/camera0.png);
-}
-
-#FREE_ICON.ip_phone0 {
-    background-image: url(resources/tel0.png);
-}
-
-#FREE_ICON.freebox_player0 {
-    background-image: url(resources/player0.png);
-}
-
-#FREE_ICON.freebox_hd0 {
-    background-image: url(resources/V50.png);
-}
-
-#FREE_ICON.networking_device0 {
-    background-image: url(resources/router0.png);
-}
-
-#FREE_ICON.multimedia_device0 {
-    background-image: url(resources/media0.png);
-}
-
-#FREE_ICON.other0 {
-    background-image: url(resources/hub0.png);
-}
-
-#FREE_ICON.freebox_delta1 {
-    background-image: url(resources/delta1.png);
-}
-
-#FREE_ICON.freebox_mini1 {
-    background-image: url(resources/mini1.png);
+    background-image: url(resources/old/desktop.png);
+    opacity: 0.3;
 }
 
 #FREE_ICON.workstation1 {
-    background-image: url(resources/desktop1.png);
+    background-image: url(resources/old/desktop.png);
 }
 
-#FREE_ICON.laptop1 {
-    background-image: url(resources/laptop1.png);
-}
-
-#FREE_ICON.smartphone1 {
-    background-image: url(resources/mobile1.png);
-}
-
-#FREE_ICON.tablet1 {
-    background-image: url(resources/tab1.png);
-}
-
-#FREE_ICON.printer1 {
-    background-image: url(resources/printer1.png);
-}
-
-#FREE_ICON.vg_console1 {
-    background-image: url(resources/game1.png);
-}
-
-#FREE_ICON.television1 {
-    background-image: url(resources/tv1.png);
-}
-
-#FREE_ICON.nas1 {
-    background-image: url(resources/nas1.png);
-}
-
-#FREE_ICON.ip_camera1 {
-    background-image: url(resources/camera1.png);
-}
-
-#FREE_ICON.ip_phone1 {
-    background-image: url(resources/tel1.png);
-}
-
-#FREE_ICON.freebox_player1 {
-    background-image: url(resources/player1.png);
-}
-
-#FREE_ICON.freebox_hd1 {
-    background-image: url(resources/V51.png);
-}
-
-#FREE_ICON.networking_device1 {
-    background-image: url(resources/router1.png);
-}
-
-#FREE_ICON.multimedia_device1 {
-    background-image: url(resources/media1.png);
+#FREE_ICON.other0 {
+    background-image: url(resources/old/other.png);
+    opacity: 0.3;
 }
 
 #FREE_ICON.other1 {
-    background-image: url(resources/hub1.png);
+    background-image: url(resources/old/other.png);
 }
 
-#FREE_ICON.missed {
-    background-image: url(resources/missed.png);
+#FREE_ICON.laptop0 {
+    background-image: url(resources/old/laptop.png);
+    opacity: 0.3;
 }
 
-#FREE_ICON.missing {
-    background-image: url(resources/missing.png);
+#FREE_ICON.laptop1 {
+    background-image: url(resources/old/laptop.png);
 }
 
-#FREE_ICON.bandwidth {
-    background-image: url(resources/band.png);
+#FREE_ICON.smartphone0 {
+    background-image: url(resources/old/phone.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.smartphone1 {
+    background-image: url(resources/old/phone.png);
+}
+
+#FREE_ICON.tablet0 {
+    background-image: url(resources/old/tablet.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.tablet1 {
+    background-image: url(resources/old/tablet.png);
+}
+
+#FREE_ICON.printer0 {
+    background-image: url(resources/old/printer.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.printer1 {
+    background-image: url(resources/old/printer.png);
+}
+
+#FREE_ICON.vg_console0 {
+    background-image: url(resources/old/game.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.vg_console1 {
+    background-image: url(resources/old/game.png);
+}
+
+#FREE_ICON.television0 {
+    background-image: url(resources/old/television.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.television1 {
+    background-image: url(resources/old/television.png);
+}
+
+#FREE_ICON.nas0 {
+    background-image: url(resources/old/nas.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.nas1 {
+    background-image: url(resources/old/nas.png);
+}
+
+#FREE_ICON.ip_camera0 {
+    background-image: url(resources/old/camera.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.ip_camera1 {
+    background-image: url(resources/old/camera.png);
+}
+
+#FREE_ICON.ip_phone0 {
+    background-image: url(resources/old/ip_phone.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.ip_phone1 {
+    background-image: url(resources/old/ip_phone.png);
+}
+
+#FREE_ICON.networking_device0 {
+    background-image: url(resources/old/networking.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.networking_device1 {
+    background-image: url(resources/old/networking.png);
+}
+
+#FREE_ICON.multimedia_device0 {
+    background-image: url(resources/old/media.png);
+    opacity: 0.3;
+}
+
+#FREE_ICON.multimedia_device1 {
+    background-image: url(resources/old/media.png);
+}
+
+#FREE_ICON.ip {
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXdlYiIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik0xNi4zNiwxNEMxNi40NCwxMy4zNCAxNi41LDEyLjY4IDE2LjUsMTJDMTYuNSwxMS4zMiAxNi40NCwxMC42NiAxNi4zNiwxMEgxOS43NEMxOS45LDEwLjY0IDIwLDExLjMxIDIwLDEyQzIwLDEyLjY5IDE5LjksMTMuMzYgMTkuNzQsMTRNMTQuNTksMTkuNTZDMTUuMTksMTguNDUgMTUuNjUsMTcuMjUgMTUuOTcsMTZIMTguOTJDMTcuOTYsMTcuNjUgMTYuNDMsMTguOTMgMTQuNTksMTkuNTZNMTQuMzQsMTRIOS42NkM5LjU2LDEzLjM0IDkuNSwxMi42OCA5LjUsMTJDOS41LDExLjMyIDkuNTYsMTAuNjUgOS42NiwxMEgxNC4zNEMxNC40MywxMC42NSAxNC41LDExLjMyIDE0LjUsMTJDMTQuNSwxMi42OCAxNC40MywxMy4zNCAxNC4zNCwxNE0xMiwxOS45NkMxMS4xNywxOC43NiAxMC41LDE3LjQzIDEwLjA5LDE2SDEzLjkxQzEzLjUsMTcuNDMgMTIuODMsMTguNzYgMTIsMTkuOTZNOCw4SDUuMDhDNi4wMyw2LjM0IDcuNTcsNS4wNiA5LjQsNC40NEM4LjgsNS41NSA4LjM1LDYuNzUgOCw4TTUuMDgsMTZIOEM4LjM1LDE3LjI1IDguOCwxOC40NSA5LjQsMTkuNTZDNy41NywxOC45MyA2LjAzLDE3LjY1IDUuMDgsMTZNNC4yNiwxNEM0LjEsMTMuMzYgNCwxMi42OSA0LDEyQzQsMTEuMzEgNC4xLDEwLjY0IDQuMjYsMTBINy42NEM3LjU2LDEwLjY2IDcuNSwxMS4zMiA3LjUsMTJDNy41LDEyLjY4IDcuNTYsMTMuMzQgNy42NCwxNE0xMiw0LjAzQzEyLjgzLDUuMjMgMTMuNSw2LjU3IDEzLjkxLDhIMTAuMDlDMTAuNSw2LjU3IDExLjE3LDUuMjMgMTIsNC4wM00xOC45Miw4SDE1Ljk3QzE1LjY1LDYuNzUgMTUuMTksNS41NSAxNC41OSw0LjQ0QzE2LjQzLDUuMDcgMTcuOTYsNi4zNCAxOC45Miw4TTEyLDJDNi40NywyIDIsNi41IDIsMTJBMTAsMTAgMCAwLDAgMTIsMjJBMTAsMTAgMCAwLDAgMjIsMTJBMTAsMTAgMCAwLDAgMTIsMloiIC8+PC9zdmc+);
+    background-position: 0 -1px;
+}
+
+#FREE_ICON.internet {
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNvbm5lY3Rpb24iIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjEuNCA3LjVDMjIuMiA4LjMgMjIuMiA5LjYgMjEuNCAxMC4zTDE4LjYgMTMuMUwxMC44IDUuM0wxMy42IDIuNUMxNC40IDEuNyAxNS43IDEuNyAxNi40IDIuNUwxOC4yIDQuM0wyMS4yIDEuM0wyMi42IDIuN0wxOS42IDUuN0wyMS40IDcuNU0xNS42IDEzLjNMMTQuMiAxMS45TDExLjQgMTQuN0w5LjMgMTIuNkwxMi4xIDkuOEwxMC43IDguNEw3LjkgMTEuMkw2LjQgOS44TDMuNiAxMi42QzIuOCAxMy40IDIuOCAxNC43IDMuNiAxNS40TDUuNCAxNy4yTDEuNCAyMS4yTDIuOCAyMi42TDYuOCAxOC42TDguNiAyMC40QzkuNCAyMS4yIDEwLjcgMjEuMiAxMS40IDIwLjRMMTQuMiAxNy42TDEyLjggMTYuMkwxNS42IDEzLjNaIiAvPjwvc3ZnPg==);
+    background-position: 0 -1px;
+}
+
+#FREE_ICON.rate {
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNwZWVkb21ldGVyIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyLDE2QTMsMyAwIDAsMSA5LDEzQzksMTEuODggOS42MSwxMC45IDEwLjUsMTAuMzlMMjAuMjEsNC43N0wxNC42OCwxNC4zNUMxNC4xOCwxNS4zMyAxMy4xNywxNiAxMiwxNk0xMiwzQzEzLjgxLDMgMTUuNSwzLjUgMTYuOTcsNC4zMkwxNC44Nyw1LjUzQzE0LDUuMTkgMTMsNSAxMiw1QTgsOCAwIDAsMCA0LDEzQzQsMTUuMjEgNC44OSwxNy4yMSA2LjM0LDE4LjY1SDYuMzVDNi43NCwxOS4wNCA2Ljc0LDE5LjY3IDYuMzUsMjAuMDZDNS45NiwyMC40NSA1LjMyLDIwLjQ1IDQuOTMsMjAuMDdWMjAuMDdDMy4xMiwxOC4yNiAyLDE1Ljc2IDIsMTNBMTAsMTAgMCAwLDEgMTIsM00yMiwxM0MyMiwxNS43NiAyMC44OCwxOC4yNiAxOS4wNywyMC4wN1YyMC4wN0MxOC42OCwyMC40NSAxOC4wNSwyMC40NSAxNy42NiwyMC4wNkMxNy4yNywxOS42NyAxNy4yNywxOS4wNCAxNy42NiwxOC42NVYxOC42NUMxOS4xMSwxNy4yIDIwLDE1LjIxIDIwLDEzQzIwLDEyIDE5LjgxLDExIDE5LjQ2LDEwLjFMMjAuNjcsOEMyMS41LDkuNSAyMiwxMS4xOCAyMiwxM1oiIC8+PC9zdmc+);
+    background-position: 0 -1px;
 }
 
 #FREE_ICON.ping {
-    background-image: url(resources/ping.png);
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWFjY2Vzcy1wb2ludC1uZXR3b3JrIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTQuOTMsMy45M0MzLjEyLDUuNzQgMiw4LjI0IDIsMTFDMiwxMy43NiAzLjEyLDE2LjI2IDQuOTMsMTguMDdMNi4zNCwxNi42NkM0Ljg5LDE1LjIyIDQsMTMuMjIgNCwxMUM0LDguNzkgNC44OSw2Ljc4IDYuMzQsNS4zNEw0LjkzLDMuOTNNMTkuMDcsMy45M0wxNy42Niw1LjM0QzE5LjExLDYuNzggMjAsOC43OSAyMCwxMUMyMCwxMy4yMiAxOS4xMSwxNS4yMiAxNy42NiwxNi42NkwxOS4wNywxOC4wN0MyMC44OCwxNi4yNiAyMiwxMy43NiAyMiwxMUMyMiw4LjI0IDIwLjg4LDUuNzQgMTkuMDcsMy45M003Ljc2LDYuNzZDNi42Nyw3Ljg1IDYsOS4zNSA2LDExQzYsMTIuNjUgNi42NywxNC4xNSA3Ljc2LDE1LjI0TDkuMTcsMTMuODNDOC40NSwxMy4xMSA4LDEyLjExIDgsMTFDOCw5Ljg5IDguNDUsOC44OSA5LjE3LDguMTdMNy43Niw2Ljc2TTE2LjI0LDYuNzZMMTQuODMsOC4xN0MxNS41NSw4Ljg5IDE2LDkuODkgMTYsMTFDMTYsMTIuMTEgMTUuNTUsMTMuMTEgMTQuODMsMTMuODNMMTYuMjQsMTUuMjRDMTcuMzMsMTQuMTUgMTgsMTIuNjUgMTgsMTFDMTgsOS4zNSAxNy4zMyw3Ljg1IDE2LjI0LDYuNzZNMTIsOUEyLDIgMCAwLDAgMTAsMTFBMiwyIDAgMCwwIDEyLDEzQTIsMiAwIDAsMCAxNCwxMUEyLDIgMCAwLDAgMTIsOU0xMSwxNVYxOUgxMEExLDEgMCAwLDAgOSwyMEgyVjIySDlBMSwxIDAgMCwwIDEwLDIzSDE0QTEsMSAwIDAsMCAxNSwyMkgyMlYyMEgxNUExLDEgMCAwLDAgMTQsMTlIMTNWMTVIMTFaIiAvPjwvc3ZnPg==);
+    background-position: 0 -1px;
+}
+
+
+#FREE_ICON.freebox_crystal0 {
+  background-image: url(resources/players.png);
+  background-position: 0 0%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_crystal1 {
+  background-image: url(resources/players.png);
+  background-position: 0 6%;
+}
+
+#FREE_ICON.freebox_delta0 {
+  background-image: url(resources/players.png);
+  background-position: 0 13%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_delta1 {
+  background-image: url(resources/players.png);
+  background-position: 0 20%;
+}
+
+#FREE_ICON.freebox_hd0 {
+  background-image: url(resources/players.png);
+  background-position: 0 27%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_hd1 {
+  background-image: url(resources/players.png);
+  background-position: 0 34%;
+}
+
+#FREE_ICON.freebox_mini0 {
+  background-image: url(resources/players.png);
+  background-position: 0 40%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_mini1 {
+  background-image: url(resources/players.png);
+  background-position: 0 46%;
+}
+
+#FREE_ICON.freebox_one0 {
+  background-image: url(resources/players.png);
+  background-position: 0 53%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_one1 {
+  background-image: url(resources/players.png);
+  background-position: 0 59%;
+}
+
+#FREE_ICON.freebox_player0 {
+  background-image: url(resources/players.png);
+  background-position: 0 66%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_player1 {
+  background-image: url(resources/players.png);
+  background-position: 0 73%;
+}
+
+#FREE_ICON.freebox_pop0 {
+  background-image: url(resources/players.png);
+  background-position: 0 80%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_pop1 {
+  background-image: url(resources/players.png);
+  background-position: 0 86%;
+}
+
+#FREE_ICON.freebox_wifi0 {
+  background-image: url(resources/players.png);
+  background-position: 0 93%;
+  opacity: 0.3;
+}
+
+#FREE_ICON.freebox_wifi1 {
+  background-image: url(resources/players.png);
+  background-position: 0 100%;
 }
 
 #FREE_ACCESS {
@@ -257,82 +325,135 @@
     background-image: url(resources/black.png);
 }
 
+#FREE_ACCESS.repeater {
+    text-align: left;
+    font-size: 7px;
+    color: red;
+}
+
+#FREE_ACCESS.repeater:before {
+    content: 'R';
+}
+
+#FREE_ACCESS.wifi7_0,
+#FREE_ACCESS.wifi6_0,
 #FREE_ACCESS.wifi5_0,
 #FREE_ACCESS.wifi2_0 {
-    background-image: url(resources/signal0.png);
+    background-image: url(resources/wifi/signal0.png);
 }
 
 #FREE_ACCESS.wifi2_1 {
-    background-image: url(resources/signal2_1.png);
+    background-image: url(resources/wifi/signal2_1.png);
 }
 
 #FREE_ACCESS.wifi2_2 {
-    background-image: url(resources/signal2_2.png);
+    background-image: url(resources/wifi/signal2_2.png);
 }
 
 #FREE_ACCESS.wifi2_3 {
-    background-image: url(resources/signal2_3.png);
+    background-image: url(resources/wifi/signal2_3.png);
 }
 
 #FREE_ACCESS.wifi2_4 {
-    background-image: url(resources/signal2_4.png);
+    background-image: url(resources/wifi/signal2_4.png);
 }
 
 #FREE_ACCESS.wifi2_5 {
-    background-image: url(resources/signal2_5.png);
+    background-image: url(resources/wifi/signal2_5.png);
 }
 
 #FREE_ACCESS.wifi5_1 {
-    background-image: url(resources/signal5_1.png);
+    background-image: url(resources/wifi/signal5_1.png);
 }
 
 #FREE_ACCESS.wifi5_2 {
-    background-image: url(resources/signal5_2.png);
+    background-image: url(resources/wifi/signal5_2.png);
 }
 
 #FREE_ACCESS.wifi5_3 {
-    background-image: url(resources/signal5_3.png);
+    background-image: url(resources/wifi/signal5_3.png);
 }
 
 #FREE_ACCESS.wifi5_4 {
-    background-image: url(resources/signal5_4.png);
+    background-image: url(resources/wifi/signal5_4.png);
 }
 
 #FREE_ACCESS.wifi5_5 {
-    background-image: url(resources/signal5_5.png);
+    background-image: url(resources/wifi/signal5_5.png);
+}
+
+#FREE_ACCESS.wifi6_1 {
+    background-image: url(resources/wifi/signal6_1.png);
+}
+
+#FREE_ACCESS.wifi6_2 {
+    background-image: url(resources/wifi/signal6_2.png);
+}
+
+#FREE_ACCESS.wifi6_3 {
+    background-image: url(resources/wifi/signal6_3.png);
+}
+
+#FREE_ACCESS.wifi6_4 {
+    background-image: url(resources/wifi/signal6_4.png);
+}
+
+#FREE_ACCESS.wifi6_5 {
+    background-image: url(resources/wifi/signal6_5.png);
+}
+
+#FREE_ACCESS.wifi7_1 {
+    background-image: url(resources/wifi/signal7_1.png);
+}
+
+#FREE_ACCESS.wifi7_2 {
+    background-image: url(resources/wifi/signal7_2.png);
+}
+
+#FREE_ACCESS.wifi7_3 {
+    background-image: url(resources/wifi/signal7_3.png);
+}
+
+#FREE_ACCESS.wifi7_4 {
+    background-image: url(resources/wifi/signal7_4.png);
+}
+
+#FREE_ACCESS.wifi7_5 {
+    background-image: url(resources/wifi/signal7_5.png);
 }
 
 #FREE_ACCESS.ethernet1 {
     background-image: url(resources/eth1.png);
-    background-position: inherit;
 }
 
 #FREE_ACCESS.ethernet2 {
     background-image: url(resources/eth2.png);
-    background-position: inherit;
 }
 
 #FREE_ACCESS.ethernet3 {
     background-image: url(resources/eth3.png);
-    background-position: inherit;
 }
 
 #FREE_ACCESS.ethernet4 {
     background-image: url(resources/eth4.png);
-    background-position: inherit;
 }
 
 #FREE_ACCESS.ethernet5 {
     background-image: url(resources/cpl.png);
-    background-position: inherit;
 }
 
 #FREE_ACCESS.ethernet6 {
     background-image: url(resources/sfp.png);
-    background-position: inherit;
+}
+
+#FREE_ACCESS.VM {
+  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNlcnZlciIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik00LDFIMjBBMSwxIDAgMCwxIDIxLDJWNkExLDEgMCAwLDEgMjAsN0g0QTEsMSAwIDAsMSAzLDZWMkExLDEgMCAwLDEgNCwxTTQsOUgyMEExLDEgMCAwLDEgMjEsMTBWMTRBMSwxIDAgMCwxIDIwLDE1SDRBMSwxIDAgMCwxIDMsMTRWMTBBMSwxIDAgMCwxIDQsOU00LDE3SDIwQTEsMSAwIDAsMSAyMSwxOFYyMkExLDEgMCAwLDEgMjAsMjNINEExLDEgMCAwLDEgMywyMlYxOEExLDEgMCAwLDEgNCwxN005LDVIMTBWM0g5VjVNOSwxM0gxMFYxMUg5VjEzTTksMjFIMTBWMTlIOVYyMU01LDNWNUg3VjNINU01LDExVjEzSDdWMTFINU01LDE5VjIxSDdWMTlINVoiIC8+PC9zdmc+') !important;
 }
 
 /* ------------ */
+.FBhidden {
+  display: none;
+}
 
 input.switch-round + label {
   padding: 1px;
@@ -344,7 +465,6 @@ input.switch-round + label {
   -ms-border-radius: 30px;
   -o-border-radius: 30px;
   border-radius: 30px;
-  margin-left: 15px;
 }
 input.switch-round + label:before, input.switch-round + label:after {
   display: block;
@@ -404,123 +524,6 @@ input.switch-round:checked + label:after {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-.hidden {
-    display:none;
-}
-
-#FREE_VPN {
-  font-size: 15px;
-  line-height: 20px;
-}
-
-#FREE_VPNUSER {
-  display: inline-flex;
-}
-
-#FREE_VPNLOGIN {
-  margin-right: 15px;
-  line-height: 40px;
-}
-
-#FREEVPNDATE,
-#FREE_VPNRXTX,
-#FREE_VPNTYPE {
-  margin-right: 15px;
-}
-
-#FREE_TV {
-  font-size: 15px;
-  text-align: left;
-  padding: 10px;
-}
-
-#FREE_CHANNEL {
-  font-size: 15px;
-  height: 80px;
-  margin-left: 25px;
-}
-
-#FREE_PHOTO {
-  height: 80px;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-#FREE_EPG {
-  font-size: 15px;
-}
-
-#FREE_PROGRAM {
-  font-size: 15px;
-  text-align: center;
-  width: 395px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space: nowrap;
-}
-
-#FREE_PROGRESS {
- /* height: 3px*/
-  width: 80%;
-}
-
-#FREE_VOLUME {
-  height: 80px;
-}
-
-#FREE_CONTENER {
- height: 80px;
-}
-
-#FREE_PROGRESS.meter {
-  -webkit-writing-mode: horizontal-tb !important;
-  -webkit-appearance: meter;
-  box-sizing: border-box;
-  display: inline-block;
-  height: 10px;
-  /* width: 5em; */
-  vertical-align: -0.2em;
-  -webkit-user-modify: read-only !important;
-  margin-left: 10px;
-  margin-right: 10px;
-
-}
-
-meter::-webkit-meter-inner-element {
-  border-radius: 10px;
-}
-
-#FREE_PROGRESS.meter::-webkit-meter-optimum-value {
-    background: red; /* Green */
-      border-radius: 10px;
-}
-
-#FREE_PROGRESS.meter::-webkit-meter-bar  {
-  /*background: #eee;*/
-  /*box-shadow: 0 2px 3px rgba (0, 0, 0, 0.2) inset;*/
-  border-radius: 10px;
-}
-
-#FREE_PROGRESS_CONTENER {
-  display: flex;
-}
-
-#FREE_PROGRESS_START {
-  height: 10px;
-  line-height: 10px;
-}
-
-#FREE_PROGRESS_END {
-  line-height: 10px;
-}
-
-#FREE_PROGRAM.hidden,
-#FREE_PROGRESS.hidden,
-#FREE_PROGRESS_START.hidden,
-#FREE_PROGRESS_END.hidden {
-  display:none;
 }
 
 #FREE_CLIENTIP {
