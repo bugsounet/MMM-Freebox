@@ -148,10 +148,6 @@ module.exports = NodeHelper.create({
 
     var device = {}
     
-console.log(res.Client[3])
-console.log(res.Client[10])
-
-
     res.Client.forEach(client=> {
     /** Array of client with used value in object **/
       device = {
