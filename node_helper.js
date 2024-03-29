@@ -78,7 +78,7 @@ module.exports = NodeHelper.create({
 
   makeCache (res) {
     this.cache = {};
-    if (this.config.debug )this.sendSocketNotification("debug", res);
+    if (this.config.debug) this.sendSocketNotification("debug", res);
     if (Object.keys(res.Client).length > 0) {
       for (let [item, client] of Object.entries(res.Client)) {
         this.cache[client.l2ident.id] = {

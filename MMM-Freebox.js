@@ -75,7 +75,7 @@ Module.register("MMM-Freebox", {
         this.result(payload);
         break;
       case "debug":
-        console.log(payload);
+        FB("DEBUG", payload);
         break;
     }
   },
@@ -88,7 +88,8 @@ Module.register("MMM-Freebox", {
 
   hideFreebox () {
     this.Freebox.Hidden = true;
-    this.hide(1000, this.callbackHide(), { lockString: "FREEBOX_LOCKED" });
+    this.hide(1000, () => {}, { lockString: "FREEBOX_LOCKED" });
+    this.callbackHide();
     FB("Hide module");
   },
 
@@ -100,7 +101,7 @@ Module.register("MMM-Freebox", {
   showFreebox () {
     this.Freebox.Hidden = false;
     FB("Show module");
-    this.show(1000, { lockString: "FREEBOX_LOCKED" });
+    this.show(1000, () => {}, { lockString: "FREEBOX_LOCKED" });
   },
 
   result (payload) {
