@@ -5,7 +5,8 @@
   "description": "Display Freebox informations",
   "main": "MMM-Freebox.js",
   "keywords": [
-    "freebox"
+    "freebox",
+    "french"
   ],
   "scripts": {
     "register": "node installer/Freebox_Login.js",

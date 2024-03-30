@@ -19,6 +19,9 @@
 #FREE_IP,
 #FREE_DEBIT,
 #FREE_BAND,
+#FREE_BAND_TYPE,
+#FREE_BAND_DOWN,
+#FREE_BAND_UP,
 #FREE_CLIENT {
     display: flex;
     font-size: small;
@@ -33,6 +36,10 @@
     overflow:hidden;
     text-overflow:ellipsis;
     white-space: nowrap;
+}
+
+#FREE_VALUE.nomargin {
+    margin-left: 0px;
 }
 
 #FREE_RATE {
@@ -223,6 +230,13 @@
     background-position: 0 -1px;
 }
 
+#FREE_ICON.up {
+   background-image: url(resources/up.png);
+}
+
+#FREE_ICON.down {
+   background-image: url(resources/down.png);
+}
 
 #FREE_ICON.freebox_crystal0 {
   background-image: url(resources/players.png);

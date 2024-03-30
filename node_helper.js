@@ -156,7 +156,8 @@ module.exports = NodeHelper.create({
         ip: null,
         type: client.host_type,
         vendor: client.vendor_name,
-        debit: null,
+        debitDown: null,
+        debitUp:null,
         active: client.active,
         repeater: false,
         access_type: null,
@@ -178,8 +179,10 @@ module.exports = NodeHelper.create({
           device.signal_percent = this.wifiPercent(device.signal);
           device.signal_bar = this.wifiBar(device.signal_percent);
         }
-        if (client.access_point?.tx_rate) device.debit = this.convert(client.access_point.tx_rate*8,0,1); // Warn debit en bytes! (base 8)
-        else device.debit = "0 Ko/s";
+        if (client.access_point?.tx_rate) device.debitDown = this.convert(client.access_point.tx_rate*8,0,1); // Warn debit en bytes! (base 8)
+        else device.debitDown = "0 Ko/s";
+        if (client.access_point?.rx_rate) device.debitUp = this.convert(client.access_point.rx_rate*8,0,1); // Warn debit en bytes! (base 8)
+        else device.debitUp = "0 Ko/s";
       }
 
       if (this.config.showClientRate || this.config.showClientCnxType) {
@@ -191,7 +194,10 @@ module.exports = NodeHelper.create({
               if (client.l2ident.id === mac) {
                 if (client.access_point?.connectivity_type === "wifi" && client.access_point?.type === "repeater") device.repeater = true;
                 else if (res[info.id] && res[info.id].tx_bytes_rate) {
-                  if (this.config.showEthClientRate) device.debit = this.convert(res[info.id].tx_bytes_rate,0,1);
+                  if (this.config.showEthClientRate) {
+                    device.debitDown = this.convert(res[info.id].tx_bytes_rate,0,1);
+                    device.debitUp = this.convert(res[info.id].rx_bytes_rate,0,1);
+                  }
                   device.access_type = "ethernet";
                   device.eth = info.id;
                 }
@@ -316,8 +322,10 @@ module.exports = NodeHelper.create({
     });
     FB("Done!");
 
-    bandwidth = `${this.convert(cnx.data.result.bandwidth_down,1,2)} - ${this.convert(cnx.data.result.bandwidth_up,1,2)}`;
-    debit = `${this.convert(cnx.data.result.rate_down,0,2)} - ${this.convert(cnx.data.result.rate_up,0,2)}`;
+    bandwidthDown = this.convert(cnx.data.result.bandwidth_down,1,2);
+    bandwidthUp = this.convert(cnx.data.result.bandwidth_up,1,2);
+    debitUp = this.convert(cnx.data.result.rate_down,0,2);
+    debitDown = this.convert(cnx.data.result.rate_up,0,2);
     type = (cnx.data.result.media === "xdsl") ? "xDSL" : ((cnx.data.result.media === "ftth") ? "FTTH" : "Inconnu");
     degroup = (cnx.data.result.type === "rfc2684") ? true : false;
 
@@ -325,8 +333,10 @@ module.exports = NodeHelper.create({
       Model: this.FreeboxVersion,
       Type: type,
       Degroup: degroup,
-      Bandwidth: bandwidth,
-      Debit: debit,
+      BandwidthDown: bandwidthDown,
+      BandwidthUp: bandwidthUp,      
+      DebitDown: debitDown,
+      DebitUp: debitUp,
       IP: cnx.data.result.ipv4,
       Client: clients.data.result ? clients.data.result : [],
       EthCnx: clientRate && ethCnx.data.result ? ethCnx.data.result : [],
