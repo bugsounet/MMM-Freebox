@@ -166,9 +166,6 @@ npm run update
  - Merci de me confirmer le bon fonctionnement sur les autres Freebox!
  - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
 
-## Support et aide
-Toute aide peut-être demandée sur [le forum 4th Party Modules](http://forum.bugsounet.fr)
-
 ## Donation
  Si vous aimez ce module, un petit café est bien sympatique :)
  
