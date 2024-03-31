@@ -152,13 +152,37 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 
 ### Personalisation de l'affichage des appareils connectés
  * Utilisez l'interface `FreeboxOS` de votre Freebox Server (Periphériques Réseau)
- * Utilisez l'application `Freebox Connect` sur votre téléphone (Appareils Connectés)
+ * Utilisez l'application `Freebox Connect` sur votre téléphone (Appareils)
 
-## Update
-Utilisez cette commande:
-```
+## Mise à jour
+
+### Mise à jour manuelle
+
+Utilisez cette commande::
+```sh
 cd ~/MagicMirror/modules/MMM-Freebox
 npm run update
+```
+
+### Mise à jour automatique depuis le module [updatenotification](https://develop.docs.magicmirror.builders/modules/updatenotification.html)
+
+Depuis MagicMirror² v2.27.x, vous pouvez appliquer automatiquement les mises à jours des modules depuis `updatenotification`.<br>
+Voici la règle a ajouter pour `MMM-Freebox`
+
+```js
+  {
+    module: "updatenotification",
+    position: "top_center",
+    config: {
+      updateAutorestart: true, // restart MagicMirror automaticaly after update
+      updates: [
+        // MMM-Freebox rule
+        {
+          "MMM-Freebox": "npm run update"
+        },
+      ]
+    }
+  },
 ```
 
 ## Notes:
