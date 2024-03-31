@@ -127,28 +127,28 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | debug | Active le mode de debuguage | Boolean | false |
 | verbose | Active le mode verbose en console | Boolean| false |
 | updateDelay | Delai de mise à jour en ms | Number | 5 * 1000 (5 sec) |
-| zoom | Permet de zoomer le module | Number | 110 |
+| zoom | Zoom global du module (en pourcent)<br>100 est considéré 100% | Number | 110 |
 | activeOnly | Affiche uniquement les appareils connectés | Boolean | false |
 | showModel | Affiche le model de Freebox utilisé | Boolean | true |
-| showIcon| Affiche les icones | Boolean | true |
+| showIcon| Affiche les icones personalisés des appareils | Boolean | true |
 | showButton | Affiche les boutons de status de connexion | Boolean | true |
-| showBandWidth | Affiche la bande passante | Boolean | true |
-| showRate | Affiche le débit utilisé | Boolean | true |
+| showBandWidth | Affiche la bande passante de votre connexion | Boolean | true |
+| showRate | Affiche le débit utilisé de votre connexion | Boolean | true |
 | showClient | Affiche la liste des appareils | Boolean | true |
-| showClientRate | Affiche le débit de l'appareil | Boolean | true |
+| showClientRate | Affiche le débit des appareils | Boolean | true |
 | showEthClientRate | Affiche le débit de connexion de l'appareil connecté sur le port ethernet.<br>**Ne fonctionne que si un seul appareil est connecté par port ethernet.**<br>**Activer sur vous n'utiliser pas de swtich/hub sur votre Freebox!** | Boolean | false |
+| showClientRateDownOnly | Affiche uniquement le debit descendant des appareils | true |
 | showClientIP | Affiche l'addresse IPv4 des appareils | Boolean | false |
 | showClientCnxType | Affiche le type de connexion des appareils | Boolean | true |
-| showFree | Affiche les Freebox Player | Boolean | true |
+| showFree | Affiche les Freebox Player et répéteurs | Boolean | true |
 | showIP | Affiche l'adresse ip de votre connexion | Boolean | true |
 | showPing | Affiche le ping entre le mirroir et google.fr | Boolean | true |
 | pingAdress| personalisation de l'adresse a ping | String | google.fr |
 | textWidth | Largeur du texte à afficher (mini: 220) | Number | 250 |
 | excludeMac | Ne pas afficher les appareils connectés avec certaines adresses MAC | Array | [] |
 | sortBy | Classement des appareils connectés par : "type", "name", "mac" ou null pour classement par defaut| String | null |
-| checkFreePlug| Permet de verifier et d'afficher les connexions via FreePlug sur le reseau (Freebox Delta uniquement)| Boolean | false |
-| checkSFP| Permet de verifier et d'afficher les connexions via la carte SFP sur le reseau (Freebox Delta/Ultra uniquement)| Boolean | false |
-
+| checkFreePlug| Permet de verifier et d'afficher les connexions via FreePlug sur le réseau (Freebox Delta uniquement)| Boolean | false |
+| checkSFP| Permet de verifier et d'afficher les connexions via la carte SFP sur le réseau (Freebox Delta/Ultra uniquement)| Boolean | false |
 
 ### Personalisation de l'affichage des appareils connectés
  * Utilisez l'interface `FreeboxOS` de votre Freebox Server (Periphériques Réseau)
