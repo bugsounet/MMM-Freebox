@@ -1,7 +1,7 @@
 FB = (...arg) => { /* do nothing */ };
 
 Module.register("MMM-Freebox", {
-
+  requiresVersion: "2.26.0",
   defaults: {
     freebox: {},
     debug: false,
