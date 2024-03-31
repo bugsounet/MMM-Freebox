@@ -166,7 +166,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/VM.svg) Machine Virtuelle
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/what.svg) Connexion indéterminée
 
-### Personalisation de l'affichage des appareils connectés
+### Personalisation de l'affichage des noms et des icones des appareils connectés
  * Utilisez l'interface `FreeboxOS` de votre Freebox Server (Periphériques Réseau)
  * Utilisez l'application `Freebox Connect` sur votre téléphone (Appareils)
 
