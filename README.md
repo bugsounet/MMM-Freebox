@@ -150,6 +150,22 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | checkFreePlug| Permet de verifier et d'afficher les connexions via FreePlug sur le réseau (Freebox Delta uniquement)| Boolean | false |
 | checkSFP| Permet de verifier et d'afficher les connexions via la carte SFP sur le réseau (Freebox Delta/Ultra uniquement)| Boolean | false |
 
+
+### Legende des Icones de connexion
+
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth1.png) Connexion depuis le port Ethernet numéro 1
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth2.png) Connexion depuis le port Ethernet numéro 2
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth3.png) Connexion depuis le port Ethernet numéro 3
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth4.png) Connexion depuis le port Ethernet numéro 4
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/cpl.png) Connexion depuis le port CPL
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/sfp.png) Connexion depuis le port SFP
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal2_5.png) Connexion depuis le wifi 2.4Ghz
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal5_5.png) Connexion depuis le wifi 5
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal6_5.png) Connexion depuis le wifi 6
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal7_5.png) Connexion depuis le wifi 7 (non testé)
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/VM.svg) Machine Virtuelle
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/what.svg) Connexion indéterminée
+
 ### Personalisation de l'affichage des appareils connectés
  * Utilisez l'interface `FreeboxOS` de votre Freebox Server (Periphériques Réseau)
  * Utilisez l'application `Freebox Connect` sur votre téléphone (Appareils)
