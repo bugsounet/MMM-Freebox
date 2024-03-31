@@ -322,10 +322,10 @@ module.exports = NodeHelper.create({
     });
     FB("Done!");
 
-    bandwidthDown = this.convert(cnx.data.result.bandwidth_down,1,2);
     bandwidthUp = this.convert(cnx.data.result.bandwidth_up,1,2);
-    debitUp = this.convert(cnx.data.result.rate_down,0,2);
-    debitDown = this.convert(cnx.data.result.rate_up,0,2);
+    bandwidthDown = this.convert(cnx.data.result.bandwidth_down,1,2);
+    debitDown = this.convert(cnx.data.result.rate_down,0,2);
+    debitUp = this.convert(cnx.data.result.rate_up,0,2);
     type = (cnx.data.result.media === "xdsl") ? "xDSL" : ((cnx.data.result.media === "ftth") ? "FTTH" : "Inconnu");
     degroup = (cnx.data.result.type === "rfc2684") ? true : false;
 

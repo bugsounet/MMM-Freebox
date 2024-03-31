@@ -17,6 +17,7 @@ Module.register("MMM-Freebox", {
     showClient: true,
     showClientRate: true,
     showEthClientRate: false,
+    showClientRateDownOnly: true,
     showClientIP: false,
     showClientCnxType: true,
     showFree: true,
@@ -171,6 +172,12 @@ Module.register("MMM-Freebox", {
         return this.sendSocketNotification("CACHE");
       }
 
+      /** Changement d'icone du client -> rebuild du cache **/
+      if (cache.type !== client.type) {
+        FB(`Type Appareil changé [${mac}] - ${cache.type} --> ${client.type}`);
+        return this.sendSocketNotification("CACHE");
+      }
+
       /** Le nom d'affichage a été changé **/
       var clientName = clientSelect.querySelector("#FREE_NAME");
       client.name = client.name ? client.name : "(Appareil sans nom)";
@@ -206,8 +213,29 @@ Module.register("MMM-Freebox", {
 
       /** debit client **/
       var clientDebit = clientSelect.querySelector("#FREE_RATE");
+      var clientDebitDown = clientSelect.querySelector("#FREE_RATE_DOWN");
+      var clientDebitDownIcon = clientDebitDown.querySelector("#FREE_ICON");
+      var clientDebitDownValue = clientDebitDown.querySelector("#FREE_VALUE");
+      var clientDebitUp = clientSelect.querySelector("#FREE_RATE_UP");
+      var clientDebitUpIcon = clientDebitUp.querySelector("#FREE_ICON");
+      var clientDebitUpValue = clientDebitUp.querySelector("#FREE_VALUE");
       if (this.config.showClientRate) clientDebit.classList.remove("hidden");
-      clientDebit.textContent = client.debitDown;
+      clientDebitDownValue.textContent = client.debitDown;
+      if (!this.config.showClientRateDownOnly) {
+        if (client.debitDown) {
+          clientDebitDownIcon.classList.add("down");
+          clientDebitUpIcon.classList.add("up");
+        } else {
+          clientDebitDownIcon.classList.add("black");
+          clientDebitUpIcon.classList.add("black");
+        }
+
+        clientDebitDownIcon.classList.remove("hidden");
+        clientDebitUp.classList.remove("hidden");
+        clientDebitUpIcon.classList.remove("hidden");
+        clientDebitUpValue.classList.remove("hidden");
+        clientDebitUpValue.textContent = client.debitUp;
+      }
 
       /** bouton **/
       var clientStatus = clientSelect.querySelector("INPUT");
@@ -232,15 +260,21 @@ Module.register("MMM-Freebox", {
     /** Affichage Débit utilisé en temps réél **/
     var debit = document.getElementById("FREE_DEBIT");
     var debitIcon = debit.querySelector("#FREE_ICON");
-    var debitValue = debit.querySelector("#FREE_VALUE");
+    var debitUp = document.getElementById("FREE_DEBIT_UP");
+    var debitDown = document.getElementById("FREE_DEBIT_DOWN");
+    var debitDownValue = debitDown.querySelector("#FREE_VALUE");
+    var debitUpValue = debitUp.querySelector("#FREE_VALUE");
+
     if (this.config.showIcon) debitIcon.classList.remove("hidden");
     if (this.config.showRate) debit.classList.remove("hidden");
-    debitValue.textContent = `${this.Freebox.DebitDown} - ${this.Freebox.DebitUp}`;
+    debitDownValue.textContent = this.Freebox.DebitDown;
+    debitUpValue.textContent = this.Freebox.DebitUp;
 
     /** Affichage Ping en temps réél **/
     var ping = document.getElementById("FREE_PING");
     var pingIcon = ping.querySelector("#FREE_ICON");
     var pingValue = ping.querySelector("#FREE_VALUE");
+
     if (this.config.showIcon) pingIcon.classList.remove("hidden");
     if (this.config.showPing) ping.classList.remove("hidden");
     pingValue.textContent = this.Freebox.Ping;
@@ -386,9 +420,39 @@ Module.register("MMM-Freebox", {
 
           var clientDebit = document.createElement("div");
           clientDebit.id ="FREE_RATE";
-          clientDebit.textContent = "-";
           clientDebit.classList.add("hidden");
           client.appendChild(clientDebit);
+
+          var clientDebitDown= document.createElement("div");
+          clientDebitDown.id = "FREE_RATE_DOWN";
+          if (this.config.showClientRateDownOnly) clientDebitDown.className = "noicon";
+          clientDebit.appendChild( clientDebitDown);
+
+          var clientDebitDownIcon= document.createElement("div");
+          clientDebitDownIcon.className = "down hidden";
+          clientDebitDownIcon.id = "FREE_ICON";
+          clientDebitDown.appendChild(clientDebitDownIcon);
+
+          var clientDebitDownRate= document.createElement("div");
+          clientDebitDownRate.id = "FREE_VALUE";
+          clientDebitDownRate.className = "nomargin";
+          clientDebitDown.appendChild(clientDebitDownRate);
+
+          var clientDebitUp= document.createElement("div");
+          clientDebitUp.id = "FREE_RATE_UP";
+          clientDebitUp.className = "up hidden";
+          clientDebit.appendChild( clientDebitUp);
+
+          var clientDebitUpIcon= document.createElement("div");
+          clientDebitUpIcon.className = "up hidden";
+          clientDebitUpIcon.id = "FREE_ICON";
+          clientDebitUp.appendChild(clientDebitUpIcon);
+
+          var clientDebitUpRate= document.createElement("div");
+          clientDebitUpRate.id = "FREE_VALUE";
+          clientDebitUpRate.className = "nomargin hidden";
+          clientDebitUpRate.textContent = "-";
+          clientDebitUp.appendChild(clientDebitUpRate);
 
           var clientStatus = document.createElement("div");
           clientStatus.className = "switch";
@@ -417,19 +481,46 @@ Module.register("MMM-Freebox", {
       var debit = document.createElement("div");
       debit.id = "FREE_DEBIT";
       debit.classList.add("hidden");
+
       var debitIcon = document.createElement("div");
       debitIcon.id= "FREE_ICON";
       debitIcon.className = "rate";
       debitIcon.classList.add("hidden");
       debit.appendChild(debitIcon);
+
       var debitText = document.createElement("div");
       debitText.id = "FREE_TEXT";
       debitText.textContent = "Débit total utilisé:";
       debit.appendChild(debitText);
-      var debitDisplay= document.createElement("div");
-      debitDisplay.id = "FREE_VALUE";
 
-      debit.appendChild(debitDisplay);
+      var debitDown= document.createElement("div");
+      debitDown.id = "FREE_DEBIT_DOWN";
+      debit.appendChild(debitDown);
+
+      var debitDownIcon= document.createElement("div");
+      debitDownIcon.className = "down";
+      debitDownIcon.id = "FREE_ICON";
+      debitDown.appendChild(debitDownIcon);
+
+      var debitDownRate= document.createElement("div");
+      debitDownRate.id = "FREE_VALUE";
+      debitDownRate.className = "nomargin";
+      debitDown.appendChild(debitDownRate);
+
+      var debitUp= document.createElement("div");
+      debitUp.id = "FREE_DEBIT_UP";
+      debit.appendChild(debitUp);
+
+      var debitUpIcon= document.createElement("div");
+      debitUpIcon.className = "up";
+      debitUpIcon.id = "FREE_ICON";
+      debitUp.appendChild(debitUpIcon);
+
+      var debitUpRate= document.createElement("div");
+      debitUpRate.id = "FREE_VALUE";
+      debitUpRate.className = "nomargin";
+      debitUp.appendChild(debitUpRate);
+
       wrapper.appendChild(debit);
 
       /** ping **/

@@ -18,6 +18,8 @@
 #FREE_PING,
 #FREE_IP,
 #FREE_DEBIT,
+#FREE_DEBIT_DOWN,
+#FREE_DEBIT_UP,
 #FREE_BAND,
 #FREE_BAND_TYPE,
 #FREE_BAND_DOWN,
@@ -28,6 +30,26 @@
     align-items: center;
     padding: 1px;
     line-height: 1;
+}
+
+#FREE_RATE {
+    margin-left: 10px;
+    display:flex;
+}
+
+
+#FREE_RATE_DOWN,
+#FREE_RATE_UP {
+    display: flex;
+    font-size: small;
+    align-items: center;
+    padding: 1px;
+    line-height: 1;
+    width: 80px;
+}
+
+#FREE_RATE_DOWN.noicon {
+    width: 65px;
 }
 
 #FREE_VALUE {
@@ -42,15 +64,6 @@
     margin-left: 0px;
 }
 
-#FREE_RATE {
-    margin-left: 10px;
-    text-align: left;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space: nowrap;
-    width: 65px;
-}
-
 #FREE_TEXT {
     margin-left: 10px;
 }
@@ -62,6 +75,8 @@
     white-space: nowrap;
 }
 
+#FREE_RATE_UP.hidden,
+#FREE_VALUE.hidden,
 #FREE_MODEL.hidden,
 #FREE_ACCESS.hidden,
 #FREE_IP.hidden,
@@ -236,6 +251,10 @@
 
 #FREE_ICON.down {
    background-image: url(resources/down.png);
+}
+
+#FREE_ICON.black {
+    background-image: url(resources/black.png);
 }
 
 #FREE_ICON.freebox_crystal0 {
