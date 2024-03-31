@@ -147,7 +147,7 @@ Module.register("MMM-Freebox", {
     var bandWidthUpValue = bandWidthUp.querySelector("#FREE_VALUE");
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden");
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden");
-    bandWidthTypeValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? " (Dégroupé): " : ": "); // + this.Freebox.BandwidthDown;
+    bandWidthTypeValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? " (Dégroupé): " : ": ");
     bandWidthDownValue.textContent = this.Freebox.BandwidthDown;
     bandWidthUpValue.textContent = this.Freebox.BandwidthUp;
 
@@ -206,7 +206,10 @@ Module.register("MMM-Freebox", {
         else if (client.access_type === "sfp") clientAccess.className= "sfp"
         */
         else if (client.access_type === "VM") clientAccess.className= "VM";
-        else clientAccess.className = "black";
+        // sometimes... WM is connected from repater !? (bug from api) -> displayed with what class `?`
+        else if (!client.access_type && client.active) clientAccess.className= "what";
+        else if (!client.active) clientAccess.className = "black";
+        // add connexion from repeater with `R` in red
         if (client.repeater) clientAccess.classList.add("repeater");
         else clientAccess.classList.remove("repeater");
       }
