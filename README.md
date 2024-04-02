@@ -163,6 +163,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal5_5.png) Connexion depuis le wifi 5
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal6_5.png) Connexion depuis le wifi 6
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal7_5.png) Connexion depuis le wifi 7 (non testé)
+ * <sup>R</sup> (En rouge) Suvi du signal wifi est la connexion depuis un répéteur Wifi
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/VM.svg) Machine Virtuelle
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/what.svg) Connexion indéterminée
 
