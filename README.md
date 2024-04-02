@@ -127,38 +127,79 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | debug | Active le mode de debuguage | Boolean | false |
 | verbose | Active le mode verbose en console | Boolean| false |
 | updateDelay | Delai de mise à jour en ms | Number | 5 * 1000 (5 sec) |
-| zoom | Permet de zoomer le module | Number | 110 |
+| zoom | Zoom global du module (en pourcent)<br>100 est considéré 100% | Number | 110 |
 | activeOnly | Affiche uniquement les appareils connectés | Boolean | false |
 | showModel | Affiche le model de Freebox utilisé | Boolean | true |
-| showIcon| Affiche les icones | Boolean | true |
+| showIcon| Affiche les icones personalisés des appareils | Boolean | true |
 | showButton | Affiche les boutons de status de connexion | Boolean | true |
-| showBandWidth | Affiche la bande passante | Boolean | true |
-| showRate | Affiche le débit utilisé | Boolean | true |
+| showBandWidth | Affiche la bande passante de votre connexion | Boolean | true |
+| showRate | Affiche le débit utilisé de votre connexion | Boolean | true |
 | showClient | Affiche la liste des appareils | Boolean | true |
-| showClientRate | Affiche le débit de l'appareil | Boolean | true |
+| showClientRate | Affiche le débit des appareils | Boolean | true |
 | showEthClientRate | Affiche le débit de connexion de l'appareil connecté sur le port ethernet.<br>**Ne fonctionne que si un seul appareil est connecté par port ethernet.**<br>**Activer sur vous n'utiliser pas de swtich/hub sur votre Freebox!** | Boolean | false |
+| showClientRateDownOnly | Affiche uniquement le debit descendant des appareils | Boolean | true |
 | showClientIP | Affiche l'addresse IPv4 des appareils | Boolean | false |
 | showClientCnxType | Affiche le type de connexion des appareils | Boolean | true |
-| showFree | Affiche les Freebox Player | Boolean | true |
+| showFree | Affiche les Freebox Player et répéteurs | Boolean | true |
 | showIP | Affiche l'adresse ip de votre connexion | Boolean | true |
 | showPing | Affiche le ping entre le mirroir et google.fr | Boolean | true |
 | pingAdress| personalisation de l'adresse a ping | String | google.fr |
 | textWidth | Largeur du texte à afficher (mini: 220) | Number | 250 |
 | excludeMac | Ne pas afficher les appareils connectés avec certaines adresses MAC | Array | [] |
 | sortBy | Classement des appareils connectés par : "type", "name", "mac" ou null pour classement par defaut| String | null |
-| checkFreePlug| Permet de verifier et d'afficher les connexions via FreePlug sur le reseau (Freebox Delta uniquement)| Boolean | false |
-| checkSFP| Permet de verifier et d'afficher les connexions via la carte SFP sur le reseau (Freebox Delta/Ultra uniquement)| Boolean | false |
+| checkFreePlug| Permet de verifier et d'afficher les connexions via FreePlug sur le réseau (Freebox Delta uniquement)| Boolean | false |
+| checkSFP| Permet de verifier et d'afficher les connexions via la carte SFP sur le réseau (Freebox Delta/Ultra uniquement)| Boolean | false |
 
 
-### Personalisation de l'affichage des appareils connectés
+### Legende des Icones de connexion
+
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth1.png) Connexion depuis le port Ethernet numéro 1
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth2.png) Connexion depuis le port Ethernet numéro 2
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth3.png) Connexion depuis le port Ethernet numéro 3
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth4.png) Connexion depuis le port Ethernet numéro 4
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/cpl.png) Connexion depuis le port CPL
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/sfp.png) Connexion depuis le port SFP
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal2_5.png) Connexion depuis le wifi 2.4Ghz
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal5_5.png) Connexion depuis le wifi 5
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal6_5.png) Connexion depuis le wifi 6
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal7_5.png) Connexion depuis le wifi 7 (non testé)
+ * <sup>R</sup> (En rouge) Suivi du signal wifi est la connexion depuis un répéteur Wifi
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/VM.svg) Machine Virtuelle
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/what.svg) Connexion indéterminée
+
+### Personalisation de l'affichage des noms et des icones des appareils connectés
  * Utilisez l'interface `FreeboxOS` de votre Freebox Server (Periphériques Réseau)
- * Utilisez l'application `Freebox Connect` sur votre téléphone (Appareils Connectés)
+ * Utilisez l'application `Freebox Connect` sur votre téléphone (Appareils)
 
-## Update
-Utilisez cette commande:
-```
+## Mise à jour
+
+### Mise à jour manuelle
+
+Utilisez cette commande::
+```sh
 cd ~/MagicMirror/modules/MMM-Freebox
 npm run update
+```
+
+### Mise à jour automatique depuis le module [updatenotification](https://develop.docs.magicmirror.builders/modules/updatenotification.html)
+
+Depuis MagicMirror² v2.27.x, vous pouvez appliquer automatiquement les mises à jours des modules depuis `updatenotification`.<br>
+Voici la règle a ajouter pour `MMM-Freebox`
+
+```js
+  {
+    module: "updatenotification",
+    position: "top_center",
+    config: {
+      updateAutorestart: true, // restart MagicMirror automaticaly after update
+      updates: [
+        // MMM-Freebox rule
+        {
+          "MMM-Freebox": "npm run update"
+        },
+      ]
+    }
+  },
 ```
 
 ## Notes:

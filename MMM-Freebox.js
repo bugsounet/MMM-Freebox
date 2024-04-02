@@ -1,7 +1,7 @@
 FB = (...arg) => { /* do nothing */ };
 
 Module.register("MMM-Freebox", {
-
+  requiresVersion: "2.26.0",
   defaults: {
     freebox: {},
     debug: false,
@@ -17,6 +17,7 @@ Module.register("MMM-Freebox", {
     showClient: true,
     showClientRate: true,
     showEthClientRate: false,
+    showClientRateDownOnly: true,
     showClientIP: false,
     showClientCnxType: true,
     showFree: true,
@@ -34,8 +35,10 @@ Module.register("MMM-Freebox", {
     this.Init = false;
     this.Freebox = {
       Hidden: true,
-      Bandwidth: null,
-      Debit: null,
+      BandwidthDown: null,
+      BandwidthUp: null,
+      DebitDown: null,
+      DebitUp: null,
       IP: null,
       Degroup: false,
       Type: null,
@@ -108,8 +111,10 @@ Module.register("MMM-Freebox", {
     this.Freebox.Model = payload.Model;
     this.Freebox.Type = payload.Type;
     this.Freebox.Degroup = payload.Degroup;
-    this.Freebox.Bandwidth = payload.Bandwidth;
-    this.Freebox.Debit = payload.Debit;
+    this.Freebox.BandwidthDown = payload.BandwidthDown;
+    this.Freebox.BandwidthUp = payload.BandwidthUp;
+    this.Freebox.DebitDown = payload.DebitDown;
+    this.Freebox.DebitUp = payload.DebitUp;
     this.Freebox.IP = payload.IP;
     this.Freebox.Clients = payload.Clients;
     this.Freebox.Ping = payload.Ping;
@@ -133,11 +138,18 @@ Module.register("MMM-Freebox", {
     /** Bande Passante **/
     var bandWidth = document.getElementById("FREE_BAND");
     var bandWidthIcon = bandWidth.querySelector("#FREE_ICON");
+    var bandWidthType = document.getElementById("FREE_BAND_TYPE");
+    var bandWidthDown = document.getElementById("FREE_BAND_DOWN");
+    var bandWidthUp = document.getElementById("FREE_BAND_UP");
 
-    var bandWidthValue = bandWidth.querySelector("#FREE_VALUE");
+    var bandWidthTypeValue = bandWidth.querySelector("#FREE_VALUE");
+    var bandWidthDownValue = bandWidthDown.querySelector("#FREE_VALUE");
+    var bandWidthUpValue = bandWidthUp.querySelector("#FREE_VALUE");
     if (this.config.showIcon) bandWidthIcon.classList.remove("hidden");
     if (this.config.showBandWidth) bandWidth.classList.remove("hidden");
-    bandWidthValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? " (Dégroupé): " : ": ") + this.Freebox.Bandwidth;
+    bandWidthTypeValue.textContent = this.Freebox.Type + (this.Freebox.Degroup ? " (Dégroupé): " : ": ");
+    bandWidthDownValue.textContent = this.Freebox.BandwidthDown;
+    bandWidthUpValue.textContent = this.Freebox.BandwidthUp;
 
     /** Adresse IP **/
     var IP = document.getElementById("FREE_IP");
@@ -157,6 +169,12 @@ Module.register("MMM-Freebox", {
       /** Nouveau Client connecté -> rebuild du cache **/
       if (!clientSelect || (this.Freebox.Clients.length !== Object.keys(this.Freebox.Cache).length)) {
         FB(`Appareil inconnu [${mac}] - Rechargement du cache.`);
+        return this.sendSocketNotification("CACHE");
+      }
+
+      /** Changement d'icone du client -> rebuild du cache **/
+      if (cache.type !== client.type) {
+        FB(`Type Appareil changé [${mac}] - ${cache.type} --> ${client.type}`);
         return this.sendSocketNotification("CACHE");
       }
 
@@ -188,15 +206,39 @@ Module.register("MMM-Freebox", {
         else if (client.access_type === "sfp") clientAccess.className= "sfp"
         */
         else if (client.access_type === "VM") clientAccess.className= "VM";
-        else clientAccess.className = "black";
+        // sometimes... WM is connected from repater !? (bug from api) -> displayed with what class `?`
+        else if (!client.access_type && client.active) clientAccess.className= "what";
+        else if (!client.active) clientAccess.className = "black";
+        // add connexion from repeater with `R` in red
         if (client.repeater) clientAccess.classList.add("repeater");
         else clientAccess.classList.remove("repeater");
       }
 
       /** debit client **/
       var clientDebit = clientSelect.querySelector("#FREE_RATE");
+      var clientDebitDown = clientSelect.querySelector("#FREE_RATE_DOWN");
+      var clientDebitDownIcon = clientDebitDown.querySelector("#FREE_ICON");
+      var clientDebitDownValue = clientDebitDown.querySelector("#FREE_VALUE");
+      var clientDebitUp = clientSelect.querySelector("#FREE_RATE_UP");
+      var clientDebitUpIcon = clientDebitUp.querySelector("#FREE_ICON");
+      var clientDebitUpValue = clientDebitUp.querySelector("#FREE_VALUE");
       if (this.config.showClientRate) clientDebit.classList.remove("hidden");
-      clientDebit.textContent = client.debit;
+      clientDebitDownValue.textContent = client.debitDown;
+      if (!this.config.showClientRateDownOnly) {
+        if (client.debitDown) {
+          clientDebitDownIcon.classList.add("down");
+          clientDebitUpIcon.classList.add("up");
+        } else {
+          clientDebitDownIcon.classList.add("black");
+          clientDebitUpIcon.classList.add("black");
+        }
+
+        clientDebitDownIcon.classList.remove("hidden");
+        clientDebitUp.classList.remove("hidden");
+        clientDebitUpIcon.classList.remove("hidden");
+        clientDebitUpValue.classList.remove("hidden");
+        clientDebitUpValue.textContent = client.debitUp;
+      }
 
       /** bouton **/
       var clientStatus = clientSelect.querySelector("INPUT");
@@ -221,15 +263,21 @@ Module.register("MMM-Freebox", {
     /** Affichage Débit utilisé en temps réél **/
     var debit = document.getElementById("FREE_DEBIT");
     var debitIcon = debit.querySelector("#FREE_ICON");
-    var debitValue = debit.querySelector("#FREE_VALUE");
+    var debitUp = document.getElementById("FREE_DEBIT_UP");
+    var debitDown = document.getElementById("FREE_DEBIT_DOWN");
+    var debitDownValue = debitDown.querySelector("#FREE_VALUE");
+    var debitUpValue = debitUp.querySelector("#FREE_VALUE");
+
     if (this.config.showIcon) debitIcon.classList.remove("hidden");
     if (this.config.showRate) debit.classList.remove("hidden");
-    debitValue.textContent = this.Freebox.Debit;
+    debitDownValue.textContent = this.Freebox.DebitDown;
+    debitUpValue.textContent = this.Freebox.DebitUp;
 
     /** Affichage Ping en temps réél **/
     var ping = document.getElementById("FREE_PING");
     var pingIcon = ping.querySelector("#FREE_ICON");
     var pingValue = ping.querySelector("#FREE_VALUE");
+
     if (this.config.showIcon) pingIcon.classList.remove("hidden");
     if (this.config.showPing) ping.classList.remove("hidden");
     pingValue.textContent = this.Freebox.Ping;
@@ -280,9 +328,41 @@ Module.register("MMM-Freebox", {
       bandWidthIcon.id= "FREE_ICON";
       bandWidth.appendChild(bandWidthIcon);
 
-      var bandWidthDisplay= document.createElement("div");
-      bandWidthDisplay.id = "FREE_VALUE";
-      bandWidth.appendChild(bandWidthDisplay);
+      var bandWidthType= document.createElement("div");
+      bandWidthType.id = "FREE_BAND_TYPE";
+      bandWidth.appendChild(bandWidthType);
+
+      var bandWidthTypeValue= document.createElement("div");
+      bandWidthTypeValue.id = "FREE_VALUE";
+      bandWidthType.appendChild(bandWidthTypeValue);
+
+      var bandWidthDown= document.createElement("div");
+      bandWidthDown.id = "FREE_BAND_DOWN";
+      bandWidth.appendChild(bandWidthDown);
+
+      var bandWidthDownIcon= document.createElement("div");
+      bandWidthDownIcon.className = "down";
+      bandWidthDownIcon.id = "FREE_ICON";
+      bandWidthDown.appendChild(bandWidthDownIcon);
+
+      var bandWidthDownRate= document.createElement("div");
+      bandWidthDownRate.id = "FREE_VALUE";
+      bandWidthDownRate.className = "nomargin";
+      bandWidthDown.appendChild(bandWidthDownRate);
+
+      var bandWidthUp= document.createElement("div");
+      bandWidthUp.id = "FREE_BAND_UP";
+      bandWidth.appendChild(bandWidthUp);
+
+      var bandWidthUpIcon= document.createElement("div");
+      bandWidthUpIcon.className = "up";
+      bandWidthUpIcon.id = "FREE_ICON";
+      bandWidthUp.appendChild(bandWidthUpIcon);
+
+      var bandWidthUpRate= document.createElement("div");
+      bandWidthUpRate.id = "FREE_VALUE";
+      bandWidthUpRate.className = "nomargin";
+      bandWidthUp.appendChild(bandWidthUpRate);
 
       wrapper.appendChild(bandWidth);
 
@@ -343,9 +423,39 @@ Module.register("MMM-Freebox", {
 
           var clientDebit = document.createElement("div");
           clientDebit.id ="FREE_RATE";
-          clientDebit.textContent = "-";
           clientDebit.classList.add("hidden");
           client.appendChild(clientDebit);
+
+          var clientDebitDown= document.createElement("div");
+          clientDebitDown.id = "FREE_RATE_DOWN";
+          if (this.config.showClientRateDownOnly) clientDebitDown.className = "noicon";
+          clientDebit.appendChild( clientDebitDown);
+
+          var clientDebitDownIcon= document.createElement("div");
+          clientDebitDownIcon.className = "down hidden";
+          clientDebitDownIcon.id = "FREE_ICON";
+          clientDebitDown.appendChild(clientDebitDownIcon);
+
+          var clientDebitDownRate= document.createElement("div");
+          clientDebitDownRate.id = "FREE_VALUE";
+          clientDebitDownRate.className = "nomargin";
+          clientDebitDown.appendChild(clientDebitDownRate);
+
+          var clientDebitUp= document.createElement("div");
+          clientDebitUp.id = "FREE_RATE_UP";
+          clientDebitUp.className = "up hidden";
+          clientDebit.appendChild( clientDebitUp);
+
+          var clientDebitUpIcon= document.createElement("div");
+          clientDebitUpIcon.className = "up hidden";
+          clientDebitUpIcon.id = "FREE_ICON";
+          clientDebitUp.appendChild(clientDebitUpIcon);
+
+          var clientDebitUpRate= document.createElement("div");
+          clientDebitUpRate.id = "FREE_VALUE";
+          clientDebitUpRate.className = "nomargin hidden";
+          clientDebitUpRate.textContent = "-";
+          clientDebitUp.appendChild(clientDebitUpRate);
 
           var clientStatus = document.createElement("div");
           clientStatus.className = "switch";
@@ -374,19 +484,46 @@ Module.register("MMM-Freebox", {
       var debit = document.createElement("div");
       debit.id = "FREE_DEBIT";
       debit.classList.add("hidden");
+
       var debitIcon = document.createElement("div");
       debitIcon.id= "FREE_ICON";
       debitIcon.className = "rate";
       debitIcon.classList.add("hidden");
       debit.appendChild(debitIcon);
+
       var debitText = document.createElement("div");
       debitText.id = "FREE_TEXT";
       debitText.textContent = "Débit total utilisé:";
       debit.appendChild(debitText);
-      var debitDisplay= document.createElement("div");
-      debitDisplay.id = "FREE_VALUE";
 
-      debit.appendChild(debitDisplay);
+      var debitDown= document.createElement("div");
+      debitDown.id = "FREE_DEBIT_DOWN";
+      debit.appendChild(debitDown);
+
+      var debitDownIcon= document.createElement("div");
+      debitDownIcon.className = "down";
+      debitDownIcon.id = "FREE_ICON";
+      debitDown.appendChild(debitDownIcon);
+
+      var debitDownRate= document.createElement("div");
+      debitDownRate.id = "FREE_VALUE";
+      debitDownRate.className = "nomargin";
+      debitDown.appendChild(debitDownRate);
+
+      var debitUp= document.createElement("div");
+      debitUp.id = "FREE_DEBIT_UP";
+      debit.appendChild(debitUp);
+
+      var debitUpIcon= document.createElement("div");
+      debitUpIcon.className = "up";
+      debitUpIcon.id = "FREE_ICON";
+      debitUp.appendChild(debitUpIcon);
+
+      var debitUpRate= document.createElement("div");
+      debitUpRate.id = "FREE_VALUE";
+      debitUpRate.className = "nomargin";
+      debitUp.appendChild(debitUpRate);
+
       wrapper.appendChild(debit);
 
       /** ping **/
