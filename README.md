@@ -137,7 +137,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | showClient | Affiche la liste des appareils | Boolean | true |
 | showClientRate | Affiche le débit des appareils | Boolean | true |
 | showEthClientRate | Affiche le débit de connexion de l'appareil connecté sur le port ethernet.<br>**Ne fonctionne que si un seul appareil est connecté par port ethernet.**<br>**Activer sur vous n'utiliser pas de swtich/hub sur votre Freebox!** | Boolean | false |
-| showClientRateDownOnly | Affiche uniquement le debit descendant des appareils | true |
+| showClientRateDownOnly | Affiche uniquement le debit descendant des appareils | Boolean | true |
 | showClientIP | Affiche l'addresse IPv4 des appareils | Boolean | false |
 | showClientCnxType | Affiche le type de connexion des appareils | Boolean | true |
 | showFree | Affiche les Freebox Player et répéteurs | Boolean | true |
