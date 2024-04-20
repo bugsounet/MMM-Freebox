@@ -12,6 +12,11 @@
   background-repeat: no-repeat;
 }
 
+#FREE {
+  display: inline-flex;
+  flex-direction: column;
+}
+
 #FREE_MODEL,
 #FREE_PING,
 #FREE_IP,
