@@ -334,7 +334,7 @@ class Freebox {
       const { status, data } = error.response;
       const {
         error_code,
-        result: { challenge }
+        result //: { challenge } <-- to inspect: why challange ?
       } = data;
       const isTokenExpired
 				= status === 403
@@ -346,7 +346,8 @@ class Freebox {
       }
 
       // Token has expired, we need to login
-      await this.login(challenge);
+      await this.login();
+      //await this.login(challenge); <-- why challenge !?
 
       // Execute once again the initial request
       response = await this._getAxiosInstance().request(requestConfig);
