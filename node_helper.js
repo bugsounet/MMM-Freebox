@@ -164,16 +164,17 @@ module.exports = NodeHelper.create({
         signal: null,
         signal_percent: null,
         signal_bar: null,
+        standard: null,
         eth: null
       };
       
       let ip = client?.l3connectivities.find((cnx) => cnx.af === "ipv4" && cnx.active);
       device.ip = ip ? ip.addr : null;
       if (client.access_point?.connectivity_type === "wifi") {
-        if (client.access_point?.wifi_information.band === "2d4g") device.access_type= "wifi2";
-        if (client.access_point?.wifi_information.band === "5g") device.access_type= "wifi5";
-        if (client.access_point?.wifi_information.band === "6g") device.access_type= "wifi6";
-        if (client.access_point?.wifi_information.band === "60g") device.access_type= "wifi7";
+        if (client.access_point?.wifi_information.band === "2d4g") device.band = "2d4g";
+        if (client.access_point?.wifi_information.band === "5g") device.band = "5g";
+        if (client.access_point?.wifi_information.band === "6g") device.band = "6g";
+        if (client.access_point?.wifi_information.band === "60g") device.band = "60g";
         if (client.access_point?.wifi_information.signal) {
           device.signal = client.access_point.wifi_information.signal;
           device.signal_percent = this.wifiPercent(device.signal);
@@ -183,6 +184,7 @@ module.exports = NodeHelper.create({
         else device.debitDown = "0 Ko/s";
         if (client.access_point?.rx_rate) device.debitUp = this.convert(client.access_point.rx_rate*8,0,1); // Warn debit en bytes! (base 8)
         else device.debitUp = "0 Ko/s";
+        if (client.access_point?.wifi_information?.standard) device.standard = client.access_point.wifi_information.standard;
       }
 
       if (this.config.showClientRate || this.config.showClientCnxType) {
