@@ -351,40 +351,49 @@
 
 #FREE_STANDARD {
   background-image: url(resources/black.png);
-  height: 15px;
-  width: 40px;
+  height: 16px;
+  width: 16px;
   background-size: 100%;
   background-repeat: no-repeat;
   background-position: 0px center;
   margin-right: 10px;
 }
 
-#FREE_STANDARD.std_a {
-  background-image: url(/modules/MMM-Freebox/resources/standard/a.png);
-}
+/* ancienne norme wifi */
 
-#FREE_STANDARD.std_ac {
-  background-image: url(/modules/MMM-Freebox/resources/standard/ac.png);
-}
-
-#FREE_STANDARD.std_ax {
-  background-image: url(/modules/MMM-Freebox/resources/standard/ax.png);
-}
-
+/* wifi 1 */
 #FREE_STANDARD.std_b {
-  background-image: url(/modules/MMM-Freebox/resources/standard/b.png);
+  background-image: url(/modules/MMM-Freebox/resources/standard/Wi-Fi_1.png);
 }
 
-#FREE_STANDARD.std_be {
-  background-image: url(/modules/MMM-Freebox/resources/standard/be.png);
+/* wifi 2 */
+#FREE_STANDARD.std_a {
+  background-image: url(/modules/MMM-Freebox/resources/standard/Wi-Fi_2.png);
 }
 
+/* wifi 3 */
 #FREE_STANDARD.std_g {
-  background-image: url(/modules/MMM-Freebox/resources/standard/g.png);
+  background-image: url(/modules/MMM-Freebox/resources/standard/Wi-Fi_3.png);
 }
 
+/* wifi 4 */
 #FREE_STANDARD.std_n {
-  background-image: url(/modules/MMM-Freebox/resources/standard/n.png);
+  background-image: url(/modules/MMM-Freebox/resources/standard/Wi-Fi_4.png);
+}
+
+/* wifi 5 */
+#FREE_STANDARD.std_ac {
+  background-image: url(/modules/MMM-Freebox/resources/standard/Wi-Fi_5.png);
+}
+
+/* wifi 6 */
+#FREE_STANDARD.std_ax {
+  background-image: url(/modules/MMM-Freebox/resources/standard/Wi-Fi_6.png);
+}
+
+/* wifi 7 */
+#FREE_STANDARD.std_be {
+  background-image: url(/modules/MMM-Freebox/resources/standard/Wi-Fi_7.png);
 }
 
 #FREE_ACCESS {
