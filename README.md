@@ -109,6 +109,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     showEthClientRate: false,
     showClientIP: false,
     showClientCnxType: true,
+    showWifiStandard: true,
     showFree: true,
     showIP: true,
     showPing: true,
@@ -140,6 +141,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | showClientRateDownOnly | Affiche uniquement le debit descendant des appareils | Boolean | true |
 | showClientIP | Affiche l'addresse IPv4 des appareils | Boolean | false |
 | showClientCnxType | Affiche le type de connexion des appareils | Boolean | true |
+| showWifiStandard | Affiche la norme de connexion utilisée | Bolean | true |
 | showFree | Affiche les Freebox Player et répéteurs | Boolean | true |
 | showIP | Affiche l'adresse ip de votre connexion | Boolean | true |
 | showPing | Affiche le ping entre le mirroir et google.fr | Boolean | true |
@@ -151,7 +153,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
 | checkSFP| Permet de verifier et d'afficher les connexions via la carte SFP sur le réseau (Freebox Delta/Ultra uniquement)| Boolean | false |
 
 
-### Legende des Icones de connexion
+### Legende des icones de connexion
 
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth1.png) Connexion depuis le port Ethernet numéro 1
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth2.png) Connexion depuis le port Ethernet numéro 2
@@ -159,13 +161,22 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/eth4.png) Connexion depuis le port Ethernet numéro 4
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/cpl.png) Connexion depuis le port CPL
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/sfp.png) Connexion depuis le port SFP
- * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal2_5.png) Connexion depuis le wifi 2.4Ghz
- * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal5_5.png) Connexion depuis le wifi 5
- * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal6_5.png) Connexion depuis le wifi 6
- * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/signal7_5.png) Connexion depuis le wifi 7 (non testé)
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/2d4g_5.png) Connexion depuis le wifi 2.4Ghz
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/5g_5.png) Connexion depuis le wifi 5Ghz
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/6g_5.png) Connexion depuis le wifi 6Ghz
+ * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/wifi/60g_5.png) Connexion depuis le wifi 60Ghz (non disponible)
  * <sup>R</sup> (En rouge) Suivi du signal wifi est la connexion depuis un répéteur Wifi
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/VM.svg) Machine Virtuelle
  * ![](https://raw.githubusercontent.com/bugsounet/MMM-Freebox/e257a81b24d3dff1d451e0c35b7b2cdda3c5f5c6/resources/fromFreeboxOS/what.svg) Connexion indéterminée
+
+### Legende des icones de norme de connexion wifi
+  *  <img src="https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/standard/Wi-Fi_1.png" width=20px /> Connexion avec la norme 802.11b (wifi 1)
+  *  <img src="https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/standard/Wi-Fi_2.png" width=20px /> Connexion avec la norme 802.11a (wifi 2)
+  *  <img src="https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/standard/Wi-Fi_3.png" width=20px /> Connexion avec la norme 802.11g (wifi 3)
+  *  <img src="https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/standard/Wi-Fi_4.png" width=20px /> Connexion avec la norme 802.11n (wifi 4)
+  *  <img src="https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/standard/Wi-Fi_5.png" width=20px /> Connexion avec la norme 802.11ac (wifi 5)
+  *  <img src="https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/standard/Wi-Fi_6.png" width=20px /> Connexion avec la norme 802.11ax (wifi 6)
+  *  <img src="https://raw.githubusercontent.com/bugsounet/MMM-Freebox/dev/resources/standard/Wi-Fi_7.png" width=20px /> Connexion avec la norme 802.11be (wifi 7)
 
 ### Personalisation de l'affichage des noms et des icones des appareils connectés
  * Utilisez l'interface `FreeboxOS` de votre Freebox Server (Periphériques Réseau)
