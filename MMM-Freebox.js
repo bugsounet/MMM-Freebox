@@ -20,6 +20,7 @@ Module.register("MMM-Freebox", {
     showClientRateDownOnly: true,
     showClientIP: false,
     showClientCnxType: true,
+    showWifiStandard: true,
     showFree: true,
     showIP: true,
     showPing: true,
@@ -192,22 +193,37 @@ Module.register("MMM-Freebox", {
         clientIP.textContent = client.ip ? client.ip : "";
       }
 
+      if (this.config.showWifiStandard) {
+        /** Display wireless Standard */
+        var clientStandard = clientSelect.querySelector("#FREE_STANDARD");
+        if (client.standard === "a") clientStandard.className= `std_${client.standard}`;
+        if (client.standard === "ac") clientStandard.className= `std_${client.standard}`;
+        if (client.standard === "ax") clientStandard.className= `std_${client.standard}`;
+        if (client.standard === "b") clientStandard.className= `std_${client.standard}`;
+        if (client.standard === "be") clientStandard.className= `std_${client.standard}`;
+        if (client.standard === "g") clientStandard.className= `std_${client.standard}`;
+        if (client.standard === "n") clientStandard.className= `std_${client.standard}`;
+      }
+
       /** Wifi ou Eth ? **/
       var clientAccess = clientSelect.querySelector("#FREE_ACCESS");
       if (this.config.showClientCnxType) {
         clientAccess.classList.remove("hidden");
         if (client.access_type === "ethernet") clientAccess.className= `ethernet${client.eth}`;
-        else if (client.access_type === "wifi2") clientAccess.className =`wifi2_${client.signal_bar ? client.signal_bar : 0}`;
-        else if (client.access_type === "wifi5") clientAccess.className =`wifi5_${client.signal_bar ? client.signal_bar : 0}`;
-        else if (client.access_type === "wifi6") clientAccess.className =`wifi6_${client.signal_bar ? client.signal_bar : 0}`;
-        else if (client.access_type === "wifi7") clientAccess.className =`wifi7_${client.signal_bar ? client.signal_bar : 0}`;
+        else if (client.band === "2d4g") clientAccess.className =`signal2d4g_${client.signal_bar ? client.signal_bar : 0}`;
+        else if (client.band === "5g") clientAccess.className =`signal5g_${client.signal_bar ? client.signal_bar : 0}`;
+        else if (client.band === "6g") clientAccess.className =`signal6g_${client.signal_bar ? client.signal_bar : 0}`;
+        else if (client.band === "60g") clientAccess.className =`signal60g_${client.signal_bar ? client.signal_bar : 0}`;
         /* can't really code it ... but can be handled with eth5/eth6
         else if (client.access_type === "freeplug") clientAccess.className= "freeplug"
         else if (client.access_type === "sfp") clientAccess.className= "sfp"
         */
         else if (client.access_type === "VM") clientAccess.className= "VM";
         // sometimes... WM is connected from repater !? (bug from api) -> displayed with what class `?`
-        else if (!client.access_type && client.active) clientAccess.className= "what";
+        else if (!client.access_type && client.active) {
+          clientAccess.className= "what";
+          if (this.config.showWifiStandard) clientStandard.className = "";
+        }
         else if (!client.active) clientAccess.className = "black";
         // add connexion from repeater with `R` in red
         if (client.repeater) clientAccess.classList.add("repeater");
@@ -413,6 +429,13 @@ Module.register("MMM-Freebox", {
             var clientIP = document.createElement("div");
             clientIP.id= "FREE_CLIENTIP";
             client.appendChild(clientIP);
+          }
+
+          if (this.config.showWifiStandard) {
+            var clientCnxStandard= document.createElement("div");
+            clientCnxStandard.id = "FREE_STANDARD";
+            clientCnxStandard.className= "black";
+            client.appendChild(clientCnxStandard);
           }
 
           var clientCnxType= document.createElement("div");
