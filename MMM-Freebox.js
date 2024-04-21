@@ -222,7 +222,7 @@ Module.register("MMM-Freebox", {
         // sometimes... WM is connected from repater !? (bug from api) -> displayed with what class `?`
         else if (!client.access_type && client.active) {
           clientAccess.className= "what";
-          if (this.config.showWifiStandard) clientStandard.className = '';
+          if (this.config.showWifiStandard) clientStandard.className = "";
         }
         else if (!client.active) clientAccess.className = "black";
         // add connexion from repeater with `R` in red
