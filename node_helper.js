@@ -378,12 +378,13 @@ module.exports = NodeHelper.create({
 
   /** Signal wifi en % **/
   wifiPercent (dB) {
-    if(dB <= -100)
+    var quality = 2 * (dB + 100);
+
+    if (dB <= -80)
       quality = 0;
-    else if(dB >= -50)
+    else if (dB >= -50)
       quality = 100;
-    else
-      quality = 2 * (dB + 100);
+
     return quality;
   },
 
