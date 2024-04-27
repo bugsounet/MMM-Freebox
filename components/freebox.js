@@ -11,14 +11,7 @@
  * Added support for API versions above 10
  */
 
-/*
-import https from 'node:https';
-import {createHmac} from 'node:crypto';
-import axios from 'axios';
-*/
-
 /* eslint-disable no-param-reassign */
-/* make as original content */
 
 const https = require("node:https");
 const { createHmac } = require("node:crypto");
@@ -106,13 +99,9 @@ class FreeboxRegister {
       throw error;
     }
 
-    const { api_domain, https_port, api_base_url, api_version }
-			= discoveryResponse.data;
+    const { api_domain, https_port, api_base_url, api_version } = discoveryResponse.data;
 
-    this.baseAPIURL = `${this.baseURL}${api_base_url}v${api_version
-      .split(".")
-      .shift()
-      .trim()}`;
+    this.baseAPIURL = `${this.baseURL}${api_base_url}v${api_version.split(".").shift().trim()}`;
 
     const { data } = await this.requestAuthorization(this.appIdentity);
     const { app_token, track_id } = data.result;
@@ -175,8 +164,7 @@ class FreeboxRegister {
     const authorizationStatus = {
       unknown: "The app_token is invalid or has been revoked",
       pending: "The user has not confirmed the authorization request yet",
-      timeout:
-				"The user did not confirmed the authorization within the given time",
+      timeout: "The user did not confirmed the authorization within the given time",
       granted: "The app_token is valid and can be used to open a session",
       denied: "The user denied the authorization request"
     };
@@ -223,10 +211,7 @@ class FreeboxRegister {
   }
 
   async trackAuthorizationProgress (track_id) {
-    if (
-      !track_id
-			|| (typeof track_id !== "string" && typeof track_id !== "number")
-    ) {
+    if (!track_id || (typeof track_id !== "string" && typeof track_id !== "number")) {
       throw new Error("track_id must be a string or a number not null");
     }
 
@@ -289,9 +274,7 @@ class Freebox {
     }
 
     // fix api > v10
-    this.baseAPIURL = `https://${api_domain}${
-      https_port ? `:${  https_port}` : ""
-    }${api_base_url}v${api_version.split(".").shift().trim()}`;
+    this.baseAPIURL = `https://${api_domain}:${https_port}${api_base_url}v${api_version.split(".").shift().trim()}`;
 
     this.appToken = app_token;
     this.appVersion = app_version;
@@ -332,22 +315,15 @@ class Freebox {
       }
 
       const { status, data } = error.response;
-      const {
-        error_code,
-        result //: { challenge } <-- to inspect: why challange ?
-      } = data;
-      const isTokenExpired
-				= status === 403
-				&& error_code === "auth_required"
-				&& this.headers["X-Fbx-App-Auth"];
+      const { error_code, result } = data;
+      const isTokenExpired = status === 403 && error_code === "auth_required" && this.headers["X-Fbx-App-Auth"];
 
       if (!isTokenExpired) {
         throw error;
       }
 
       // Token has expired, we need to login
-      await this.login();
-      //await this.login(challenge); <-- why challenge !?
+      await this.login(result.challenge);
 
       // Execute once again the initial request
       response = await this._getAxiosInstance().request(requestConfig);

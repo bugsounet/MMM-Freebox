@@ -214,9 +214,13 @@ Voici la règle a ajouter pour `MMM-Freebox`
 ```
 
 ## Notes:
- - Les essais ont été effectué avec une Freebox Ultra.
+ - Les essais ont été effectués avec une Freebox Ultra.
  - Merci de me confirmer le bon fonctionnement sur les autres Freebox!
  - Ne fonctionne pas avec les Freebox Crystal et antérieur (API différante)
+
+## Test Freebox:
+ - Ultra: api v11.1 (Freebox OS v4.8)
+ - Révolution: api v10.2 (Freebox OS v4.7)
 
 ## Donation
  Si vous aimez ce module, un petit café est bien sympatique :)

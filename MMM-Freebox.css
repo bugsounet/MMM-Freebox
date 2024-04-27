@@ -415,7 +415,7 @@
     color: red;
 }
 
-#FREE_ACCESS.repeater:before {
+#FREE_ACCESS.repeater::before {
     content: 'R';
 }
 

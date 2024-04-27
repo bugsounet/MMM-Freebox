@@ -168,7 +168,7 @@ module.exports = NodeHelper.create({
         eth: null
       };
       
-      let ip = client?.l3connectivities.find((cnx) => cnx.af === "ipv4" && cnx.active);
+      let ip = client?.l3connectivities?.find((cnx) => cnx.af === "ipv4" && cnx.active);
       device.ip = ip ? ip.addr : null;
       if (client.access_point?.connectivity_type === "wifi") {
         if (client.access_point?.wifi_information.band === "2d4g") device.band = "2d4g";
@@ -378,12 +378,13 @@ module.exports = NodeHelper.create({
 
   /** Signal wifi en % **/
   wifiPercent (dB) {
-    if(dB <= -100)
+    var quality = 2 * (dB + 100);
+
+    if (dB <= -80)
       quality = 0;
-    else if(dB >= -50)
+    else if (dB >= -50)
       quality = 100;
-    else
-      quality = 2 * (dB + 100);
+
     return quality;
   },
 
@@ -407,6 +408,7 @@ module.exports = NodeHelper.create({
         case "v7":
           version = "Delta";
           break;
+        case "Server":
         case "v6":
           version = "Révolution";
           break;
