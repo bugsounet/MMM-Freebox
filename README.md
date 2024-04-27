@@ -107,6 +107,7 @@ Ceci est la configuration par defaut si vous definissez aucune valeurs
     showClient: true,
     showClientRate: true,
     showEthClientRate: false,
+    showClientRateDownOnly: false,
     showClientIP: false,
     showClientCnxType: true,
     showWifiStandard: true,
