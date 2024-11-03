@@ -212,9 +212,8 @@ module.exports = NodeHelper.create({
         });
       }
 
-      // consider virtual machine is connected without access point and with only 1 names length !
-      // -> with only 1 names length -> prevent fake VM detect on disconnect (don't find other solution...)
-      if (!client.access_point && client.active && client.names?.length === 1) device.access_type = "VM";
+      // consider virtual machine is connected without vendor_name and with only 1 names length !
+      if (client.active && client.names?.length === 1 && client.vendor_name === "") device.access_type = "VM";
       res.Clients.push(device);
     });
 
