@@ -1,7 +1,7 @@
 {
   "name": "MMM-Freebox",
-  "version": "2.3.1",
-  "rev": "241103",
+  "version": "2.3.2",
+  "rev": "241120",
   "description": "Display Freebox informations",
   "main": "MMM-Freebox.js",
   "keywords": [
@@ -40,8 +40,8 @@
     "ping": "^0.4.4"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^2.10.1",
-    "eslint": "^9.14.0",
+    "@stylistic/eslint-plugin": "^2.11.0",
+    "eslint": "^9.15.0",
     "eslint-plugin-import": "^2.31.0"
   }
 }

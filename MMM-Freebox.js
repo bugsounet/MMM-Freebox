@@ -1,4 +1,4 @@
-FB = (...arg) => { /* do nothing */ };
+var FB = () => { /* do nothing */ };
 
 Module.register("MMM-Freebox", {
   requiresVersion: "2.26.0",
@@ -6,7 +6,7 @@ Module.register("MMM-Freebox", {
     freebox: {},
     debug: false,
     verbose: false,
-    updateDelay:  5 * 1000,
+    updateDelay: 5 * 1000,
     zoom: 110,
     activeOnly: false,
     showModel: true,
@@ -50,16 +50,17 @@ Module.register("MMM-Freebox", {
 
     if (this.config.debug) FB = (...arg) => { console.log("[Freebox]", ...arg); };
     if (this.config.excludeMac.length > 0) {
+
       /** normalise les adresses MAC en majuscule **/
-      this.config.excludeMac = this.config.excludeMac.map(function (x){ return x.toUpperCase(); });
+      this.config.excludeMac = this.config.excludeMac.map(function (x) { return x.toUpperCase(); });
     }
     if (this.config.textWidth < 200) this.config.textWidth = 200;
     if (typeof this.config.textWidth !== "number") this.config.textWidth = this.defaults.textWidth;
     console.log("[Freebox] Started...");
   },
 
-  notificationReceived (notification, payload) {
-    switch(notification) {
+  notificationReceived (notification) {
+    switch (notification) {
       case "DOM_OBJECTS_CREATED":
         this.sendSocketNotification("INIT", this.config);
         break;
@@ -125,6 +126,7 @@ Module.register("MMM-Freebox", {
   },
 
   displayDom () {
+
     /** On applique les mises a jour en live ! **/
 
     /** affichage du model de la freebox **/
@@ -139,7 +141,6 @@ Module.register("MMM-Freebox", {
     /** Bande Passante **/
     var bandWidth = document.getElementById("FREE_BAND");
     var bandWidthIcon = bandWidth.querySelector("#FREE_ICON");
-    var bandWidthType = document.getElementById("FREE_BAND_TYPE");
     var bandWidthDown = document.getElementById("FREE_BAND_DOWN");
     var bandWidthUp = document.getElementById("FREE_BAND_UP");
 
@@ -167,6 +168,7 @@ Module.register("MMM-Freebox", {
       var excludeMac = this.config.excludeMac;
 
       var clientSelect = document.getElementsByClassName(mac)[0];
+
       /** Nouveau Client connecté -> rebuild du cache **/
       if (!clientSelect || (this.Freebox.Clients.length !== Object.keys(this.Freebox.Cache).length)) {
         FB(`Appareil inconnu [${mac}] - Rechargement du cache.`);
@@ -188,40 +190,43 @@ Module.register("MMM-Freebox", {
       }
 
       if (this.config.showClientIP) {
+
         /** Affichage IP **/
         var clientIP = clientSelect.querySelector("#FREE_CLIENTIP");
         clientIP.textContent = client.ip ? client.ip : "";
       }
 
       if (this.config.showWifiStandard) {
+
         /** Display wireless Standard */
         var clientStandard = clientSelect.querySelector("#FREE_STANDARD");
-        if (client.standard === "a") clientStandard.className= `std_${client.standard}`;
-        if (client.standard === "ac") clientStandard.className= `std_${client.standard}`;
-        if (client.standard === "ax") clientStandard.className= `std_${client.standard}`;
-        if (client.standard === "b") clientStandard.className= `std_${client.standard}`;
-        if (client.standard === "be") clientStandard.className= `std_${client.standard}`;
-        if (client.standard === "g") clientStandard.className= `std_${client.standard}`;
-        if (client.standard === "n") clientStandard.className= `std_${client.standard}`;
+        if (client.standard === "a") clientStandard.className = `std_${client.standard}`;
+        if (client.standard === "ac") clientStandard.className = `std_${client.standard}`;
+        if (client.standard === "ax") clientStandard.className = `std_${client.standard}`;
+        if (client.standard === "b") clientStandard.className = `std_${client.standard}`;
+        if (client.standard === "be") clientStandard.className = `std_${client.standard}`;
+        if (client.standard === "g") clientStandard.className = `std_${client.standard}`;
+        if (client.standard === "n") clientStandard.className = `std_${client.standard}`;
       }
 
       /** Wifi ou Eth ? **/
       var clientAccess = clientSelect.querySelector("#FREE_ACCESS");
       if (this.config.showClientCnxType) {
         clientAccess.classList.remove("hidden");
-        if (client.access_type === "ethernet") clientAccess.className= `ethernet${client.eth}`;
-        else if (client.band === "2d4g") clientAccess.className =`signal2d4g_${client.signal_bar ? client.signal_bar : 0}`;
-        else if (client.band === "5g") clientAccess.className =`signal5g_${client.signal_bar ? client.signal_bar : 0}`;
-        else if (client.band === "6g") clientAccess.className =`signal6g_${client.signal_bar ? client.signal_bar : 0}`;
-        else if (client.band === "60g") clientAccess.className =`signal60g_${client.signal_bar ? client.signal_bar : 0}`;
+        if (client.access_type === "ethernet") clientAccess.className = `ethernet${client.eth}`;
+        else if (client.band === "2d4g") clientAccess.className = `signal2d4g_${client.signal_bar ? client.signal_bar : 0}`;
+        else if (client.band === "5g") clientAccess.className = `signal5g_${client.signal_bar ? client.signal_bar : 0}`;
+        else if (client.band === "6g") clientAccess.className = `signal6g_${client.signal_bar ? client.signal_bar : 0}`;
+        else if (client.band === "60g") clientAccess.className = `signal60g_${client.signal_bar ? client.signal_bar : 0}`;
+
         /* can't really code it ... but can be handled with eth5/eth6
         else if (client.access_type === "freeplug") clientAccess.className= "freeplug"
         else if (client.access_type === "sfp") clientAccess.className= "sfp"
         */
-        else if (client.access_type === "VM") clientAccess.className= "VM";
+        else if (client.access_type === "VM") clientAccess.className = "VM";
         // sometimes... WM is connected from repater !? (bug from api) -> displayed with what class `?`
         else if (!client.access_type && client.active) {
-          clientAccess.className= "what";
+          clientAccess.className = "what";
           if (this.config.showWifiStandard) clientStandard.className = "";
         }
         else if (!client.active) clientAccess.className = "black";
@@ -262,7 +267,7 @@ Module.register("MMM-Freebox", {
       var clientBouton = clientSelect.querySelector(".switch");
       if (this.config.showButton) clientBouton.classList.remove("FBhidden");
       clientStatus.checked = client.active;
-      clientIcon.className= client.type + (client.active ? "1" : "0");
+      clientIcon.className = client.type + (client.active ? "1" : "0");
       if (this.config.showIcon) clientIcon.classList.remove("hidden");
       else clientIcon.classList.add("hidden");
 
@@ -314,6 +319,7 @@ Module.register("MMM-Freebox", {
     } else {
       wrapper.innerHTML = "";
       wrapper.style.zoom = `${this.config.zoom}%`;
+
       /** on prepare le DOM en cachant tout **/
 
       /** Affichage du model de la Freebox **/
@@ -324,10 +330,10 @@ Module.register("MMM-Freebox", {
       var modelIcon = document.createElement("div");
       modelIcon.className = "free"; /// <-- to see
       modelIcon.classList.add("hidden");
-      modelIcon.id= "FREE_ICON";
+      modelIcon.id = "FREE_ICON";
       model.appendChild(modelIcon);
 
-      var modelDisplay= document.createElement("div");
+      var modelDisplay = document.createElement("div");
       modelDisplay.id = "FREE_VALUE";
       model.appendChild(modelDisplay);
 
@@ -341,41 +347,41 @@ Module.register("MMM-Freebox", {
       var bandWidthIcon = document.createElement("div");
       bandWidthIcon.className = "internet";
       bandWidthIcon.classList.add("hidden");
-      bandWidthIcon.id= "FREE_ICON";
+      bandWidthIcon.id = "FREE_ICON";
       bandWidth.appendChild(bandWidthIcon);
 
-      var bandWidthType= document.createElement("div");
+      var bandWidthType = document.createElement("div");
       bandWidthType.id = "FREE_BAND_TYPE";
       bandWidth.appendChild(bandWidthType);
 
-      var bandWidthTypeValue= document.createElement("div");
+      var bandWidthTypeValue = document.createElement("div");
       bandWidthTypeValue.id = "FREE_VALUE";
       bandWidthType.appendChild(bandWidthTypeValue);
 
-      var bandWidthDown= document.createElement("div");
+      var bandWidthDown = document.createElement("div");
       bandWidthDown.id = "FREE_BAND_DOWN";
       bandWidth.appendChild(bandWidthDown);
 
-      var bandWidthDownIcon= document.createElement("div");
+      var bandWidthDownIcon = document.createElement("div");
       bandWidthDownIcon.className = "down";
       bandWidthDownIcon.id = "FREE_ICON";
       bandWidthDown.appendChild(bandWidthDownIcon);
 
-      var bandWidthDownRate= document.createElement("div");
+      var bandWidthDownRate = document.createElement("div");
       bandWidthDownRate.id = "FREE_VALUE";
       bandWidthDownRate.className = "nomargin";
       bandWidthDown.appendChild(bandWidthDownRate);
 
-      var bandWidthUp= document.createElement("div");
+      var bandWidthUp = document.createElement("div");
       bandWidthUp.id = "FREE_BAND_UP";
       bandWidth.appendChild(bandWidthUp);
 
-      var bandWidthUpIcon= document.createElement("div");
+      var bandWidthUpIcon = document.createElement("div");
       bandWidthUpIcon.className = "up";
       bandWidthUpIcon.id = "FREE_ICON";
       bandWidthUp.appendChild(bandWidthUpIcon);
 
-      var bandWidthUpRate= document.createElement("div");
+      var bandWidthUpRate = document.createElement("div");
       bandWidthUpRate.id = "FREE_VALUE";
       bandWidthUpRate.className = "nomargin";
       bandWidthUp.appendChild(bandWidthUpRate);
@@ -387,7 +393,7 @@ Module.register("MMM-Freebox", {
       IP.id = "FREE_IP";
       IP.classList.add("hidden");
       var IPIcon = document.createElement("div");
-      IPIcon.id= "FREE_ICON";
+      IPIcon.id = "FREE_ICON";
       IPIcon.className = "ip";
       IPIcon.classList.add("hidden");
       IP.appendChild(IPIcon);
@@ -395,7 +401,7 @@ Module.register("MMM-Freebox", {
       IPText.id = "FREE_TEXT";
       IPText.textContent = "Adresse IP:";
       IP.appendChild(IPText);
-      var IPDisplay= document.createElement("div");
+      var IPDisplay = document.createElement("div");
       IPDisplay.id = "FREE_VALUE";
 
       IP.appendChild(IPDisplay);
@@ -408,73 +414,73 @@ Module.register("MMM-Freebox", {
           var type = value.type;
           var setName = value.name;
 
-          var client = document.createElement("div");
-          client.id= "FREE_CLIENT";
-          client.className= id;
-          client.classList.add("hidden");
+          var clientData = document.createElement("div");
+          clientData.id = "FREE_CLIENT";
+          clientData.className = id;
+          clientData.classList.add("hidden");
 
           var clientIcon = document.createElement("div");
-          clientIcon.id= "FREE_ICON";
-          clientIcon.className= `${type}0`;
+          clientIcon.id = "FREE_ICON";
+          clientIcon.className = `${type}0`;
           clientIcon.classList.add("hidden");
-          client.appendChild(clientIcon);
+          clientData.appendChild(clientIcon);
 
           var clientName = document.createElement("div");
           clientName.id = "FREE_NAME";
-          clientName.style.width= this.config.showClientIP ? `${this.config.textWidth-80}px` : `${this.config.textWidth}px`;
+          clientName.style.width = this.config.showClientIP ? `${this.config.textWidth - 80}px` : `${this.config.textWidth}px`;
           clientName.textContent = setName;
-          client.appendChild(clientName);
+          clientData.appendChild(clientName);
 
           if (this.config.showClientIP) {
             var clientIP = document.createElement("div");
-            clientIP.id= "FREE_CLIENTIP";
-            client.appendChild(clientIP);
+            clientIP.id = "FREE_CLIENTIP";
+            clientData.appendChild(clientIP);
           }
 
           if (this.config.showWifiStandard) {
-            var clientCnxStandard= document.createElement("div");
+            var clientCnxStandard = document.createElement("div");
             clientCnxStandard.id = "FREE_STANDARD";
-            clientCnxStandard.className= "black";
-            client.appendChild(clientCnxStandard);
+            clientCnxStandard.className = "black";
+            clientData.appendChild(clientCnxStandard);
           }
 
-          var clientCnxType= document.createElement("div");
+          var clientCnxType = document.createElement("div");
           clientCnxType.id = "FREE_ACCESS";
-          clientCnxType.className= "black";
+          clientCnxType.className = "black";
           clientCnxType.classList.add("hidden");
-          client.appendChild(clientCnxType);
+          clientData.appendChild(clientCnxType);
 
           var clientDebit = document.createElement("div");
-          clientDebit.id ="FREE_RATE";
+          clientDebit.id = "FREE_RATE";
           clientDebit.classList.add("hidden");
-          client.appendChild(clientDebit);
+          clientData.appendChild(clientDebit);
 
-          var clientDebitDown= document.createElement("div");
+          var clientDebitDown = document.createElement("div");
           clientDebitDown.id = "FREE_RATE_DOWN";
           if (this.config.showClientRateDownOnly) clientDebitDown.className = "noicon";
-          clientDebit.appendChild( clientDebitDown);
+          clientDebit.appendChild(clientDebitDown);
 
-          var clientDebitDownIcon= document.createElement("div");
+          var clientDebitDownIcon = document.createElement("div");
           clientDebitDownIcon.className = "down hidden";
           clientDebitDownIcon.id = "FREE_ICON";
           clientDebitDown.appendChild(clientDebitDownIcon);
 
-          var clientDebitDownRate= document.createElement("div");
+          var clientDebitDownRate = document.createElement("div");
           clientDebitDownRate.id = "FREE_VALUE";
           clientDebitDownRate.className = "nomargin";
           clientDebitDown.appendChild(clientDebitDownRate);
 
-          var clientDebitUp= document.createElement("div");
+          var clientDebitUp = document.createElement("div");
           clientDebitUp.id = "FREE_RATE_UP";
           clientDebitUp.className = "up hidden";
-          clientDebit.appendChild( clientDebitUp);
+          clientDebit.appendChild(clientDebitUp);
 
-          var clientDebitUpIcon= document.createElement("div");
+          var clientDebitUpIcon = document.createElement("div");
           clientDebitUpIcon.className = "up hidden";
           clientDebitUpIcon.id = "FREE_ICON";
           clientDebitUp.appendChild(clientDebitUpIcon);
 
-          var clientDebitUpRate= document.createElement("div");
+          var clientDebitUpRate = document.createElement("div");
           clientDebitUpRate.id = "FREE_VALUE";
           clientDebitUpRate.className = "nomargin hidden";
           clientDebitUpRate.textContent = "-";
@@ -497,9 +503,9 @@ Module.register("MMM-Freebox", {
           clientStatus.appendChild(clientButton);
           clientStatus.appendChild(clientLabel);
 
-          client.appendChild(clientStatus);
+          clientData.appendChild(clientStatus);
 
-          wrapper.appendChild(client);
+          wrapper.appendChild(clientData);
         }
       }
 
@@ -509,7 +515,7 @@ Module.register("MMM-Freebox", {
       debit.classList.add("hidden");
 
       var debitIcon = document.createElement("div");
-      debitIcon.id= "FREE_ICON";
+      debitIcon.id = "FREE_ICON";
       debitIcon.className = "rate";
       debitIcon.classList.add("hidden");
       debit.appendChild(debitIcon);
@@ -519,30 +525,30 @@ Module.register("MMM-Freebox", {
       debitText.textContent = "Débit total utilisé:";
       debit.appendChild(debitText);
 
-      var debitDown= document.createElement("div");
+      var debitDown = document.createElement("div");
       debitDown.id = "FREE_DEBIT_DOWN";
       debit.appendChild(debitDown);
 
-      var debitDownIcon= document.createElement("div");
+      var debitDownIcon = document.createElement("div");
       debitDownIcon.className = "down";
       debitDownIcon.id = "FREE_ICON";
       debitDown.appendChild(debitDownIcon);
 
-      var debitDownRate= document.createElement("div");
+      var debitDownRate = document.createElement("div");
       debitDownRate.id = "FREE_VALUE";
       debitDownRate.className = "nomargin";
       debitDown.appendChild(debitDownRate);
 
-      var debitUp= document.createElement("div");
+      var debitUp = document.createElement("div");
       debitUp.id = "FREE_DEBIT_UP";
       debit.appendChild(debitUp);
 
-      var debitUpIcon= document.createElement("div");
+      var debitUpIcon = document.createElement("div");
       debitUpIcon.className = "up";
       debitUpIcon.id = "FREE_ICON";
       debitUp.appendChild(debitUpIcon);
 
-      var debitUpRate= document.createElement("div");
+      var debitUpRate = document.createElement("div");
       debitUpRate.id = "FREE_VALUE";
       debitUpRate.className = "nomargin";
       debitUp.appendChild(debitUpRate);
@@ -554,7 +560,7 @@ Module.register("MMM-Freebox", {
       ping.id = "FREE_PING";
       ping.classList.add("hidden");
       var pingIcon = document.createElement("div");
-      pingIcon.id= "FREE_ICON";
+      pingIcon.id = "FREE_ICON";
       pingIcon.className = "ping";
       pingIcon.classList.add("hidden");
       ping.appendChild(pingIcon);
@@ -562,7 +568,7 @@ Module.register("MMM-Freebox", {
       pingText.id = "FREE_TEXT";
       pingText.textContent = "Ping:";
       ping.appendChild(pingText);
-      var pingDisplay= document.createElement("div");
+      var pingDisplay = document.createElement("div");
       pingDisplay.id = "FREE_VALUE";
 
       ping.appendChild(pingDisplay);
@@ -574,9 +580,7 @@ Module.register("MMM-Freebox", {
   /*****************************************/
 
   getScripts () {
-    return [
-      "moment.js"
-    ];
+    return ["moment.js"];
   },
 
   getStyles () {
