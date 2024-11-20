@@ -79,16 +79,14 @@ module.exports = NodeHelper.create({
   makeCache (res) {
     this.cache = {};
     if (this.config.debug) this.sendSocketNotification("debug", res);
-    if (Object.keys(res.Client).length > 0) {
-      console.log(res.Client);
-      for (let [item, client] of Object.entries(res.Client)) {
-        this.cache[client.l2ident.id] = {
-          name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
-          type: client.host_type,
-          show: (!this.config.showFree && client.vendor_name.toLowerCase() === "freebox sas") ? false : this.config.showClient
-        };
-      }
-    }
+
+    res.Client.forEach((client) => {
+      this.cache[client.l2ident.id] = {
+        name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
+        type: client.host_type,
+        show: (!this.config.showFree && client.vendor_name.toLowerCase() === "freebox sas") ? false : this.config.showClient
+      };
+    });
 
     this.cache = this.sortBy(this.cache, this.config.sortBy);
 
@@ -118,24 +116,19 @@ module.exports = NodeHelper.create({
         return at > bt ? 1 : (at < bt ? -1 : 0);
       });
 
-      for (var i = 0, l = arr.length; i < l; i++) {
-        var obj = arr[i];
-        delete obj.Sort;
-        for (var mac in obj) {
-          if (obj.hasOwnProperty(mac)) {
-            var id = mac;
-          }
+      arr.forEach((dataFreebox) => {
+        delete dataFreebox.Sort;
+        for (var macClient in dataFreebox) {
+          result[macClient] = dataFreebox[macClient];
         }
-
-        result[mac] = obj[id];
-      }
+      });
     } else if (sort === "mac") {
 
       /** sort by MAC **/
       FB("Sort cache by", sort);
-      var mac = Object.keys(data);
-      mac.sort();
-      mac.forEach((macSort) => {
+      var macAddr = Object.keys(data);
+      macAddr.sort();
+      macAddr.forEach((macSort) => {
         result[macSort] = data[macSort];
       });
     } else {
@@ -149,7 +142,6 @@ module.exports = NodeHelper.create({
 
   makeResult (res) {
     res.Clients = [];
-
     var device = {};
 
     res.Client.forEach((client) => {
@@ -252,7 +244,6 @@ module.exports = NodeHelper.create({
   /** Freebox OS API CALL **/
   async Freebox_OS (config, clientRate) {
     FB("Start Query Freebox Server:");
-    var rate;
     var output;
 
     const freebox = new Freebox(config);
@@ -329,12 +320,12 @@ module.exports = NodeHelper.create({
     });
     FB("Done!");
 
-    bandwidthUp = this.convert(cnx.data.result.bandwidth_up, 1, 2);
-    bandwidthDown = this.convert(cnx.data.result.bandwidth_down, 1, 2);
-    debitDown = this.convert(cnx.data.result.rate_down, 0, 2);
-    debitUp = this.convert(cnx.data.result.rate_up, 0, 2);
-    type = (cnx.data.result.media === "xdsl") ? "xDSL" : ((cnx.data.result.media === "ftth") ? "FTTH" : "Inconnu");
-    degroup = (cnx.data.result.type === "rfc2684") ? true : false;
+    let bandwidthUp = this.convert(cnx.data.result.bandwidth_up, 1, 2);
+    let bandwidthDown = this.convert(cnx.data.result.bandwidth_down, 1, 2);
+    let debitDown = this.convert(cnx.data.result.rate_down, 0, 2);
+    let debitUp = this.convert(cnx.data.result.rate_up, 0, 2);
+    let type = (cnx.data.result.media === "xdsl") ? "xDSL" : ((cnx.data.result.media === "ftth") ? "FTTH" : "Inconnu");
+    let degroup = (cnx.data.result.type === "rfc2684") ? true : false;
 
     output = {
       Model: this.FreeboxVersion,
@@ -422,7 +413,7 @@ module.exports = NodeHelper.create({
       }
       let FreeboxName = `Freebox ${version} ${rev}`;
       return FreeboxName;
-    } catch (e) {
+    } catch {
       console.warn("[Freebox] Error Freebox model formating!");
       console.warn("[Freebox] Please contact developer with this freebox model:", model);
       return model;
