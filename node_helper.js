@@ -1,8 +1,8 @@
 var NodeHelper = require("node_helper");
 var ping = require("ping");
-const { Freebox } = require("./components/freebox.js");
+const { Freebox } = require("./components/freebox");
 
-FB = (...args) => { /* do nothing */ };
+var FB = () => { /* do nothing */ };
 
 module.exports = NodeHelper.create({
   start () {
@@ -17,7 +17,7 @@ module.exports = NodeHelper.create({
   },
 
   async Freebox (config) {
-    this.Freebox_OS(config,this.config.showClientRate || this.config.showClientCnxType).then(
+    this.Freebox_OS(config, this.config.showClientRate || this.config.showClientCnxType).then(
       (res) => {
         if (Object.keys(this.cache).length === 0) this.makeCache(res);
         else {
@@ -42,7 +42,7 @@ module.exports = NodeHelper.create({
     clearInterval(this.update);
     this.counterUpdate = this.config.updateDelay;
 
-    this.update = setInterval( ()=> {
+    this.update = setInterval(() => {
       this.counterUpdate -= 1000;
       if (this.counterUpdate <= 0) {
         clearInterval(this.update);
@@ -52,7 +52,7 @@ module.exports = NodeHelper.create({
   },
 
   socketNotificationReceived (notification, payload) {
-    switch(notification) {
+    switch (notification) {
       case "INIT":
         this.config = payload;
         if (this.config.debug) FB = (...args) => { console.log("[Freebox]", ...args); };
@@ -71,7 +71,7 @@ module.exports = NodeHelper.create({
     }
   },
 
-  sendInfo (noti, payload) {
+  sendInfo (noti, payload) {
     if (this.config.verbose) FB(`Send notification: ${noti}`, payload);
     this.sendSocketNotification(noti, payload);
   },
@@ -79,15 +79,14 @@ module.exports = NodeHelper.create({
   makeCache (res) {
     this.cache = {};
     if (this.config.debug) this.sendSocketNotification("debug", res);
-    if (Object.keys(res.Client).length > 0) {
-      for (let [item, client] of Object.entries(res.Client)) {
-        this.cache[client.l2ident.id] = {
-          name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
-          type: client.host_type,
-          show: (!this.config.showFree && client.vendor_name.toLowerCase() === "freebox sas") ? false : this.config.showClient
-        };
-      }
-    }
+
+    res.Client.forEach((client) => {
+      this.cache[client.l2ident.id] = {
+        name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
+        type: client.host_type,
+        show: (!this.config.showFree && client.vendor_name.toLowerCase() === "freebox sas") ? false : this.config.showClient
+      };
+    });
 
     this.cache = this.sortBy(this.cache, this.config.sortBy);
 
@@ -97,9 +96,10 @@ module.exports = NodeHelper.create({
 
   sortBy (data, sort) {
     var result = {};
+
     /** sort by type or by name **/
     if (sort === "type" || sort === "name") {
-      FB("Sort cache by" , sort);
+      FB("Sort cache by", sort);
       var arr = [];
       for (var mac in data) {
         if (data.hasOwnProperty(mac)) {
@@ -110,32 +110,29 @@ module.exports = NodeHelper.create({
         }
       }
 
-      arr.sort((a, b)=> {
+      arr.sort((a, b) => {
         var at = a.Sort;
         var bt = b.Sort;
-        return at > bt ? 1 : ( at < bt ? -1 : 0 );
+        return at > bt ? 1 : (at < bt ? -1 : 0);
       });
 
-      for (var i=0, l=arr.length; i<l; i++) {
-        var obj = arr[i];
-        delete obj.Sort;
-        for (var mac in obj) {
-          if (obj.hasOwnProperty(mac)) {
-            var id = mac;
-          }
+      arr.forEach((dataFreebox) => {
+        delete dataFreebox.Sort;
+        for (var macClient in dataFreebox) {
+          result[macClient] = dataFreebox[macClient];
         }
-
-        result[mac] = obj[id];
-      }
+      });
     } else if (sort === "mac") {
+
       /** sort by MAC **/
       FB("Sort cache by", sort);
-      var mac = Object.keys(data);
-      mac.sort();
-      mac.forEach((macSort)=> {
+      var macAddr = Object.keys(data);
+      macAddr.sort();
+      macAddr.forEach((macSort) => {
         result[macSort] = data[macSort];
       });
     } else {
+
       /** other return the same **/
       FB("Cache not sorted");
       result = data;
@@ -145,11 +142,11 @@ module.exports = NodeHelper.create({
 
   makeResult (res) {
     res.Clients = [];
-
     var device = {};
-    
-    res.Client.forEach((client)=> {
-    /** Array of client with used value in object **/
+
+    res.Client.forEach((client) => {
+
+      /** Array of client with used value in object **/
       device = {
         mac: client.l2ident.id,
         name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
@@ -157,7 +154,7 @@ module.exports = NodeHelper.create({
         type: client.host_type,
         vendor: client.vendor_name,
         debitDown: null,
-        debitUp:null,
+        debitUp: null,
         active: client.active,
         repeater: false,
         access_type: null,
@@ -167,7 +164,7 @@ module.exports = NodeHelper.create({
         standard: null,
         eth: null
       };
-      
+
       let ip = client?.l3connectivities?.find((cnx) => cnx.af === "ipv4" && cnx.active);
       device.ip = ip ? ip.addr : null;
       if (client.access_point?.connectivity_type === "wifi") {
@@ -180,30 +177,31 @@ module.exports = NodeHelper.create({
           device.signal_percent = this.wifiPercent(device.signal);
           device.signal_bar = this.wifiBar(device.signal_percent);
         }
-        if (client.access_point?.tx_rate) device.debitDown = this.convert(client.access_point.tx_rate*8,0,1); // Warn debit en bytes! (base 8)
+        if (client.access_point?.tx_rate) device.debitDown = this.convert(client.access_point.tx_rate * 8, 0, 1); // Warn debit en bytes! (base 8)
         else device.debitDown = "0 Ko/s";
-        if (client.access_point?.rx_rate) device.debitUp = this.convert(client.access_point.rx_rate*8,0,1); // Warn debit en bytes! (base 8)
+        if (client.access_point?.rx_rate) device.debitUp = this.convert(client.access_point.rx_rate * 8, 0, 1); // Warn debit en bytes! (base 8)
         else device.debitUp = "0 Ko/s";
         if (client.access_point?.wifi_information?.standard) device.standard = client.access_point.wifi_information.standard;
       }
 
       if (this.config.showClientRate || this.config.showClientCnxType) {
-        res.EthCnx.forEach((info)=> {
+        res.EthCnx.forEach((info) => {
           if (info.mac_list) {
             if (!info.mac_list.length) return; // return an object ???
-            var macList = info.mac_list.map((mac_list)=>{return mac_list.mac;});
+            var macList = info.mac_list.map((mac_list) => { return mac_list.mac; });
             macList.forEach((mac) => {
               if (client.l2ident.id === mac) {
                 if (client.access_point?.connectivity_type === "wifi" && client.access_point?.type === "repeater") device.repeater = true;
                 else if (res[info.id] && res[info.id].tx_bytes_rate) {
                   if (this.config.showEthClientRate) {
-                    device.debitDown = this.convert(res[info.id].tx_bytes_rate,0,1);
-                    device.debitUp = this.convert(res[info.id].rx_bytes_rate,0,1);
+                    device.debitDown = this.convert(res[info.id].tx_bytes_rate, 0, 1);
+                    device.debitUp = this.convert(res[info.id].rx_bytes_rate, 0, 1);
                   }
                   device.access_type = "ethernet";
                   device.eth = info.id;
                 }
                 else {
+
                   /* try again next time */
                 }
               }
@@ -237,16 +235,15 @@ module.exports = NodeHelper.create({
         timeout: 2,
         extra: ["-4"]
       })
-      .then((res)=> {
+      .then((res) => {
         if (res.alive) this.pingValue = `${res.time} ms`;
         else this.pingValue = "Erreur !";
       });
   },
 
   /** Freebox OS API CALL **/
-  async Freebox_OS (config,clientRate) {
+  async Freebox_OS (config, clientRate) {
     FB("Start Query Freebox Server:");
-    var rate;
     var output;
 
     const freebox = new Freebox(config);
@@ -273,46 +270,46 @@ module.exports = NodeHelper.create({
     FB("Quering ALL Ethernet Cnx...");
     var ethCnx = await freebox.request({
       method: "GET",
-      url:"switch/status/"
+      url: "switch/status/"
     });
 
     if (clientRate) {
       FB("Quering Ethernet on port 1...");
       var eth1 = await freebox.request({
         method: "GET",
-        url:"switch/port/1/stats"
+        url: "switch/port/1/stats"
       });
 
       FB("Quering Ethernet on port 2...");
       var eth2 = await freebox.request({
         method: "GET",
-        url:"switch/port/2/stats"
+        url: "switch/port/2/stats"
       });
 
       FB("Quering Ethernet on port 3...");
       var eth3 = await freebox.request({
         method: "GET",
-        url:"switch/port/3/stats"
+        url: "switch/port/3/stats"
       });
 
       FB("Quering Ethernet on port 4...");
       var eth4 = await freebox.request({
         method: "GET",
-        url:"switch/port/4/stats"
+        url: "switch/port/4/stats"
       });
 
       if (this.config.checkFreePlug) {
         FB("Quering Freeplug...");
         var eth5 = await freebox.request({
           method: "GET",
-          url:"switch/port/5/stats"
+          url: "switch/port/5/stats"
         });
       }
       if (this.config.checkSFP) {
         FB("Quering SFP...");
         var eth6 = await freebox.request({
           method: "GET",
-          url:"switch/port/9999/stats"
+          url: "switch/port/9999/stats"
         });
       }
     }
@@ -323,19 +320,19 @@ module.exports = NodeHelper.create({
     });
     FB("Done!");
 
-    bandwidthUp = this.convert(cnx.data.result.bandwidth_up,1,2);
-    bandwidthDown = this.convert(cnx.data.result.bandwidth_down,1,2);
-    debitDown = this.convert(cnx.data.result.rate_down,0,2);
-    debitUp = this.convert(cnx.data.result.rate_up,0,2);
-    type = (cnx.data.result.media === "xdsl") ? "xDSL" : ((cnx.data.result.media === "ftth") ? "FTTH" : "Inconnu");
-    degroup = (cnx.data.result.type === "rfc2684") ? true : false;
+    let bandwidthUp = this.convert(cnx.data.result.bandwidth_up, 1, 2);
+    let bandwidthDown = this.convert(cnx.data.result.bandwidth_down, 1, 2);
+    let debitDown = this.convert(cnx.data.result.rate_down, 0, 2);
+    let debitUp = this.convert(cnx.data.result.rate_up, 0, 2);
+    let type = (cnx.data.result.media === "xdsl") ? "xDSL" : ((cnx.data.result.media === "ftth") ? "FTTH" : "Inconnu");
+    let degroup = (cnx.data.result.type === "rfc2684") ? true : false;
 
     output = {
       Model: this.FreeboxVersion,
       Type: type,
       Degroup: degroup,
       BandwidthDown: bandwidthDown,
-      BandwidthUp: bandwidthUp,      
+      BandwidthUp: bandwidthUp,
       DebitDown: debitDown,
       DebitUp: debitUp,
       IP: cnx.data.result.ipv4,
@@ -352,24 +349,24 @@ module.exports = NodeHelper.create({
     await freebox.logout();
     return output;
   },
-  
-  convert (data,type=0,FixTo=0) {
+
+  convert (data, type = 0, FixTo = 0) {
     // type 0: octet / type:1 bytes
     var value = Number(data);
 
-    if (value>1000000000) {
-      value=Number((value/1000000000).toFixed(FixTo));
+    if (value > 1000000000) {
+      value = Number((value / 1000000000).toFixed(FixTo));
       if (type === 0) value = `${value} Go/s`;
       if (type === 1) value = `${value} Gb/s`;
       return value;
     }
-    if (value>1000000) {
-      value=Number((value/1000000).toFixed(FixTo));
+    if (value > 1000000) {
+      value = Number((value / 1000000).toFixed(FixTo));
       if (type === 0) value = `${value} Mo/s`;
       if (type === 1) value = `${value} Mb/s`;
       return value;
     }
-    value=Number((value/1000).toFixed(FixTo));
+    value = Number((value / 1000).toFixed(FixTo));
     if (type === 0) value = `${value} Ko/s`;
     if (type === 1) value = `${value} Kb/s`;
     return value;
@@ -379,17 +376,15 @@ module.exports = NodeHelper.create({
   wifiPercent (dB) {
     var quality = 2 * (dB + 100);
 
-    if (dB <= -80)
-      quality = 0;
-    else if (dB >= -50)
-      quality = 100;
+    if (dB <= -80) quality = 0;
+    else if (dB >= -50) quality = 100;
 
     return quality;
   },
 
   /** nbre de barre wifi selon % quality) **/
   wifiBar (percent) {
-    return parseInt(((percent*5)/100).toFixed(0));
+    return parseInt(((percent * 5) / 100).toFixed(0));
   },
 
   ModelSearh (model) {
@@ -418,7 +413,7 @@ module.exports = NodeHelper.create({
       }
       let FreeboxName = `Freebox ${version} ${rev}`;
       return FreeboxName;
-    } catch (e) {
+    } catch {
       console.warn("[Freebox] Error Freebox model formating!");
       console.warn("[Freebox] Please contact developer with this freebox model:", model);
       return model;

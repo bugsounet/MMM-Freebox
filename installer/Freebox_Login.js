@@ -1,9 +1,9 @@
-const { FreeboxRegister } = require("../components/freebox.js");
+const { FreeboxRegister } = require("../components/freebox");
 
 var count = 1;
 
 async function main () {
-  const register = await new FreeboxRegister(
+  await new FreeboxRegister(
     {
       app_id: "fbx.MMM-Freebox",
       app_name: "MMM-Freebox",
@@ -22,4 +22,4 @@ function retry () {
   });
 }
 
-main().catch((err) => retry() );
+main().catch(() => retry());

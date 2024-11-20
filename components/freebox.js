@@ -5,7 +5,7 @@
  * 26/03/24
  *
  * ~ Changes ~
- * Delete import and use require 
+ * Delete import and use require
  * Don't use export Class and create js class (class FreeboxRegister and class Freebox)
  * Export module
  * Added support for API versions above 10
