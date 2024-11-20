@@ -1,8 +1,8 @@
 var NodeHelper = require("node_helper");
 var ping = require("ping");
-const { Freebox } = require("./components/freebox.js");
+const { Freebox } = require("./components/freebox");
 
-FB = (...args) => { /* do nothing */ };
+var FB = () => { /* do nothing */ };
 
 module.exports = NodeHelper.create({
   start () {
@@ -17,7 +17,7 @@ module.exports = NodeHelper.create({
   },
 
   async Freebox (config) {
-    this.Freebox_OS(config,this.config.showClientRate || this.config.showClientCnxType).then(
+    this.Freebox_OS(config, this.config.showClientRate || this.config.showClientCnxType).then(
       (res) => {
         if (Object.keys(this.cache).length === 0) this.makeCache(res);
         else {
@@ -42,7 +42,7 @@ module.exports = NodeHelper.create({
     clearInterval(this.update);
     this.counterUpdate = this.config.updateDelay;
 
-    this.update = setInterval( ()=> {
+    this.update = setInterval(() => {
       this.counterUpdate -= 1000;
       if (this.counterUpdate <= 0) {
         clearInterval(this.update);
@@ -52,7 +52,7 @@ module.exports = NodeHelper.create({
   },
 
   socketNotificationReceived (notification, payload) {
-    switch(notification) {
+    switch (notification) {
       case "INIT":
         this.config = payload;
         if (this.config.debug) FB = (...args) => { console.log("[Freebox]", ...args); };
@@ -71,7 +71,7 @@ module.exports = NodeHelper.create({
     }
   },
 
-  sendInfo (noti, payload) {
+  sendInfo (noti, payload) {
     if (this.config.verbose) FB(`Send notification: ${noti}`, payload);
     this.sendSocketNotification(noti, payload);
   },
@@ -80,6 +80,7 @@ module.exports = NodeHelper.create({
     this.cache = {};
     if (this.config.debug) this.sendSocketNotification("debug", res);
     if (Object.keys(res.Client).length > 0) {
+      console.log(res.Client)
       for (let [item, client] of Object.entries(res.Client)) {
         this.cache[client.l2ident.id] = {
           name: client.primary_name ? client.primary_name : "(Appareil sans nom)",
