@@ -1,7 +1,7 @@
 {
   "name": "MMM-Freebox",
-  "version": "2.3.1",
-  "rev": "241103",
+  "version": "2.3.2",
+  "rev": "241120",
   "description": "Display Freebox informations",
   "main": "MMM-Freebox.js",
   "keywords": [
