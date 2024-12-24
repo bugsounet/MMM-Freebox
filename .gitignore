@@ -1,1 +1,4 @@
 /node_modules/
+/MMM-*.js
+/components/*.js
+/node_helper.js
