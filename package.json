@@ -1,6 +1,6 @@
 {
   "name": "MMM-Freebox",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "description": "Display Freebox informations",
   "keywords": [
     "freebox",
@@ -46,5 +46,5 @@
   "engines": {
     "node": ">=20.9.0 <21 || >=22"
   },
-  "rev": "241224"
+  "rev": "250103"
 }
